@@ -65,7 +65,6 @@ async function loadParties() {
         const listContainer = document.getElementById('parties-list');
         listContainer.innerHTML = '';
 
-        // УМНЫЙ ВОЗРАСТНОЙ КОРИДОР
         // Подросткам (<18) показываем только подростков, взрослым (18+) — только взрослых
         const filteredParties = parties.filter(party => {
             const isOrganisatorAdult = party.creatorAge >= 18;
@@ -125,11 +124,7 @@ document.getElementById('create-party-form').addEventListener('submit', async (e
         needBoys: parseInt(document.getElementById('need-boys').innerText),
         needGirls: parseInt(document.getElementById('need-girls').innerText),
         creatorAge: userAge,
-        creator: {
-            id: user.id,
-            username: user.username || "grodno_anon",
-            first_name: user.first_name
-        }
+        creator: { id: user.id, username: user.username || "grodno_anon", first_name: user.first_name }
     };
 
     try {
@@ -172,7 +167,7 @@ async function loadReports() {
         reportsContainer.innerHTML = '';
 
         if (!reports || reports.length === 0) {
-            reportsContainer.innerHTML = '<div class="text-center text-gray-500 py-12 text-sm">Жалоб нет. На районе всё спокойно!</div>';
+            reportsContainer.innerHTML = '<div class="text-center text-slate-500 py-12 text-sm">Жалоб нет. На районе всё спокойно!</div>';
             return;
         }
 
