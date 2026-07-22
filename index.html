@@ -3,133 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grodno Spot</title>
-    <!-- Подключаем Tailwind CSS для крутого дизайна -->
+    <title>Grodno Run</title>
+    <!-- Подключаем свежий Tailwind CSS -->
     <script src="https://jsdelivr.net"></script>
-    <!-- Официальный скрипт Telegram Web App -->
     <script src="https://telegram.org"></script>
     <style>
-        body { background-color: #111827; color: #f3f4f6; font-family: sans-serif; }
+        body { 
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); 
+            color: #f8fafc; 
+            font-family: system-ui, -apple-system, sans-serif; 
+        }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
     </style>
 </head>
-<body class="p-4 bg-gray-900 text-gray-100">
+<body class="p-4 min-h-screen">
 
-    <!-- ХЕДЕР ПРИЛОЖЕНИЯ -->
-    <header class="flex justify-between items-center mb-6 pb-3 border-b border-gray-800">
-        <h1 class="text-xl font-bold text-yellow-400">📍 Grodno Spot</h1>
-        <!-- Кнопка админа (по умолчанию скрыта, включится только для тебя) -->
-        <button id="admin-nav-btn" onclick="switchTab('admin-screen')" class="hidden bg-red-600 text-white text-xs px-3 py-1.5 rounded-lg font-bold shadow-md hover:bg-red-700">
-            🛡 ЖБ Панель
+    <!-- ХЕДЕР -->
+    <header class="flex justify-between items-center mb-6 pb-4 border-b border-slate-800">
+        <div class="flex flex-col">
+            <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">Локатор сборов</span>
+            <h1 class="text-2xl font-black text-white tracking-tight">GRODNO RUN</h1>
+        </div>
+        <button id="admin-nav-btn" onclick="switchTab('admin-screen')" class="hidden bg-rose-600 text-white text-xs px-4 py-2 rounded-xl font-black uppercase tracking-wider shadow-lg shadow-rose-900/40">
+            Модерация
         </button>
     </header>
 
-    <!-- 1. ЭКРАН: ЛЕНТА ГУЛЯНОК -->
+    <!-- 1. ЛЕНТА ГУЛЯНОК -->
     <div id="feed-screen" class="tab-content active">
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="text-lg font-semibold">Гулянки прямо сейчас</h2>
-            <button onclick="switchTab('create-screen')" class="bg-yellow-500 text-gray-900 px-4 py-2 rounded-xl font-bold text-sm shadow-lg active:scale-95 transition">
-                + Создать
-            </button>
+        <div class="space-y-4 mb-24">
+            <div id="parties-list" class="space-y-4">
+                <div class="text-center text-slate-500 py-12 text-sm font-medium">Поиск активных сборов в городе...</div>
+            </div>
         </div>
-        <!-- Сюда JS будет вставлять активные карточки -->
-        <div id="parties-list" class="space-y-4">
-            <div class="text-center text-gray-500 py-8">Загрузка гулянок в Гродно...</div>
+
+        <!-- ОГРОМНАЯ КНОПКА СОЗДАТЬ (Закреплена внизу экрана) -->
+        <div class="fixed bottom-6 left-4 right-4 z-50">
+            <button onclick="switchTab('create-screen')" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-4 rounded-2xl font-bold text-lg shadow-xl shadow-indigo-950/50 active:scale-95 transition-all border border-indigo-400/20">
+                Создать сбор
+            </button>
         </div>
     </div>
 
-    <!-- 2. ЭКРАН: СОЗДАНИЕ ГУЛЯНКИ -->
-    <div id="create-screen" class="tab-content">
-        <div class="flex items-center mb-4">
-            <button onclick="switchTab('feed-screen')" class="text-gray-400 mr-2 font-bold text-lg">←</button>
-            <h2 class="text-lg font-semibold">Собрать компанию</h2>
+    <!-- 2. СОЗДАНИЕ ГУЛЯНКИ -->
+    <div id="create-screen" class="tab-content mb-12">
+        <div class="flex items-center mb-6">
+            <button onclick="switchTab('feed-screen')" class="bg-slate-800 hover:bg-slate-700 w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xl mr-3 text-slate-400">←</button>
+            <h2 class="text-xl font-bold text-white">Параметры сбора</h2>
         </div>
         
-        <form id="create-party-form" class="space-y-4 bg-gray-800 p-4 rounded-2xl border border-gray-700">
-            <!-- Локация -->
+        <form id="create-party-form" class="space-y-5 bg-slate-900/60 backdrop-blur-xl p-5 rounded-2xl border border-slate-800">
+            <!-- Место встречи -->
             <div>
-                <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Где встречаемся?</label>
-                <select id="party-location" class="w-full bg-gray-700 border border-gray-600 rounded-xl p-2.5 text-white focus:outline-none focus:border-yellow-500">
-                    <option value="Советская (Центр)">Улица Советская (Центр)</option>
-                    <option value="Дворик на Советской 18">Дворик на Советской, 18</option>
-                    <option value="Парк Жилибера (Фонтан)">Парк Жилибера (Фонтан)</option>
-                    <option value="Коложский парк">Коложский парк</option>
-                    <option value="Пышки (Тропа здоровья)">Пышки (Тропа здоровья)</option>
-                    <option value="Поляна (Филармония)">Поляна (Филармония)</option>
-                    <option value="Крыша ТД Неман">Крыша ТД Неман</option>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Где собираемся</label>
+                <select id="party-location" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3.5 text-white text-base focus:outline-none focus:border-indigo-500">
+                    <option value="Центр (Советская)">Центр (Советская улица)</option>
+                    <option value="ТРК Тринити">ТРК Тринити</option>
+                    <option value="Грандичи">Грандичи</option>
+                    <option value="Ольшанка">Ольшанка</option>
+                    <option value="Девятовка">Девятовка</option>
+                    <option value="Вишневец">Вишневец</option>
+                    <option value="Пышки">Пышки (Парк)</option>
+                    <option value="БЛК / Форты">БЛК / Форты</option>
+                    <option value="Парк Жилибера">Парк Жилибера</option>
                 </select>
             </div>
 
             <!-- Формат -->
             <div>
-                <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Что делаем?</label>
-                <select id="party-tag" class="w-full bg-gray-700 border border-gray-600 rounded-xl p-2.5 text-white focus:outline-none focus:border-yellow-500">
-                    <option value="⚽️ Футбол / Баскет">⚽️ Футбол / Баскет</option>
-                    <option value="🛹 Скейт / Самокаты">🛹 Скейт / Самокаты</option>
-                    <option value="🎧 Просто чилл">🎧 Просто чилл / Прогулка</option>
-                    <option value="🎮 Компьютеры / Настолки">🎮 Компьютеры / Настолки</option>
-                    <option value="🍿 Кино / Еда">🍿 Кино / Еда</option>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Цель сбора</label>
+                <select id="party-tag" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3.5 text-white text-base focus:outline-none focus:border-indigo-500">
+                    <option value="Прогулка / Чилл">Прогулка / Чилл</option>
+                    <option value="Футбол / Спорт">Футбол / Спорт</option>
+                    <option value="Катка на самокатах / Вело">Катка на самокатах / Вело</option>
+                    <option value="Компьютерный клуб / Настолки">Компьютерный клуб / Настолки</option>
+                    <option value="Движ / Вечеринка">Движ / Вечеринка</option>
                 </select>
             </div>
 
-            <!-- Фильтр возраста -->
+            <!-- Возраст -->
             <div>
-                <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Возраст компании</label>
-                <div class="flex gap-2">
-                    <input type="number" id="age-min" placeholder="От" min="12" max="30" class="w-1/2 bg-gray-700 border border-gray-600 rounded-xl p-2 text-center" required>
-                    <input type="number" id="age-max" placeholder="До" min="12" max="30" class="w-1/2 bg-gray-700 border border-gray-600 rounded-xl p-2 text-center" required>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Возрастной диапазон</label>
+                <div class="flex gap-3">
+                    <input type="number" id="age-min" placeholder="От" min="12" max="35" class="w-1/2 bg-slate-800 border border-slate-700 rounded-xl p-3 text-center text-base" required>
+                    <input type="number" id="age-max" placeholder="До" min="12" max="35" class="w-1/2 bg-slate-800 border border-slate-700 rounded-xl p-3 text-center text-base" required>
                 </div>
             </div>
 
-            <!-- Кнопка "Я не один" -->
-            <div class="flex items-center justify-between bg-gray-700/50 p-2.5 rounded-xl border border-gray-700">
-                <span class="text-sm">Я гуляю не один (с другом)</span>
-                <input type="checkbox" id="with-friend" class="w-5 h-5 accent-yellow-500">
+            <!-- Друг -->
+            <div class="flex items-center justify-between bg-slate-800/40 p-3.5 rounded-xl border border-slate-800">
+                <span class="text-sm font-medium text-slate-300">Я иду не один (со мной друг)</span>
+                <input type="checkbox" id="with-friend" class="w-6 h-6 rounded-md accent-indigo-500 bg-slate-700 border-slate-600">
             </div>
 
-            <!-- Точный состав кого ищут -->
+            <!-- Состав -->
             <div>
-                <label class="block text-xs font-semibold text-gray-400 uppercase mb-2">Кого ищем в компанию?</label>
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="bg-gray-700 p-3 rounded-xl flex flex-col items-center">
-                        <span class="text-sm font-medium mb-1">🙋‍♂️ Парней</span>
-                        <div class="flex items-center gap-3">
-                            <button type="button" onclick="changeCount('need-boys', -1)" class="w-8 h-8 bg-gray-600 rounded-lg text-lg font-bold">-</button>
-                            <span id="need-boys" class="text-lg font-bold">0</span>
-                            <button type="button" onclick="changeCount('need-boys', 1)" class="w-8 h-8 bg-gray-600 rounded-lg text-lg font-bold">+</button>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Кто нужен в компанию</label>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-slate-800/80 p-4 rounded-xl flex flex-col items-center border border-slate-700/50">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Парни</span>
+                        <div class="flex items-center gap-4">
+                            <button type="button" onclick="changeCount('need-boys', -1)" class="w-10 h-10 bg-slate-700 hover:bg-slate-600 rounded-xl text-xl font-bold flex items-center justify-center">-</button>
+                            <span id="need-boys" class="text-xl font-black text-white w-4 text-center">0</span>
+                            <button type="button" onclick="changeCount('need-boys', 1)" class="w-10 h-10 bg-slate-700 hover:bg-slate-600 rounded-xl text-xl font-bold flex items-center justify-center">+</button>
                         </div>
                     </div>
-                    <div class="bg-gray-700 p-3 rounded-xl flex flex-col items-center">
-                        <span class="text-sm font-medium mb-1">🙋‍♀️ Девушек</span>
-                        <div class="flex items-center gap-3">
-                            <button type="button" onclick="changeCount('need-girls', -1)" class="w-8 h-8 bg-gray-600 rounded-lg text-lg font-bold">-</button>
-                            <span id="need-girls" class="text-lg font-bold">0</span>
-                            <button type="button" onclick="changeCount('need-girls', 1)" class="w-8 h-8 bg-gray-600 rounded-lg text-lg font-bold">+</button>
+                    <div class="bg-slate-800/80 p-4 rounded-xl flex flex-col items-center border border-slate-700/50">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Девушки</span>
+                        <div class="flex items-center gap-4">
+                            <button type="button" onclick="changeCount('need-girls', -1)" class="w-10 h-10 bg-slate-700 hover:bg-slate-600 rounded-xl text-xl font-bold flex items-center justify-center">-</button>
+                            <span id="need-girls" class="text-xl font-black text-white w-4 text-center">0</span>
+                            <button type="button" onclick="changeCount('need-girls', 1)" class="w-10 h-10 bg-slate-700 hover:bg-slate-600 rounded-xl text-xl font-bold flex items-center justify-center">+</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <button type="submit" class="w-full bg-yellow-500 text-gray-900 py-3 rounded-xl font-bold shadow-lg active:scale-98 transition">
-                Запустить радар гулянки
+            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-4 rounded-xl font-bold text-base shadow-lg transition-all mt-4">
+                Запустить радар сбора
             </button>
         </form>
     </div>
 
-    <!-- 3. СЕКРЕТНЫЙ ЭКРАН: АДМИН-ПАНЕЛЬ (ЖБ) -->
+    <!-- 3. АДМИНКА -->
     <div id="admin-screen" class="tab-content">
-        <div class="flex items-center mb-4">
-            <button onclick="switchTab('feed-screen')" class="text-gray-400 mr-2 font-bold text-lg">←</button>
-            <h2 class="text-lg font-semibold text-red-400">Модерация жалоб (Для @vqc_2)</h2>
+        <div class="flex items-center mb-6">
+            <button onclick="switchTab('feed-screen')" class="bg-slate-800 w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xl mr-3 text-slate-400">←</button>
+            <h2 class="text-xl font-bold text-rose-400">Панель модерации жалоб</h2>
         </div>
-        <!-- Список поданных ЖБ -->
         <div id="reports-list" class="space-y-4">
-            <div class="text-center text-gray-500 py-8">Жалоб пока нет. На районе всё спокойно!</div>
+            <div class="text-center text-slate-500 py-12 text-sm">Жалоб нет. На районе всё спокойно!</div>
         </div>
     </div>
 
-    <!-- Подключаем файл логики, который сделаем следующим -->
     <script src="app.js"></script>
 </body>
 </html>
