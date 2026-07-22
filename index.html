@@ -49,9 +49,8 @@
         </div>
     </div>
 
-    <!-- ГЛАВНЫЙ БЛОК ПРИЛОЖЕНИЯ (скрыт до авторизации) -->
+    <!-- ГЛАВНЫЙ БЛОК ПРИЛОЖЕНИЯ -->
     <div id="main-app" class="hidden">
-        <!-- ХЕДЕР -->
         <header class="flex justify-between items-center mb-6 pb-4 border-b border-gray-800">
             <div class="flex flex-col">
                 <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">Локатор сборов</span>
@@ -66,7 +65,7 @@
         <div id="feed-screen" class="tab-content">
             <div class="space-y-4 mb-24">
                 <div id="parties-list" class="space-y-4">
-                    <div class="text-center text-gray-500 py-12 text-sm font-medium">Поиск active сборов...</div>
+                    <div class="text-center text-gray-500 py-12 text-sm font-medium">Поиск активных сборов...</div>
                 </div>
             </div>
 
@@ -75,8 +74,7 @@
                     Создать сбор
                 </button>
             </div>
-        </div>
-                <!-- 2. СОЗДАНИЕ ГУЛЯНКИ -->
+                    <!-- 2. СОЗДАНИЕ ГУЛЯНКИ -->
         <div id="create-screen" class="tab-content mb-12">
             <div class="flex items-center mb-6">
                 <button onclick="switchTab('feed-screen')" class="bg-gray-800 w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xl mr-3 text-gray-400">←</button>
@@ -100,7 +98,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Цель сбора</label>
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Цель сбора</label>
                     <select id="party-tag" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3.5 text-white text-base focus:outline-none">
                         <option value="Прогулка / Чилл">Прогулка / Чилл</option>
                         <option value="Футбол / Спорт">Футбол / Спорт</option>
@@ -111,7 +109,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Возрастной диапазон</label>
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Возрастной диапазон</label>
                     <div class="flex gap-3">
                         <input type="number" id="age-min" placeholder="От" min="12" max="35" class="w-1/2 bg-gray-800 border border-gray-700 rounded-xl p-3 text-center text-base" required>
                         <input type="number" id="age-max" placeholder="До" min="12" max="35" class="w-1/2 bg-gray-800 border border-gray-700 rounded-xl p-3 text-center text-base" required>
@@ -154,7 +152,7 @@
         <!-- 3. АДМИНКА -->
         <div id="admin-screen" class="tab-content">
             <div class="flex items-center mb-6">
-                <button onclick="switchTab('feed-screen')" class="bg-slate-800 w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xl mr-3 text-gray-400">←</button>
+                <button onclick="switchTab('feed-screen')" class="bg-slate-800 w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xl mr-3 text-slate-400">←</button>
                 <h2 class="text-xl font-bold text-red-400">Панель модерации жалоб</h2>
             </div>
             <div id="reports-list" class="space-y-4">
@@ -166,3 +164,6 @@
     <script src="app.js"></script>
 </body>
 </html>
+
+        </div>
+        
