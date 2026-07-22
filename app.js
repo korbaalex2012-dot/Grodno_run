@@ -5,8 +5,8 @@ tg.expand(); // Расширяем приложение на весь экран
 // Твой ID для автоматического включения админки
 const ADMIN_ID = 6949963047;
 
-// URL твоего бэкенда (когда запустим сервер, заменим на реальный адрес)
-const BACKEND_URL = "https://railway.app"; 
+// Твоя реальная ссылка на сервер Render
+const BACKEND_URL = "https://onrender.com"; 
 
 // Данные текущего пользователя из Telegram
 const user = tg.initDataUnsafe?.user || { id: 0, first_name: "Тест Юзер", username: "test" };
@@ -51,7 +51,6 @@ async function loadParties() {
             const card = document.createElement('div');
             card.className = "bg-gray-800 p-4 rounded-2xl border border-gray-700 shadow-md relative";
             
-            // Проверяем, подходит ли юзер под возрастной коридор гулянки
             card.innerHTML = `
                 <div class="flex justify-between items-start mb-2">
                     <span class="bg-yellow-500/10 text-yellow-400 text-xs px-2.5 py-1 rounded-lg font-bold">${party.tag}</span>
@@ -173,4 +172,3 @@ loadParties();
 if (user.id === ADMIN_ID) {
     loadReports();
 }
-
