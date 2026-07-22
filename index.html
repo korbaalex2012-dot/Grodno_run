@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grodno Spot</title>
+    <!-- Подключаем Tailwind CSS для крутого дизайна -->
+    <script src="https://jsdelivr.net"></script>
+    <!-- Официальный скрипт Telegram Web App -->
+    <script src="https://telegram.org"></script>
+    <style>
+        body { background-color: #111827; color: #f3f4f6; font-family: sans-serif; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body class="p-4 bg-gray-900 text-gray-100">
+
+    <!-- ХЕДЕР ПРИЛОЖЕНИЯ -->
+    <header class="flex justify-between items-center mb-6 pb-3 border-b border-gray-800">
+        <h1 class="text-xl font-bold text-yellow-400">📍 Grodno Spot</h1>
+        <!-- Кнопка админа (по умолчанию скрыта, включится только для тебя) -->
+        <button id="admin-nav-btn" onclick="switchTab('admin-screen')" class="hidden bg-red-600 text-white text-xs px-3 py-1.5 rounded-lg font-bold shadow-md hover:bg-red-700">
+            🛡 ЖБ Панель
+        </button>
+    </header>
+
+    <!-- 1. ЭКРАН: ЛЕНТА ГУЛЯНОК -->
+    <div id="feed-screen" class="tab-content active">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-semibold">Гулянки прямо сейчас</h2>
+            <button onclick="switchTab('create-screen')" class="bg-yellow-500 text-gray-900 px-4 py-2 rounded-xl font-bold text-sm shadow-lg active:scale-95 transition">
+                + Создать
+            </button>
+        </div>
+        <!-- Сюда JS будет вставлять активные карточки -->
+        <div id="parties-list" class="space-y-4">
+            <div class="text-center text-gray-500 py-8">Загрузка гулянок в Гродно...</div>
+        </div>
+    </div>
+
+    <!-- 2. ЭКРАН: СОЗДАНИЕ ГУЛЯНКИ -->
+    <div id="create-screen" class="tab-content">
+        <div class="flex items-center mb-4">
+            <button onclick="switchTab('feed-screen')" class="text-gray-400 mr-2 font-bold text-lg">←</button>
+            <h2 class="text-lg font-semibold">Собрать компанию</h2>
+        </div>
+        
+        <form id="create-party-form" class="space-y-4 bg-gray-800 p-4 rounded-2xl border border-gray-700">
+            <!-- Локация -->
+            <div>
+                <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Где встречаемся?</label>
+                <select id="party-location" class="w-full bg-gray-700 border border-gray-600 rounded-xl p-2.5 text-white focus:outline-none focus:border-yellow-500">
+                    <option value="Советская (Центр)">Улица Советская (Центр)</option>
+                    <option value="Дворик на Советской 18">Дворик на Советской, 18</option>
+                    <option value="Парк Жилибера (Фонтан)">Парк Жилибера (Фонтан)</option>
+                    <option value="Коложский парк">Коложский парк</option>
+                    <option value="Пышки (Тропа здоровья)">Пышки (Тропа здоровья)</option>
+                    <option value="Поляна (Филармония)">Поляна (Филармония)</option>
+                    <option value="Крыша ТД Неман">Крыша ТД Неман</option>
+                </select>
+            </div>
+
+            <!-- Формат -->
+            <div>
+                <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Что делаем?</label>
+                <select id="party-tag" class="w-full bg-gray-700 border border-gray-600 rounded-xl p-2.5 text-white focus:outline-none focus:border-yellow-500">
+                    <option value="⚽️ Футбол / Баскет">⚽️ Футбол / Баскет</option>
+                    <option value="🛹 Скейт / Самокаты">🛹 Скейт / Самокаты</option>
+                    <option value="🎧 Просто чилл">🎧 Просто чилл / Прогулка</option>
+                    <option value="🎮 Компьютеры / Настолки">🎮 Компьютеры / Настолки</option>
+                    <option value="🍿 Кино / Еда">🍿 Кино / Еда</option>
+                </select>
+            </div>
+
+            <!-- Фильтр возраста -->
+            <div>
+                <label class="block text-xs font-semibold text-gray-400 uppercase mb-1">Возраст компании</label>
+                <div class="flex gap-2">
+                    <input type="number" id="age-min" placeholder="От" min="12" max="30" class="w-1/2 bg-gray-700 border border-gray-600 rounded-xl p-2 text-center" required>
+                    <input type="number" id="age-max" placeholder="До" min="12" max="30" class="w-1/2 bg-gray-700 border border-gray-600 rounded-xl p-2 text-center" required>
+                </div>
+            </div>
+
+            <!-- Кнопка "Я не один" -->
+            <div class="flex items-center justify-between bg-gray-700/50 p-2.5 rounded-xl border border-gray-700">
+                <span class="text-sm">Я гуляю не один (с другом)</span>
+                <input type="checkbox" id="with-friend" class="w-5 h-5 accent-yellow-500">
+            </div>
+
+            <!-- Точный состав кого ищут -->
+            <div>
+                <label class="block text-xs font-semibold text-gray-400 uppercase mb-2">Кого ищем в компанию?</label>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-gray-700 p-3 rounded-xl flex flex-col items-center">
+                        <span class="text-sm font-medium mb-1">🙋‍♂️ Парней</span>
+                        <div class="flex items-center gap-3">
+                            <button type="button" onclick="changeCount('need-boys', -1)" class="w-8 h-8 bg-gray-600 rounded-lg text-lg font-bold">-</button>
+                            <span id="need-boys" class="text-lg font-bold">0</span>
+                            <button type="button" onclick="changeCount('need-boys', 1)" class="w-8 h-8 bg-gray-600 rounded-lg text-lg font-bold">+</button>
+                        </div>
+                    </div>
+                    <div class="bg-gray-700 p-3 rounded-xl flex flex-col items-center">
+                        <span class="text-sm font-medium mb-1">🙋‍♀️ Девушек</span>
+                        <div class="flex items-center gap-3">
+                            <button type="button" onclick="changeCount('need-girls', -1)" class="w-8 h-8 bg-gray-600 rounded-lg text-lg font-bold">-</button>
+                            <span id="need-girls" class="text-lg font-bold">0</span>
+                            <button type="button" onclick="changeCount('need-girls', 1)" class="w-8 h-8 bg-gray-600 rounded-lg text-lg font-bold">+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="w-full bg-yellow-500 text-gray-900 py-3 rounded-xl font-bold shadow-lg active:scale-98 transition">
+                Запустить радар гулянки
+            </button>
+        </form>
+    </div>
+
+    <!-- 3. СЕКРЕТНЫЙ ЭКРАН: АДМИН-ПАНЕЛЬ (ЖБ) -->
+    <div id="admin-screen" class="tab-content">
+        <div class="flex items-center mb-4">
+            <button onclick="switchTab('feed-screen')" class="text-gray-400 mr-2 font-bold text-lg">←</button>
+            <h2 class="text-lg font-semibold text-red-400">Модерация жалоб (Для @vqc_2)</h2>
+        </div>
+        <!-- Список поданных ЖБ -->
+        <div id="reports-list" class="space-y-4">
+            <div class="text-center text-gray-500 py-8">Жалоб пока нет. На районе всё спокойно!</div>
+        </div>
+    </div>
+
+    <!-- Подключаем файл логики, который сделаем следующим -->
+    <script src="app.js"></script>
+</body>
+</html>
