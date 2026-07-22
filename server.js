@@ -17,6 +17,9 @@ const bot = new Telegraf(BOT_TOKEN);
 app.use(cors());
 app.use(express.json());
 
+// ВАЖНОЕ ИСПРАВЛЕНИЕ: Раздаем файлы интерфейса (index.html и app.js) как сайт
+app.use(express.static(__dirname));
+
 // Функция для чтения/записи временной БД (JSON файла)
 function readDB() {
     if (!fs.existsSync(DB_FILE)) {
@@ -36,7 +39,6 @@ function writeDB(data) {
 // 1. Получить список всех активных гулянок
 app.get('/api/parties', (req, res) => {
     const db = readDB();
-    // Фильтруем: убираем гулянки забаненных пользователей
     const activeParties = db.parties.filter(p => !db.bannedUsers.includes(p.creator.id));
     res.json(activeParties);
 });
@@ -65,12 +67,11 @@ app.post('/api/reports', (req, res) => {
     const report = {
         id: Math.random().toString(36).substr(2, 9),
         ...req.body,
-        status: 'pending' // Ожидает твоей проверки
+        status: 'pending'
     };
     db.reports.push(report);
     writeDB(db);
 
-    // Сразу отправляем уведомление тебе в ЛС через бота
     bot.telegram.sendMessage(ADMIN_ID, `🚨 *Поступила новая ЖБ!*\n\nНарушитель: @${report.targetUsername}\nПричина: код [${report.reason}]\nКто пожаловался: ID ${report.reporterId}\n\nПроверь админку в Mini App!`, { parse_mode: 'Markdown' })
        .catch(err => console.error("Не удалось отправить уведомление админу:", err));
 
@@ -87,30 +88,25 @@ app.get('/api/reports', (req, res) => {
 // 🤖 ЛОГИКА ТЕЛЕГРАМ-БОТА
 // ==========================================
 
-// Команда /start отправляет кнопку для открытия Mini App
 bot.start((ctx) => {
     ctx.reply(
-        `Привет, ${ctx.from.first_name}! 📍 Добро пожаловать на Grodno Spot.\n\nНадоело скучать дома? Жми кнопку ниже, создавай компанию для гулянок, футбола или каток прямо сейчас или присоединяйся к ребятам на районе!`,
+        `Привет, ${ctx.from.first_name}! 📍 Добро пожаловать на Grodno Run.\n\nНадоело скучать дома? Жми кнопку ниже, создавай компанию для гулянок, футбола или каток прямо сейчас или присоединяйся к ребятам на районе!`,
         Markup.inlineKeyboard([
-            [Markup.button.webApp('🚀 Открыть Радар Гулянок', 'https://google.com')] // Заменим google.com на ссылку GitHub Pages позже
+            [Markup.button.webApp('🚀 Открыть Радар Гулянок', 'https://onrender.com')]
         ])
     );
 });
 
-// Обработка верификации (4 уровня проверки из админки)
 bot.action(/^verify_(.+)$/, async (ctx) => {
     if (ctx.from.id !== ADMIN_ID) return ctx.answerCbQuery("Доступ запрещен!");
     const targetId = ctx.match[1];
     
-    // Бот пишет пользователю требование пройти проверку
     bot.telegram.sendMessage(targetId, "⚠️ *Внимание! На ваш аккаунт поступили жалобы.*\n Чтобы восстановить доступ к радару гулянок, отправьте в этот чат *видео-кружочек* с кодовым словом 'ГРОДНО' или ссылку на открытый профиль Instagram/TikTok.", { parse_mode: 'Markdown' })
         .then(() => ctx.reply("Запрос на верификацию отправлен пользователю."))
         .catch(() => ctx.reply("Не удалось отправить сообщение. Возможно, бот заблокирован пользователем."));
 });
 
-// Пересылка кружочков и ГС от подозреваемых прямо тебе на оценку
 bot.on(['video_note', 'voice', 'text'], (ctx) => {
-    // Если пишет обычный юзер, пересылаем админу для ручной проверки
     if (ctx.from.id !== ADMIN_ID) {
         ctx.reply("Спасибо. Ваши данные отправлены модератору @vqc_2 на проверку. Ожидайте разблокировки.");
         bot.telegram.sendMessage(ADMIN_ID, `📨 *Данные для проверки от юзера @${ctx.from.username || 'скрыт'} (ID: ${ctx.from.id}):*`);
@@ -118,10 +114,9 @@ bot.on(['video_note', 'voice', 'text'], (ctx) => {
     }
 });
 
-// Запуск HTTP сервера и Telegram бота
 app.listen(PORT, () => console.log(`Сервер запущен на порту ${PORT}`));
 bot.launch().then(() => console.log("Telegram-бот успешно запущен"));
 
-// Корректная остановка при выключении процесса
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
+
