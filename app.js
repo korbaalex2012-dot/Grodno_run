@@ -4,13 +4,13 @@
 
 const BOT_TOKEN = "8829942321:AAHzai6My057v36JiB35izszp5COPg31FCw";
 const ADMIN_ID = 6949963047;
-const CHANNEL_ID = "@Grodno_run"; // Твой канал привязан напрямую
+const CHANNEL_ID = "@Grodno_run"; // Канал Гродно привязан напрямую
 
 // Инициализация Telegram Web App API
 const tg = window.Telegram.WebApp;
-tg.expand(); // Открываем Mini App на максимум вверх
+tg.expand(); // Расширяем Mini App на весь экран смартфона
 
-// Извлекаем реальный профиль пользователя из системы Telegram
+// Профиль пользователя из системы Telegram
 let userProfile = {
     tgId: tg.initDataUnsafe?.user?.id || 999999999,
     username: tg.initDataUnsafe?.user?.username || "",
@@ -19,7 +19,7 @@ let userProfile = {
     age: null
 };
 
-// Переменные для твоего админского "Режима Бога" (Эмулятора)
+// Переменные эмулятора для твоего админского "Режима Бога"
 let isAdminMode = false;
 let fakeGender = null;
 let fakeAge = null;
@@ -27,15 +27,15 @@ let fakeAge = null;
 // Системный буфер для жалоб
 let selectedReportTarget = null; 
 
-// Точка входа при полной загрузке страницы приложения
+// Старт при полной загрузке приложения
 document.addEventListener("DOMContentLoaded", () => {
     checkAdminRights();
     loadSession();
     processIncomingDeepLink();
-    tg.ready(); // Сигнал Телеграму, что приложение успешно загрузилось
+    tg.ready(); // Жесткий сигнал Телеграму убрать белый экран загрузки
 });
 
-// Проверка на твой личный Telegram ID (Активация пульта модератора)
+// Активация твоего пульта управления модератора
 function checkAdminRights() {
     if (userProfile.tgId === ADMIN_ID) {
         const panel = document.getElementById("admin-panel");
@@ -44,7 +44,7 @@ function checkAdminRights() {
     }
 }
 
-// Загрузка сессии, чтобы не заполнять Шаг 0 каждый раз при входе
+// Загрузка сессии авторизации из памяти телефона
 function loadSession() {
     const savedGender = localStorage.getItem("gr_gender");
     const savedAge = localStorage.getItem("gr_age");
@@ -201,6 +201,7 @@ function triggerAdminAction(type) {
 // БЛОК 5: НАВИГАЦИЯ И УПРАВЛЕНИЕ СЧЕТЧИКАМИ
 // ==========================================
 
+// Переключатель вкладок в Mini App
 function switchTab(tab) {
     const isFeed = tab === "feed";
     const feedSec = document.getElementById("section-feed");
@@ -250,7 +251,7 @@ function submitRadar() {
 
     let loc = locSelect.value;
     const customLoc = customLocInput.value.trim();
-    if (customLoc) loc += ` — ${customLoc}`;
+    if (customLoc) loc += " — " + customLoc;
 
     const purposeSelect = document.getElementById("purpose");
     if (!purposeSelect) return;
@@ -272,7 +273,6 @@ function submitRadar() {
     const girls = parseInt(document.getElementById("count-girls")?.innerText || "0");
     const desc = document.getElementById("description")?.value.trim() || "";
 
-    // ЖЕСТКИЙ ФИЛЬТР ОТ СПАМ-ССЫЛОК И РЕКЛАМЫ В ОПИСАНИИ
     if (desc.match(/(http|https|t\.me|\x40)/gi)) {
         tg.showAlert("Ссылки, юзернеймы и реклама в описании строго запрещены!");
         return;
@@ -281,7 +281,6 @@ function submitRadar() {
     const effectiveAge = (isAdminMode && fakeAge) ? fakeAge : userProfile.age;
     const effectiveGender = (isAdminMode && fakeGender) ? fakeGender : userProfile.gender;
 
-    // Вторичная валидация шлюзов коридора возраста
     if (effectiveAge <= 16 && (ageFrom > 17 || ageTo > 17)) {
         tg.showAlert("Ошибка коридора: Подросткам нельзя звать взрослых (18+)!");
         return;
@@ -291,26 +290,24 @@ function submitRadar() {
         return;
     }
 
-    // Собираем текст карточки для публикации в канал
-    const textMessage = `⚡️ *НОВЫЙ СБОР: Grodno Run*\n\n` +
-                        `📍 *Район:* ${loc}\n` +
-                        `🎯 *Цель:* ${purp}\n` +
-                        `🔞 *Коридор возраста:* ${ageFrom} - ${ageTo} лет\n` +
-                        `👥 *Состав:* Ищу парней (${guys}), Ищу девушек (${girls})\n` +
-                        `${withFriend ? "📌 *Со мной уже идёт друг/подруга*\n" : ""}` +
-                        `${desc ? `📝 *Описание:* _${desc}_\n` : ""}\n` +
-                        `⚠️ *Статус автора:* Нарушений не зафиксировано (0 ШО)\n\n` +
-                        `🔒 _Контакты скрыты от спама. Нажми кнопку ниже, чтобы пройти автоматический фейс-контроль._`;
+    const textMessage = "⚡️ *НОВЫЙ СБОР: Grodno Run*\n\n" +
+                        "📍 *Район:* " + loc + "\n" +
+                        "🎯 *Цель:* " + purp + "\n" +
+                        "🔞 *Коридор возраста:* " + ageFrom + " - " + ageTo + " лет\n" +
+                        "👥 *Состав:* Ищу парней (" + guys + "), Ищу девушек (" + girls + ")\n" +
+                        (withFriend ? "📌 *Со мной уже идёт друг/подруга*\n" : "") +
+                        (desc ? "📝 *Описание:* _" + desc + "_\n" : "") + "\n" +
+                        "⚠️ *Статус автора:* Нарушений не зафиксировано (0 ШО)\n\n" +
+                        "🔒 _Контакты скрыты от спама. Нажми кнопку ниже, чтобы пройти автоматический фейс-контроль._";
 
-    // Сборка умной ссылки для фейс-контроля (startapp)
     const botUser = tg.initDataUnsafe?.receiver?.username || "GrodnoRunBot"; 
-    const appUrl = `https://t.me{botUser}/app?startapp=check_${userProfile.tgId}_${effectiveGender === 'Парень'?'M':'F'}_${effectiveAge}_${ageFrom}_${ageTo}`;
+    const appUrl = "https://t.me" + botUser + "/app?startapp=check_" + userProfile.tgId + "_" + (effectiveGender === "Парень" ? "M" : "F") + "_" + effectiveAge + "_" + ageFrom + "_" + ageTo;
 
     const replyMarkup = {
         inline_keyboard: [[{ text: "🔥 Принять сбор / Вступить", url: appUrl }]]
     };
 
-    fetch(`https://telegram.org{BOT_TOKEN}/sendMessage`, {
+    fetch("https://telegram.org" + BOT_TOKEN + "/sendMessage", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -341,9 +338,10 @@ function processIncomingDeepLink() {
     if (!startParam || !startParam.startsWith("check_")) return;
 
     const parts = startParam.split("_");
-    if (parts.length < 7) return; // Защита от битых ссылок
+    if (parts.length < 7) return; 
 
-    const orgId = parts[1];
+    // Вставляем индексы элементов массива напрямую
+    const orgId = parts[1]; 
     const reqAgeFrom = parseInt(parts[4]) || 12;
     const reqAgeTo = parseInt(parts[5]) || 35;
 
@@ -386,7 +384,7 @@ function processIncomingDeepLink() {
 }
 
 function registerAcceptAction(orgId) {
-    localStorage.setItem(`allowed_report_${orgId}`, "true");
+    localStorage.setItem("allowed_report_" + orgId, "true");
 }
 
 // ==========================================
@@ -394,9 +392,9 @@ function registerAcceptAction(orgId) {
 // ==========================================
 
 function openReportModal(orgId) {
-    const isAllowed = localStorage.getItem(`allowed_report_${orgId}`);
+    const isAllowed = localStorage.getItem("allowed_report_" + orgId);
     if (!isAllowed) {
-        tg.showAlert("Запрещено! Подать жалобу можно только после того, как ты реально нажал кнопку связи, списался или сходил на встречу.");
+        tg.showAlert("Запрещено! Подать жалобу можно только после того, как ты реально нажал кнопку связи.");
         return;
     }
     selectedReportTarget = orgId;
@@ -411,13 +409,13 @@ function closeReportModal() {
 function confirmReport(reason) {
     if (!selectedReportTarget) return;
 
-    const reportText = `🚨 *СИГНАЛ НАРУШЕНИЯ: Grodno Run*\n\n` +
-                       `👤 *От кого:* ID ${userProfile.tgId} (@${userProfile.username || 'скрыт'})\n` +
-                       `🫵 *Нарушитель:* ID ${selectedReportTarget}\n` +
-                       `📝 *Статья нарушения:* ${reason}\n\n` +
-                       `⚡️ _Подтверди вину кнопками в своем боте, чтобы начислить Штрафные Очки (ШО) в рейтинг автора. Набор 100 ШО автоматически заблокирует аккаунт._`;
+    const reportText = "🚨 *СИГНАЛ НАРУШЕНИЯ: Grodno Run*\n\n" +
+                       "👤 *От кого:* ID " + userProfile.tgId + " (@" + (userProfile.username || "скрыт") + ")\n" +
+                       "🫵 *Нарушитель:* ID " + selectedReportTarget + "\n" +
+                       "📝 *Статья нарушения:* " + reason + "\n\n" +
+                       "⚡️ _Подтверди вину кнопками в своем боте, чтобы начислить Штрафные Очки (ШО) в рейтинг автора._";
 
-    fetch(`https://telegram.org{BOT_TOKEN}/sendMessage`, {
+    fetch("https://telegram.org" + BOT_TOKEN + "/sendMessage", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
