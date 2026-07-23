@@ -225,8 +225,9 @@
         .violator-item { background: rgba(255, 56, 56, 0.04); border: 1px solid rgba(255, 56, 56, 0.15); padding: 16px; border-radius: 14px; margin-bottom: 12px; }
         .track-counter { font-size: 11px; background: var(--accent); color: #fff; padding: 1px 6px; border-radius: 10px; font-weight: bold; margin-left: 4px; }
         .hidden { display: none !important; }
-        </style>
-            <audio id="bg-audio"></audio>
+    </style>
+
+    <audio id="bg-audio"></audio>
 
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: rgba(15, 15, 27, 0.7); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); padding: 12px 16px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
         <div>
@@ -263,8 +264,8 @@
             <button type="button" id="btn-submit-auth" class="btn btn-success">Пройти авторизацию</button>
         </div>
     </div>
-
-    <div id="screen-main" class="screen">
+        <div id="screen-main" class="screen">
+        <!-- ПОД-ЭКРАН 1: ЛЕНТА РАДАРА С НЕОНОВОЙ КАРТОЙ -->
         <div id="sub-radar" class="sub-screen active">
             <div class="cyber-map">
                 <div class="map-bg-grid"></div>
@@ -292,7 +293,8 @@
             <div id="empty-state-msg" class="empty-state">На радаре пока пусто... Запусти движ сам!</div>
             <div id="radar-list"></div>
         </div>
-                <!-- ПОД-ЭКРАН 2: СОЗДАНИЕ СБОРА -->
+
+        <!-- ПОД-ЭКРАН 2: НАЧАЛО ФОРМЫ СОЗДАНИЯ СБОРА -->
         <div id="sub-create" class="sub-screen">
             <h2>➕ Запустить сбор</h2>
             <p class="subtitle">Отметь локацию на общем радаре Гродно</p>
@@ -320,8 +322,7 @@
                         <span class="tag-btn" onclick="applyPlaceTag('главный вход')">#главный_вход</span>
                     </div>
                 </div>
-
-                <div class="form-group">
+                                <div class="form-group">
                     <label>🎯 Цель сбора (Свободный ввод руками)</label>
                     <input type="text" id="create-target" placeholder="Например: Поиграть в футбол / Катка на самокатах / Чилл">
                     <div class="tags-suggest">
@@ -384,7 +385,7 @@
             <div id="archive-list"></div>
         </div>
 
-        <!-- ПОД-ЭКРАН 4: ЛИЧНАЯ АДМИНКА (Строго для твоего ID 6949963047) -->
+        <!-- ПОД-ЭКРАН 4: ЛИЧНАЯ СКРЫТАЯ АДМИНКА -->
         <div id="sub-admin" class="sub-screen">
             <h2>⚡ Админка куратора</h2>
             <p class="subtitle">Панель тотального контроля проверок и жалоб</p>
@@ -409,15 +410,15 @@
             </div>
         </div>
 
-        <!-- НИЖНЕЕ КИБЕР-МЕНЮ НАВИГАЦИИ -->
+        <!-- НИЖНЕЕ МЕНЮ НАВИГАЦИИ -->
         <div class="bottom-nav">
             <button class="nav-btn active" data-sub="sub-radar"><span>🛰</span>Радар</button>
             <button class="nav-btn" data-sub="sub-create"><span>➕</span>Создать</button>
             <button class="nav-btn" data-sub="sub-archive"><span>💼</span>Мои Сходки</button>
             <button class="nav-btn hidden" id="nav-admin-btn" data-sub="sub-admin"><span>⚡</span>Админка</button>
         </div>
-    </div>
-        <script>
+        </div>
+            <script>
         // ТВОЙ НАСТОЯЩИЙ ID ИЗ ТЕЛЕГРАМА ДЛЯ ВХОДА В АДМИНКУ
         const MY_TELEGRAM_ID = 6949963047;
 
@@ -453,7 +454,7 @@
         let currentTrackIndex = 0;
 
         window.addEventListener('DOMContentLoaded', () => {
-            // Железная проверка прав администратора строго по Telegram ID
+            // Железная проверка прав администратора строго по Telegram ID аккаунта
             if (myId === MY_TELEGRAM_ID || localStorage.getItem('force_admin') === 'true') {
                 document.getElementById('nav-admin-btn').classList.remove('hidden');
             }
@@ -499,7 +500,6 @@
                     badge.innerText = playlistUrls.length;
                     badge.classList.remove('hidden');
 
-                    // Если музыка стояла на паузе — запускаем сначала очереди
                     if (audio.paused) {
                         playCurrentTrack();
                     }
@@ -510,7 +510,7 @@
             audio.addEventListener('ended', () => {
                 currentTrackIndex++;
                 if (currentTrackIndex >= playlistUrls.length) {
-                    currentTrackIndex = 0; // Зацикливаем плейлист по кругу
+                    currentTrackIndex = 0; 
                 }
                 playCurrentTrack();
             });
@@ -525,7 +525,8 @@
                 musicBtn.style.boxShadow = "0 0 10px rgba(46, 204, 113, 0.3)";
             }).catch(err => console.log("Блокировка автоплея браузером:", err));
         }
-                    function updateStatusHeader() {
+
+        function updateStatusHeader() {
             document.getElementById('user-display-status').innerText = `${activeGender}, ${activeAge} л. (@${myUsername})`;
         }
 
@@ -555,8 +556,7 @@
             updateStatusHeader();
             renderAll();
         });
-
-        // МАСКИРОВКА КУРАТОРА ДЛЯ АДМИНА
+                        // МАСКИРОВКА КУРАТОРА ДЛЯ АДМИНА
         document.getElementById('btn-apply-fake').addEventListener('click', () => {
             activeGender = document.getElementById('admin-fake-gender').value;
             activeAge = parseInt(document.getElementById('admin-fake-age').value);
@@ -601,62 +601,14 @@
             });
         });
 
-        // ЗАПУСК НОВОГО СБОРА НА РАДАР
-        document.getElementById('btn-launch-radar').addEventListener('click', () => {
-            const district = document.getElementById('create-district').value;
-            const exact = document.getElementById('create-exact-place').value || "Указано внутри";
-            const target = document.getElementById('create-target').value || "Прогулка / Чилл";
-            const link = document.getElementById('create-link').value || "";
-            const ageFrom = parseInt(document.getElementById('age-from').value);
-            const ageTo = parseInt(document.getElementById('age-to').value);
-            const mNeed = parseInt(document.getElementById('search-males').value);
-            const fNeed = parseInt(document.getElementById('search-females').value);
-            const desc = document.getElementById('create-desc').value;
-
-            if(!link.startsWith('http')) {
-                alert("Вставь рабочую Telegram ссылку на чат банды!");
-                return;
-            }
-
-            const newMeeting = {
-                id: Date.now(),
-                district: district,
-                exactPlace: exact,
-                target: target,
-                chatLink: link,
-                ageFrom: ageFrom,
-                ageTo: ageTo,
-                malesNeeded: mNeed,
-                femalesNeeded: fNeed,
-                malesJoined: 0,
-                femalesJoined: 0,
-                desc: desc,
-                creator: myUsername,
-                timeCreated: Date.now()
-            };
-
-            meetings.unshift(newMeeting);
-            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
-
-            document.getElementById('create-exact-place').value = '';
-            document.getElementById('create-target').value = '';
-            document.getElementById('create-link').value = '';
-            document.getElementById('create-desc').value = '';
-            document.getElementById('search-males').value = '1';
-            document.getElementById('search-females').value = '1';
-
-            renderAll();
-            document.querySelector('[data-sub="sub-radar"]').click();
-        });
-                    function renderAll() {
+        function renderAll() {
             renderMeetingsList();
             renderArchiveList();
             renderViolators();
             updateCyberMap();
             updateDistrictBadges();
         }
-
-        // ОБНОВЛЕНИЕ НЕОНОВЫХ ТОЧЕК НА КАРТЕ ГРОДНО
+                        // ОБНОВЛЕНИЕ НЕОНОВЫХ ТОЧЕК НА КАРТЕ ГРОДНО
         function updateCyberMap() {
             const config = {
                 "Центр (Советская)": "map-pt-center",
@@ -768,7 +720,7 @@
                 container.appendChild(card);
             });
         }
-                    // НАЖАТИЕ КНОПКИ СБОРА
+                        // НАЖАТИЕ КНОПКИ СБОРА
         window.joinMeeting = function(id) {
             const m = meetings.find(item => item.id === id);
             if (!m) return;
@@ -809,7 +761,7 @@
         function renderArchiveList() {
             const container = document.getElementById('archive-list');
             const empty = document.getElementById('archive-empty-state');
-            if (!container) return;
+            if(!container) return;
             container.innerHTML = '';
 
             if (archive.length === 0) {
@@ -913,7 +865,7 @@
             renderAll();
         };
 
-        // СЕКРЕТНЫЙ РЕЗЕРВНЫЙ ОБХОД КНОПКИ РЕГИСТРАЦИИ (ПОДМЕНА ЧЕРЕЗ ПАРОЛЬ-ID)
+        // РЕЗЕРВНЫЙ ВХОД ДЛЯ ТЕБЯ ЧЕРЕЗ ПАРОЛЬ-ID В ПОЛЕ ВОЗРАСТА
         document.getElementById('btn-submit-auth').addEventListener('click', (e) => {
             const ageInputVal = document.getElementById('auth-age').value.trim();
             if (ageInputVal === "6949963047") {
@@ -930,9 +882,11 @@
                 document.getElementById('screen-main').classList.add('active');
                 updateStatusHeader();
                 renderAll();
-                alert("Доступ Куратора подтвержден секретным кодом!");
+                alert("Доступ Куратора активирован через секретный код-пароль!");
             }
         });
     </script>
 </body>
 </html>
+
+                
