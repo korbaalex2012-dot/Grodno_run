@@ -127,20 +127,6 @@
         .input-dark:focus {
             border-color: #6366f1;
         }
-        .btn-sex {
-            padding: 16px;
-            border-radius: 12px;
-            border: 1px solid #475569;
-            background: rgba(30, 41, 59, 0.4);
-            color: #94a3b8;
-            font-size: 14px;
-            font-weight: 700;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            width: 100%;
-            box-sizing: border-box;
-        }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -159,7 +145,7 @@
             </div>
             <span class="label-title" style="color: #cbd5e1; margin-bottom: 6px;">Тестовый подмен профиля (Эмулятор):</span>
             <div style="margin-bottom: 12px;">
-                <select id="fake-gender-select" onchange="toggleFakeGender(this.value)" class="input-dark" style="font-size: 14px; padding: 10px;">
+                <select id="fake-gender-select" onchange="toggleFakeGender(this.value)" class="input-dark" style="font-size: 14px; padding: 10px; color: white;">
                     <option value="" disabled selected hidden>Тест Пол...</option>
                     <option value="Парень">Парень</option>
                     <option value="Девушка">Девушка</option>
@@ -541,10 +527,12 @@
             const startParam = tg.initDataUnsafe?.start_param;
             if (!startParam || !startParam.startsWith("check_")) return;
             const parts = startParam.split("_");
-            if (parts.length < 7) return; 
+            if (parts.length < 6) return; 
+            
             const orgId = parts[1]; 
             const reqAgeFrom = parseInt(parts[4]) || 12;
             const reqAgeTo = parseInt(parts[5]) || 35;
+            
             const myAge = (isAdminMode && fakeAge) ? fakeAge : userProfile.age;
             const zone = document.getElementById("verification-card-zone");
             if (!zone) return;
@@ -554,7 +542,7 @@
             if (myAge < reqAgeFrom || myAge > reqAgeTo) {
                 htmlContent += `<div style="background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.2); color: #f43f5e; font-size: 12px; padding: 14px; border-radius: 12px; font-weight: 700; text-transform: uppercase;">❌ ОТКАЗ: Твой возраст (${myAge} лет) не подходит под коридор сбора (${reqAgeFrom}-${reqAgeTo} лет).</div>`;
             } else {
-                htmlContent += `<div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); color: #10b981; font-size: 12px; padding: 14px; border-radius: 12px; font-weight: 700; text-transform: uppercase;">✅ ПРОЙДЕНО: Твой возраст полностью подходит под критерии сбора.</div><div style="display: flex; flex-direction: column; gap: 10px;"><a href="tg://user?id=${orgId}" onclick="registerAcceptAction('${orgId}')" style="display: block; background: linear-gradient(90deg, #10b981, #059669); text-align: center; color: #020617; font-weight: 900; padding: 14px; border-radius: 12px; font-size: 12px; text-transform: uppercase; text-decoration: none; box-shadow: 0 4px 15px rgba(16,185,129,0.3);">💬 Написать организатору в ЛС</a><button type="button" onclick="openReportModal('${orgId}')" style="width: 100%; background: #020617; border: 1px solid #334155; color: #f43f5e; font-weight: 900; padding: 12px; border-radius: 12px; font-size: 11px; text-transform: uppercase; cursor: pointer;">⚠️ Пожаловаться на автора</button></div>`;
+                htmlContent += `<div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); color: #10b981; font-size: 12px; padding: 14px; border-radius: 12px; font-weight: 700; text-transform: uppercase;">✅ ПРОЙдено: Твой возраст полностью подходит под критерии сбора.</div><div style="display: flex; flex-direction: column; gap: 10px;"><a href="tg://user?id=${orgId}" onclick="registerAcceptAction('${orgId}')" style="display: block; background: linear-gradient(90deg, #10b981, #059669); text-align: center; color: #020617; font-weight: 900; padding: 14px; border-radius: 12px; font-size: 12px; text-transform: uppercase; text-decoration: none; box-shadow: 0 4px 15px rgba(16,185,129,0.3);">💬 Написать организатору в ЛС</a><button type="button" onclick="openReportModal('${orgId}')" style="width: 100%; background: #020617; border: 1px solid #334155; color: #f43f5e; font-weight: 900; padding: 12px; border-radius: 12px; font-size: 11px; text-transform: uppercase; cursor: pointer;">⚠️ Пожаловаться на автора</button></div>`;
             }
             htmlContent += `</div>`;
             zone.innerHTML = htmlContent;
