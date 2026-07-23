@@ -4,7 +4,7 @@
 
 const BOT_TOKEN = "8829942321:AAHzai6My057v36JiB35izszp5COPg31FCw";
 const ADMIN_ID = 6949963047;
-const CHANNEL_ID = "YOUR_CHANNEL_ID"; // Сюда позже вставишь ID своего канала
+const CHANNEL_ID = "@Grodno_run"; // Сюда позже вставишь ID своего канала
 
 // Инициализация Telegram Web App API
 const tg = window.Telegram.WebApp;
