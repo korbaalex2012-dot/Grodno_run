@@ -532,21 +532,25 @@
             });
         }
 
-        function processIncomingDeepLink() {
+                function processIncomingDeepLink() {
             const startParam = tg.initDataUnsafe?.start_param;
             if (!startParam || !startParam.startsWith("check_")) return;
-            const parts = startParam.split("_");
-            if (parts.length < 6) return; 
             
-            // Чистый разбор массива БЕЗ скрытых сломанных символов
-            const orgId = parts[1]; 
-            const reqAgeFrom = parseInt(parts[4]) || 12;
-            const reqAgeTo = parseInt(parts[5]) || 35;
+            // Безопасный разбор строки через регулярное выражение в обход багов с массивами
+            const match = startParam.match(/check_([A-Za-z0-9]+)_([MF])_([0-9]+)_([0-9]+)_([0-9]+)/);
+            if (!match) return;
+
+            const orgId = match[1];
+            const reqAgeFrom = parseInt(match[4]) || 12;
+            const reqAgeTo = parseInt(match[5]) || 35;
+            
             const myAge = (isAdminMode && fakeAge) ? fakeAge : userProfile.age;
             const zone = document.getElementById("verification-card-zone");
             if (!zone) return;
+            
             zone.style.display = "block";
             switchTab("feed");
+            
             let htmlContent = `<div class="card" style="border: 2px solid #6366f1; padding: 20px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 16px;"><h3 style="margin: 0; font-size: 12px; font-weight: 900; color: #818cf8; text-transform: uppercase; letter-spacing: 1px;">🔄 Проверка шлюза фейс-контроля</h3><p style="margin: 0; font-size: 12px; color: #cbd5e1;">Вход на радар организатора ID: ${orgId}. Проверяем твое соответствие...</p>`;
             if (myAge < reqAgeFrom || myAge > reqAgeTo) {
                 htmlContent += `<div style="background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.2); color: #f43f5e; font-size: 12px; padding: 14px; border-radius: 12px; font-weight: 700; text-transform: uppercase;">❌ ОТКАЗ: Твой возраст (${myAge} лет) не подходит под коридор сбора (${reqAgeFrom}-${reqAgeTo} лет).</div>`;
@@ -556,6 +560,7 @@
             htmlContent += `</div>`;
             zone.innerHTML = htmlContent;
         }
+
 
         function registerAcceptAction(orgId) { localStorage.setItem("gr_allow_report_" + orgId, "true"); }
         function openReportModal(orgId) { const isAllowed = localStorage.getItem("gr_allow_report_" + orgId); if (!isAllowed) { tg.showAlert("Запрещено! Подать жалобу можно только после того, как ты реально нажал кнопку связи."); return; } selectedReportTarget = orgId; document.getElementById("report-modal").style.display = "block"; }
