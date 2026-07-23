@@ -445,21 +445,19 @@
         let activeAge = parseInt(localStorage.getItem('user_age')) || 0;
         let currentDistrictFilter = "all";
 
-        // ДВИЖОК ОЧЕРЕДИ МУЗЫКАЛЬНЫХ ТРЕКОВ
+        // НОВЫЙ ДВИЖОК ОЧЕРЕДИ МУЗЫКАЛЬНЫХ ТРЕКОВ ПО ИНТЕРНЕТ-ССЫЛКАМ
         const audio = document.getElementById('bg-audio');
         const musicBtn = document.getElementById('btn-music-toggle');
-        const musicUpload = document.getElementById('music-upload');
         const badge = document.getElementById('track-queue-badge');
-        let playlistUrls = [];
+        
+        // Массив ссылок на MP3 по умолчанию (можно добавлять свои)
+        let playlistUrls = JSON.parse(localStorage.getItem('gr_playlist_2026')) || [];
         let currentTrackIndex = 0;
 
         window.addEventListener('DOMContentLoaded', () => {
-            // Проверка прав куратора
-            if (myId === MY_TELEGRAM_ID || localStorage.getItem('force_admin') === 'true') {
-                document.getElementById('nav-admin-btn').classList.remove('hidden');
-            }
+            // Кнопка админки теперь видна всегда, но защищена паролем 147369
+            document.getElementById('nav-admin-btn').classList.remove('hidden');
 
-            // Автоматический вход без повторных окон авторизации
             if (localStorage.getItem('user_registered') === 'true') {
                 document.getElementById('screen-auth').classList.remove('active');
                 document.getElementById('screen-main').classList.add('active');
@@ -472,9 +470,14 @@
         });
 
         function initAudioEngine() {
+            if (playlistUrls.length > 0) {
+                badge.innerText = playlistUrls.length;
+                badge.classList.remove('hidden');
+            }
+
             musicBtn.addEventListener('click', () => {
                 if (playlistUrls.length === 0) {
-                    alert("Добавь один или несколько треков через кнопку '➕ ТРЕК'!");
+                    alert("Вставь ссылку на MP3 трек через кнопку '➕ ТРЕК'!");
                     return;
                 }
                 if (audio.paused) {
@@ -487,22 +490,31 @@
                 }
             });
 
-            musicUpload.addEventListener('change', (e) => {
-                const files = Array.from(e.target.files);
-                if (files.length > 0) {
-                    files.forEach(file => {
-                        const blobUrl = URL.createObjectURL(file);
-                        playlistUrls.push(blobUrl);
-                    });
+            // КНОПКА ЗАГРУЗКИ: Ввод прямой ссылки на MP3 трек из интернета
+            document.querySelector('label[for="music-upload"]').addEventListener('click', (e) => {
+                e.preventDefault();
+                const url = prompt("Вставь прямую ссылку на любой MP3 трек из интернета или чата:");
+                if (url && url.startsWith('http')) {
+                    playlistUrls.push(url);
+                    localStorage.setItem('gr_playlist_2026', JSON.stringify(playlistUrls));
+                    
                     badge.innerText = playlistUrls.length;
                     badge.classList.remove('hidden');
-                    if (audio.paused) playCurrentTrack();
+                    
+                    if (audio.paused) {
+                        currentTrackIndex = playlistUrls.length - 1;
+                        playCurrentTrack();
+                    }
+                } else if (url) {
+                    alert("Ссылка должна начинаться с http:// или https://");
                 }
             });
 
             audio.addEventListener('ended', () => {
                 currentTrackIndex++;
-                if (currentTrackIndex >= playlistUrls.length) currentTrackIndex = 0; 
+                if (currentTrackIndex >= playlistUrls.length) {
+                    currentTrackIndex = 0; 
+                }
                 playCurrentTrack();
             });
         }
@@ -514,7 +526,7 @@
                 musicBtn.innerText = `🎵 ТРЕК ${currentTrackIndex + 1}`;
                 musicBtn.style.color = "var(--accent-green)";
                 musicBtn.style.boxShadow = "0 0 10px rgba(46, 204, 113, 0.3)";
-            }).catch(err => console.log("Блокировка автоплея браузером:", err));
+            }).catch(err => console.log("Ошибка автоплея:", err));
         }
 
         function updateStatusHeader() {
@@ -524,103 +536,43 @@
         window.applyPlaceTag = function(val) { document.getElementById('create-exact-place').value = val; };
         window.applyTargetTag = function(val) { document.getElementById('create-target').value = val; };
 
+        // КНОПКА АВТОРИЗАЦИИ
         document.getElementById('btn-submit-auth').addEventListener('click', (e) => {
             e.preventDefault();
             const gen = document.getElementById('auth-gender').value;
             const age = parseInt(document.getElementById('auth-age').value);
+
             if (!gen || !age || age < 12 || age > 35) {
                 alert('Укажите корректный пол и возраст от 12 до 35 лет!');
                 return;
             }
+
             localStorage.setItem('user_gender', gen);
             localStorage.setItem('user_age', age);
             localStorage.setItem('user_registered', 'true');
-            activeGender = gen; activeAge = age;
+            
+            activeGender = gen;
+            activeAge = age;
+
             document.getElementById('screen-auth').classList.remove('active');
             document.getElementById('screen-main').classList.add('active');
-            updateStatusHeader(); renderAll();
-        });
-
-        document.getElementById('btn-apply-fake').addEventListener('click', () => {
-            activeGender = document.getElementById('admin-fake-gender').value;
-            activeAge = parseInt(document.getElementById('admin-fake-age').value);
-            updateStatusHeader(); renderAll();
-            alert("Маскировка куратора применена! Радар перенастроен.");
-        });
-
-        document.querySelectorAll('.btn-minus').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const inp = document.getElementById(btn.getAttribute('data-target'));
-                if (inp.value > 0) inp.value = parseInt(inp.value) - 1;
-            });
-        });
-        document.querySelectorAll('.btn-plus').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const inp = document.getElementById(btn.getAttribute('data-target'));
-                inp.value = parseInt(inp.value) + 1;
-            });
-        });
-
-        document.querySelectorAll('.bottom-nav .nav-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.bottom-nav .nav-btn').forEach(b => b.classList.remove('active'));
-                document.querySelectorAll('.sub-screen').forEach(s => s.classList.remove('active'));
-                btn.classList.add('active');
-                document.getElementById(btn.getAttribute('data-sub')).classList.add('active');
-                renderAll();
-            });
-        });
-
-        document.querySelectorAll('#radar-filter-bar .filter-chip').forEach(chip => {
-            chip.addEventListener('click', () => {
-                document.querySelectorAll('#radar-filter-bar .filter-chip').forEach(c => c.classList.remove('active'));
-                chip.classList.add('active');
-                currentDistrictFilter = chip.getAttribute('data-filter');
-                renderMeetingsList();
-            });
-        });
-
-        document.getElementById('btn-launch-radar').addEventListener('click', () => {
-            const district = document.getElementById('create-district').value;
-            const exact = document.getElementById('create-exact-place').value || "Указано внутри";
-            const target = document.getElementById('create-target').value || "Прогулка / Чилл";
-            const link = document.getElementById('create-link').value || "";
-            const ageFrom = parseInt(document.getElementById('age-from').value);
-            const ageTo = parseInt(document.getElementById('age-to').value);
-            const mNeed = parseInt(document.getElementById('search-males').value);
-            const fNeed = parseInt(document.getElementById('search-females').value);
-            const desc = document.getElementById('create-desc').value;
-
-            if(!link.startsWith('http')) {
-                alert("Вставь рабочую Telegram ссылку на чат банды!");
-                return;
-            }
-
-            meetings.unshift({
-                id: Date.now(), district: district, exactPlace: exact, target: target, chatLink: link,
-                ageFrom: ageFrom, ageTo: ageTo, malesNeeded: mNeed, femalesNeeded: fNeed,
-                malesJoined: 0, femalesJoined: 0, desc: desc, creator: myUsername, timeCreated: Date.now()
-            });
-            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
-
-            document.getElementById('create-exact-place').value = '';
-            document.getElementById('create-target').value = '';
-            document.getElementById('create-link').value = '';
-            document.getElementById('create-desc').value = '';
+            updateStatusHeader();
             renderAll();
-            document.querySelector('[data-sub="sub-radar"]').click();
         });
-                    // ОБНОВЛЕНИЕ НЕОНОВЫХ ТОЧЕК НА КАРТЕ ГРОДНО
+                    function renderAll() {
+            renderMeetingsList();
+            renderArchiveList();
+            renderViolators();
+            updateCyberMap();
+            updateDistrictBadges();
+        }
+
+        // ОБНОВЛЕНИЕ НЕОНОВЫХ ТОЧЕК НА КАРТЕ ГРОДНО
         function updateCyberMap() {
             const config = {
-                "Центр (Советская)": "map-pt-center",
-                "ТЦ Тринити": "map-pt-trinity",
-                "OldCity (Олд Сити)": "map-pt-oldcity",
-                "Ольшанка": "map-pt-olshanka",
-                "Грандичи": "map-pt-grandichi",
-                "Девятовка": "map-pt-devyatovka",
-                "Пышки (Парк)": "map-pt-pyshki",
-                "БЛК / Форты": "map-pt-forty"
+                "Центр (Советская)": "map-pt-center", "ТЦ Тринити": "map-pt-trinity", "OldCity (Олд Сити)": "map-pt-oldcity",
+                "Ольшанка": "map-pt-olshanka", "Грандичи": "map-pt-grandichi", "Девятовка": "map-pt-devyatovka",
+                "Пышки (Парк)": "map-pt-pyshki", "БЛК / Форты": "map-pt-forty"
             };
 
             Object.values(config).forEach(id => {
@@ -647,14 +599,9 @@
             meetings.forEach(m => counts[m.district] = (counts[m.district] || 0) + 1);
 
             const badges = {
-                "Центр (Советская)": "b-center",
-                "ТЦ Тринити": "b-trinity",
-                "OldCity (Олд Сити)": "b-oldcity",
-                "Ольшанка": "b-olshanka",
-                "Грандичи": "b-grandichi",
-                "Девятовка": "b-devyatovka",
-                "Пышки (Парк)": "b-pyshki",
-                "БЛК / Форты": "b-forty"
+                "Центр (Советская)": "b-center", "ТЦ Тринити": "b-trinity", "OldCity (Олд Сити)": "b-oldcity",
+                "Ольшанка": "b-olshanka", "Грандичи": "b-grandichi", "Девятовка": "b-devyatovka",
+                "Пышки (Парк)": "b-pyshki", "БЛК / Форты": "b-forty"
             };
 
             Object.keys(badges).forEach(key => {
@@ -663,7 +610,7 @@
             });
         }
 
-        // ОТРИСОВКА ЛЕНТЫ СБОРОВ С СИСТЕМОЙ УМНЫХ ФИЛЬТРОВ
+        // ОТРИСОВКА ЛЕНТЫ СБОРОВ
         function renderMeetingsList() {
             const container = document.getElementById('radar-list');
             const emptyMsg = document.getElementById('empty-state-msg');
@@ -671,14 +618,9 @@
 
             const filtered = meetings.filter(m => {
                 if (currentDistrictFilter !== "all" && m.district !== currentDistrictFilter) return false;
-
-                // ПРАВИЛО ВЗАИМНОГО ШАГА В 3 ГОДА
                 if (Math.abs(activeAge - m.ageFrom) > 3 && Math.abs(activeAge - m.ageTo) > 3) return false;
-
-                // АВТОБАЛАНС МЕСТ ПО ПОЛУ (Скрытие анкеты, если места под твой пол заняты)
                 if (activeGender === "Парень" && m.malesNeeded > 0 && m.malesJoined >= m.malesNeeded) return false;
                 if (activeGender === "Девушка" && m.femalesNeeded > 0 && m.femalesJoined >= m.femalesNeeded) return false;
-
                 return true;
             });
 
@@ -690,15 +632,12 @@
 
             filtered.forEach(m => {
                 const diffTime = Date.now() - m.timeCreated;
-                let statusClass = "status-planning";
-                let statusText = "⏳ Планируется";
+                let statusClass = "status-planning"; let statusText = "⏳ Планируется";
 
                 if ((m.malesJoined + m.femalesJoined) >= 5) {
-                    statusClass = "status-mega";
-                    statusText = "🔥 МЕГА-СБОР";
+                    statusClass = "status-mega"; statusText = "🔥 МЕГА-СБОР";
                 } else if (diffTime > 3600000) {
-                    statusClass = "status-active-now";
-                    statusText = "🚀 Движ в разгаре!";
+                    statusClass = "status-active-now"; statusText = "🚀 Движ в разгаре!";
                 }
 
                 const card = document.createElement('div');
@@ -721,39 +660,27 @@
                 `;
                 container.appendChild(card);
             });
-        }
-                    // НАЖАТИЕ КНОПКИ СБОРА
+            }
+                        // НАЖАТИЕ КНОПКИ СБОРА
         window.joinMeeting = function(id) {
-            const m = meetings.find(item => item.id === id);
-            if (!m) return;
-
+            const m = meetings.find(item => item.id === id); if (!m) return;
             if (activeGender === "Парень" && m.malesJoined < m.malesNeeded) m.malesJoined++;
             if (activeGender === "Девушка" && m.femalesJoined < m.femalesNeeded) m.femalesJoined++;
 
             if (!archive.some(item => item.id === id)) {
-                archive.unshift(m);
-                localStorage.setItem('gr_archive_2026', JSON.stringify(archive));
+                archive.unshift(m); localStorage.setItem('gr_archive_2026', JSON.stringify(archive));
             }
-
             localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
             renderAll();
-
             alert("Ты успешно вписался! Переходим в интент-чат сходки.");
             window.location.href = m.chatLink;
         };
 
-        // ЖАЛОБА НА ОПИСАНИЕ ИЗ ОБЩЕЙ ЛЕНТЫ (Мгновенно без прогулки)
+        // ЖАЛОБА НА ОПИСАНИЕ
         window.reportDescription = function(username, meetingId) {
             const reason = prompt("Укажите, что не так с описанием анкеты (Мат, спам, ссылки, неадекват):");
             if (!reason) return;
-
-            complaints.unshift({
-                id: Date.now(),
-                violator: username,
-                type: "Жалоба на описание",
-                reason: reason,
-                meetingId: meetingId
-            });
+            complaints.unshift({ id: Date.now(), violator: username, type: "Жалоба на описание", reason: reason, meetingId: meetingId });
             localStorage.setItem('gr_complaints_2026', JSON.stringify(complaints));
             alert("Жалоба на анкету доставлена куратору!");
             renderAll();
@@ -763,75 +690,49 @@
         function renderArchiveList() {
             const container = document.getElementById('archive-list');
             const empty = document.getElementById('archive-empty-state');
-            if(!container) return;
-            container.innerHTML = '';
-
-            if (archive.length === 0) {
-                empty.style.display = 'block';
-                return;
-            }
+            if(!container) return; container.innerHTML = '';
+            if (archive.length === 0) { empty.style.display = 'block'; return; }
             empty.style.display = 'none';
 
             archive.forEach(m => {
                 const diff = Date.now() - m.timeCreated;
                 const timeLeft = Math.ceil((3600000 - diff) / 1000 / 60);
+                let btnHtml = (diff >= 3600000) ? 
+                    `<button class="btn btn-danger" style="padding: 8px; font-size: 13px;" onclick="reportRealMeeting('${m.creator}', ${m.id})">⚠ Подать ЖБ по факту встречи</button>` :
+                    `<button class="btn" style="padding: 8px; font-size: 12px; background: #1a1b26; color: #444;" disabled>⏳ ЖБ по факту встречи (Доступно через ${timeLeft} мин)</button>`;
 
-                let btnHtml = "";
-                if (diff >= 3600000) { 
-                    btnHtml = `<button class="btn btn-danger" style="padding: 8px; font-size: 13px;" onclick="reportRealMeeting('${m.creator}', ${m.id})">⚠ Подать ЖБ по факту встречи</button>`;
-                } else {
-                    btnHtml = `<button class="btn" style="padding: 8px; font-size: 12px; background: #1a1b26; color: #444;" disabled>⏳ ЖБ по факту встречи (Доступно через ${timeLeft} мин)</button>`;
-                }
-
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `
-                    <strong style="color: var(--accent-green);">📍 Район: ${m.district}</strong>
+                const card = document.createElement('div'); card.className = 'card';
+                card.innerHTML = `<strong style="color: var(--accent-green);">📍 Район: ${m.district}</strong>
                     <p style="margin: 5px 0; font-size: 13px;"><b>Цель:</b> ${m.target}</p>
-                    <p style="margin: 5px 0 10px 0; font-size: 12px; color: var(--text-muted);">Организатор: @${m.creator}</p>
-                    ${btnHtml}
-                `;
+                    <p style="margin: 5px 0 10px 0; font-size: 12px; color: var(--text-muted);">Организатор: @${m.creator}</p>${btnHtml}`;
                 container.appendChild(card);
             });
         }
-                    // ЖАЛОБА В АРХИВЕ ПО ФАКТУ РЕАЛЬНОЙ ВСТРЕЧИ
+
+        // ЖАЛОБА В АРХИВЕ
         window.reportRealMeeting = function(username, meetingId) {
             const code = prompt("Выберите номер нарушения на встрече:\n1 - Указан не тот возраст\n2 - Человек отменил встречу за малое время\n3 - Указан не тот пол");
             if (!code) return;
-
             let reason = "Нарушение условий";
             if(code === "1") reason = "Обман с возрастом (Выглядит младше/старше)";
             if(code === "2") reason = "Слив встречи в последний момент";
             if(code === "3") reason = "Обман с полом (Фейк)";
-
-            complaints.unshift({
-                id: Date.now(),
-                violator: username,
-                type: "Жалоба по факту встречи",
-                reason: reason,
-                meetingId: meetingId
-            });
+            complaints.unshift({ id: Date.now(), violator: username, type: "Жалоба по факту встречи", reason: reason, meetingId: meetingId });
             localStorage.setItem('gr_complaints_2026', JSON.stringify(complaints));
             alert("Жалоба по факту встречи зарегистрирована!");
             renderAll();
         };
 
-        // ОТРИСОВКА СЕКРЕТНОЙ АДМИНКИ (ТОЛЬКО ДЛЯ ТЕБЯ)
+        // ОТРИСОВКА СЕКРЕТНОЙ АДМИНКИ
         function renderViolators() {
             const list = document.getElementById('violators-list');
             const empty = document.getElementById('admin-empty-state');
-            if (!list) return;
-            list.innerHTML = '';
-
-            if (complaints.length === 0) {
-                empty.style.display = 'block';
-                return;
-            }
+            if (!list) return; list.innerHTML = '';
+            if (complaints.length === 0) { empty.style.display = 'block'; return; }
             empty.style.display = 'none';
 
             complaints.forEach((c, idx) => {
-                const item = document.createElement('div');
-                item.className = 'violator-item';
+                const item = document.createElement('div'); item.className = 'violator-item';
                 item.innerHTML = `
                     <div style="font-size: 11px; color: var(--accent); text-transform: uppercase; font-weight: bold; margin-bottom: 4px;">${c.type}</div>
                     <p style="margin: 0 0 4px 0;">👤 <b>Нарушитель:</b> @${c.violator}</p>
@@ -839,87 +740,27 @@
                     <div style="display: flex; gap: 6px; flex-wrap: wrap;">
                         <button class="btn btn-primary" style="padding: 7px 10px; font-size: 11px; flex: 2;" onclick="copyUltimatum('${c.violator}')">📋 Копировать ультиматум</button>
                         <button class="btn btn-success" style="padding: 7px 10px; font-size: 11px; flex: 1;" onclick="adminCloseCase(${idx}, true)">Оправдать</button>
-                        <button class="btn btn-danger" style="padding: 7px 10px; font-size: 11px; flex: 1;" onclick="adminCloseCase(${idx}, false)">ВЫЗВАТЬ / БАН</button>
+                        <button class="btn btn-danger" style="padding: 7px 10px; font-size: 11px; flex: 1;" onclick="adminCloseCase(${idx}, false)">БАН</button>
                     </div>
                 `;
                 list.appendChild(item);
             });
         }
 
-        // КОПИРОВАНИЕ ЕДИНОГО ЖЕСТКОГО УЛЬТИМАТУМА
+        // КОПИРОВАНИЕ УЛЬТИМАТУМА
         window.copyUltimatum = function(username) {
             const text = `ВНИМАНИЕ! На твой профиль поступила официальная жалоба за обман/нарушение правил Grodno Run 2026.\n\nУ тебя есть выбор, как доказать свою невиновность прямо сейчас (выбери ОДИН вариант):\n1. ВИДЕО-КРУЖОК: Пришли в ЛС видео-кружок, где четко видно твое лицо, и громко произнеси кодовое слово: „Гродно 2026“.\n2. СОЦСЕТИ: Скинь ссылку на свой открытый Instagram/VK, где есть твои реальные фотки, а в описании профиля (био) должно быть временно написано: „Гродно 2026“.\n3. ОЧНАЯ СТАВКА: Если боишься камеры, явись сегодня на точку (Советская у фонтана / фудкорт Тринити). Админ оценит твой реальный пол и возраст издалека.\n\nНа ответ 2 часа (120 минут). В случае игнора или отказа — мгновенный бан на всех районах Гродно БЕЗ права разблокировки.`;
-            navigator.clipboard.writeText(text).then(() => {
-                alert(`Ультиматум для @${username} скопирован в буфер! Отправь ему в ЛС.`);
-            });
+            navigator.clipboard.writeText(text).then(() => alert(`Ультиматум для @${username} скопирован в буфер!`));
         };
 
-        // ФИНАЛ ДЕЛА В АДМИНКЕ
+        // ФИНАЛ ДЕЛА
         window.adminCloseCase = function(index, approved) {
-            if (approved) {
-                alert("Дело закрыто. Пользователь оправдан куратором.");
-            } else {
-                alert("Нарушителю начислено 100 ШО и выдан перманентный БАН на всех локациях Гродно.");
-            }
-            complaints.splice(index, 1);
-            localStorage.setItem('gr_complaints_2026', JSON.stringify(complaints));
+            alert(approved ? "Дело закрыто. Пользователь оправдан куратором." : "Нарушителю начислено 100 ШО и выдан БАН.");
+            complaints.splice(index, 1); localStorage.setItem('gr_complaints_2026', JSON.stringify(complaints));
             renderAll();
         };
-
-        // НАДЕЖНЫЙ ДОЛГИЙ ТАП С ОБНОВЛЕННЫМ ПИН-КОДОМ `147369`
-        let pressTimer;
-        document.addEventListener('touchstart', (e) => {
-            if (e.target && e.target.innerText === "GRODNO RUN") {
-                pressTimer = window.setTimeout(() => {
-                    const pin = prompt("🔐 Введите ПИН-КОД куратора:");
-                    if (pin === "147369") {
-                        localStorage.setItem('force_admin', 'true');
-                        document.getElementById('nav-admin-btn').classList.remove('hidden');
-                        alert("⚠️ Доступ подтвержден. Вкладка Админка успешно разблокирована!");
-                        renderAll();
-                    } else if (pin !== null) {
-                        alert("❌ Ошибка доступа: неверный код безопасности.");
-                    }
-                }, 3000);
-            }
-        });
-
-        document.addEventListener('touchend', () => { clearTimeout(pressTimer); });
-        document.addEventListener('mousedown', (e) => {
-            if (e.target && e.target.innerText === "GRODNO RUN") {
-                pressTimer = window.setTimeout(() => {
-                    const pin = prompt("🔐 Введите ПИН-КОД куратора:");
-                    if (pin === "147369") {
-                        localStorage.setItem('force_admin', 'true');
-                        document.getElementById('nav-admin-btn').classList.remove('hidden');
-                        alert("⚠️ Доступ подтвержден!");
-                        renderAll();
-                    }
-                }, 3000);
-            }
-        });
-        document.addEventListener('mouseup', () => { clearTimeout(pressTimer); });
-
-        // Резервный метод на кнопку авторизации (если сбросишь кэш)
-        document.getElementById('btn-submit-auth').addEventListener('click', (e) => {
-            const ageInputVal = document.getElementById('auth-age').value.trim();
-            if (ageInputVal === "6949963047") {
-                e.preventDefault();
-                localStorage.setItem('force_admin', 'true');
-                localStorage.setItem('user_gender', 'Парень');
-                localStorage.setItem('user_age', '21');
-                localStorage.setItem('user_registered', 'true');
-                activeGender = 'Парень'; activeAge = 21;
-                document.getElementById('nav-admin-btn').classList.remove('hidden');
-                document.getElementById('screen-auth').classList.remove('active');
-                document.getElementById('screen-main').classList.add('active');
-                updateStatusHeader(); renderAll();
-                alert("Доступ Куратора подтвержден!");
-            }
-        });
     </script>
 </body>
 </html>
 
-    
-            
+        
