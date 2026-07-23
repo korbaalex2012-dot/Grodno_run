@@ -6,124 +6,235 @@
     <title>Grodno Run</title>
     <!-- Официальный скрипт Telegram Web App API -->
     <script src="https://telegram.org"></script>
-    <!-- Tailwind CSS через CDN для пацанского темного дизайна -->
-    <script src="https://jsdelivr.net"></script>
+    
+    <!-- ЧИСТЫЕ АВТОНОМНЫЕ СТИЛИ (РАБОТАЮТ БЕЗ ИНТЕРНЕТА И CDN) -->
     <style>
-        /* Отключаем выделение текста и серые вспышки при тапах на смартфонах */
         body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #311042 100%);
+            color: #f1f5f9;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            min-height: screen;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
+            box-sizing: border-box;
+            padding-bottom: 30px;
         }
-        /* Тонкий футуристичный скроллбар для списков */
-        ::-webkit-scrollbar {
-            width: 4px;
+        .container {
+            max-width: 440px;
+            margin: 0 auto;
+            padding: 16px;
         }
-        ::-webkit-scrollbar-track {
-            background: rgba(15, 23, 42, 0.6);
+        header {
+            text-align: center;
+            margin-bottom: 20px;
         }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(99, 102, 241, 0.4);
-            border-radius: 2px;
+        h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, #818cf8, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
+        .sub-logo {
+            margin: 4px 0 0 0;
+            font-size: 10px;
+            color: #818cf8;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+        /* Пацанский стиль матового стекла (Glassmorphism) */
+        .card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px border rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+        }
+        .admin-card {
+            background: linear-gradient(90deg, rgba(120, 53, 4, 0.3), rgba(30, 41, 59, 0.8));
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        .label-title {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #94a3b8;
+            margin-bottom: 10px;
+        }
+        /* Жёсткие крупные кнопки для нажатия на ходу */
+        .btn-large {
+            width: 100%;
+            background: linear-gradient(90deg, #4f46e5, #4338ca);
+            color: white;
+            border: none;
+            padding: 16px;
+            font-size: 13px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+            transition: all 0.1s ease;
+        }
+        .btn-large:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+        .btn-admin {
+            width: 100%;
+            background: #f59e0b;
+            color: #020617;
+            border: none;
+            padding: 12px;
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-cols: 1fr 1fr;
+            gap: 12px;
+        }
+        .input-dark {
+            width: 100%;
+            background: #020617;
+            border: 1px solid #475569;
+            border-radius: 12px;
+            padding: 14px;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            box-sizing: border-box;
+            outline: none;
+        }
+        .input-dark:focus {
+            border-color: #6366f1;
+        }
+        .btn-sex {
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid #475569;
+            background: rgba(30, 41, 59, 0.4);
+            color: #94a3b8;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+        .hidden { display: none !important; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-slate-100 min-h-screen font-sans antialiased pb-8">
+<body>
 
-    <div class="max-w-md mx-auto px-4 pt-4">
+    <div class="container">
         
-        <!-- Главная шапка приложения -->
-        <header class="text-center mb-5">
-            <h1 class="text-3xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400 uppercase">Grodno Run</h1>
-            <p class="text-[10px] text-indigo-400 font-bold mt-1 uppercase tracking-widest">Локальный радар молодежных сборов</p>
+        <!-- Шапка -->
+        <header>
+            <h1>Grodno Run</h1>
+            <p class="sub-logo">Локальный радар молодежных сборов</p>
         </header>
 
-        <!-- АДМИН-ПАНЕЛЬ (РЕЖИМ БОГА) — Включается строго для твоего ID 6949963047 -->
-        <div id="admin-panel" class="hidden bg-gradient-to-r from-amber-950/40 to-slate-900/90 backdrop-blur-xl border border-amber-500/30 rounded-2xl p-5 mb-5 shadow-xl">
-            <div class="flex items-center justify-between mb-4 border-b border-amber-500/20 pb-2">
-                <span class="text-xs font-black tracking-wider text-amber-400 uppercase">⚡ Пульт Управления Гродно</span>
-                <span class="text-[9px] bg-amber-500/20 text-amber-300 font-bold px-2 py-0.5 rounded-full uppercase">Админ</span>
+        <!-- АДМИН-ПАНЕЛЬ (РЕЖИМ БОГА) -->
+        <div id="admin-panel" class="hidden admin-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(245,158,11,0.2); padding-bottom: 6px;">
+                <span style="font-size: 11px; font-weight: 900; color: #f59e0b; uppercase; letter-spacing: 1px;">⚡ Пульт Управления Гродно</span>
+                <span style="font-size: 9px; background: rgba(245,158,11,0.2); color: #fba518; font-weight: 700; padding: 2px 6px; border-radius: 10px; text-transform: uppercase;">Админ</span>
             </div>
             
-            <!-- Эмулятор профиля для тестов возрастных коридоров и пола -->
-            <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-2">Тестовый подмен профиля (Эмулятор):</p>
-            <div class="grid grid-cols-2 gap-3 mb-4">
-                <button type="button" id="fake-sex-male" onclick="toggleFakeGender('Парень')" class="py-3 px-4 bg-slate-950 border border-slate-800 rounded-xl text-xs font-bold uppercase tracking-wider transition-all text-slate-400 active:scale-95">Парень</button>
-                <button type="button" id="fake-sex-female" onclick="toggleFakeGender('Девушка')" class="py-3 px-4 bg-slate-950 border border-slate-800 rounded-xl text-xs font-bold uppercase tracking-wider transition-all text-slate-400 active:scale-95">Девушка</button>
+            <span class="label-title" style="color: #cbd5e1; margin-bottom: 6px;">Тестовый подмен профиля (Эмулятор):</span>
+            <div class="grid-2" style="margin-bottom: 12px;">
+                <button type="button" id="fake-sex-male" onclick="toggleFakeGender('Парень')" class="btn-sex" style="padding: 10px; font-size: 11px;">Парень</button>
+                <button type="button" id="fake-sex-female" onclick="toggleFakeGender('Девушка')" class="btn-sex" style="padding: 10px; font-size: 11px;">Девушка</button>
             </div>
             
-            <div class="flex items-center bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs mb-4">
-                <span class="text-slate-500 uppercase font-mono mr-2">Тест Возраст:</span>
-                <input type="number" id="fake-age-input" oninput="updateFakeAge(this.value)" placeholder="Напр: 15 или 30" class="w-full bg-transparent font-bold text-amber-400 focus:outline-none text-sm">
+            <div style="display: flex; align-items: center; background: #020617; border: 1px solid #334155; border-radius: 12px; padding: 10px; margin-bottom: 12px;">
+                <span style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: bold; margin-right: 8px;">Тест Возраст:</span>
+                <input type="number" id="fake-age-input" oninput="updateFakeAge(this.value)" placeholder="Напр: 15 или 30" style="background: transparent; border: none; color: #f59e0b; font-weight: 700; outline: none; width: 100%;">
             </div>
 
-            <button type="button" onclick="triggerAdminAction('verify_alert')" class="w-full bg-amber-500 active:bg-amber-600 text-slate-950 font-black py-3.5 rounded-xl text-xs uppercase tracking-wider transition-all shadow-lg shadow-amber-950/50 active:scale-[0.98]">
+            <button type="button" onclick="triggerAdminAction('verify_alert')" class="btn-admin">
                 ⚠️ Вызвать нарушителя на кружок (Гродно 2026)
             </button>
         </div>
 
-        <!-- ШАГ 0: ВХОДНОЙ КОНТРОЛЬ (Блокирующий оверлей авторизации) -->
-        <div id="auth-screen" class="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-2xl p-5 shadow-2xl mb-5">
-            <div class="mb-4">
-                <h2 class="text-base font-black text-indigo-400 uppercase tracking-wide">Входной контроль</h2>
-                <p class="text-xs text-slate-400 mt-0.5">Введи реальные данные. Они жестко проверяются при откликах пацанов.</p>
+        <!-- ШАГ 0: ВХОДНОЙ КОНТРОЛЬ -->
+        <div id="auth-screen" class="card">
+            <div style="margin-bottom: 16px;">
+                <h2 style="margin: 0; font-size: 16px; font-weight: 900; color: #818cf8; text-transform: uppercase; letter-spacing: 1px;">Входной контроль</h2>
+                <p style="margin: 4px 0 0 0; font-size: 12px; color: #94a3b8;">Введи реальные данные. Они проверяются роботом на Советской.</p>
             </div>
             
-            <!-- Выбор пола -->
-            <div class="mb-5">
-                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2.5">Ваш пол</label>
-                <div class="grid grid-cols-2 gap-3">
-                    <button type="button" id="gender-male" onclick="setGender('Парень')" class="py-4 px-4 rounded-xl border border-slate-700 bg-slate-800/40 text-sm font-bold uppercase tracking-wider transition-all focus:outline-none active:scale-95">Парень</button>
-                    <button type="button" id="gender-female" onclick="setGender('Девушка')" class="py-4 px-4 rounded-xl border border-slate-700 bg-slate-800/40 text-sm font-bold uppercase tracking-wider transition-all focus:outline-none active:scale-95">Девушка</button>
+            <div style="margin-bottom: 20px;">
+                <label class="label-title">Ваш пол</label>
+                <div class="grid-2">
+                    <button type="button" id="gender-male" onclick="setGender('Парень')" class="btn-sex">Парень</button>
+                    <button type="button" id="gender-female" onclick="setGender('Девушка')" class="btn-sex">Девушка</button>
                 </div>
             </div>
 
-            <!-- Ввод возраста -->
-            <div class="mb-6">
-                <label for="user-age" class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2.5">Ваш возраст (от 12 до 35 лет)</label>
-                <input type="number" id="user-age" min="12" max="35" oninput="handleAgeInput(this.value)" placeholder="Введите ваш точный возраст" class="w-full bg-slate-950/80 border border-slate-700 rounded-xl px-4 py-3.5 text-base font-bold text-white focus:outline-none focus:border-indigo-500 transition-all placeholder-slate-600">
-                <p id="age-warning-text" class="text-[10px] text-slate-500 mt-2">Школьники не увидят сборы взрослых, и наоборот. Все строго.</p>
+            <div style="margin-bottom: 24px;">
+                <label for="user-age" class="label-title">Ваш возраст (от 12 до 35 лет)</label>
+                <input type="number" id="user-age" min="12" max="35" oninput="handleAgeInput(this.value)" placeholder="Введите ваш точный возраст" class="input-dark">
+                <p id="age-warning-text" style="margin: 8px 0 0 0; font-size: 10px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Школьники не увидят сборы взрослых, и наоборот. Все строго.</p>
             </div>
 
-            <!-- Кнопка авторизации -->
-            <button type="button" onclick="verifyAndProceed()" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 active:from-indigo-700 active:to-indigo-800 text-white font-black py-4 rounded-xl text-xs uppercase tracking-widest shadow-lg shadow-indigo-950/50 transition-all active:scale-[0.99]">
+            <button type="button" onclick="verifyAndProceed()" class="btn-large">
                 Пройти авторизацию
             </button>
         </div>
                 <!-- ШАГ 1: ГЛАВНЫЙ ЭКРАН ПРИЛОЖЕНИЯ (Изначально скрыт) -->
-        <main id="main-app" class="hidden space-y-5">
+        <main id="main-app" class="hidden" style="margin-top: 20px;">
             
             <!-- ВКЛАДКИ НАВИГАЦИИ -->
-            <div class="grid grid-cols-2 gap-2 bg-slate-900/90 p-1.5 rounded-xl border border-slate-800">
-                <button type="button" id="tab-feed" onclick="switchTab('feed')" class="py-3 text-xs font-black uppercase tracking-wider rounded-lg bg-indigo-600 text-white transition-all">
+            <div class="card" style="padding: 6px; display: grid; grid-template-cols: 1fr 1fr; gap: 8px; margin-bottom: 16px;">
+                <button type="button" id="tab-feed" onclick="switchTab('feed')" style="background: #4f46e5; color: white; border: none; padding: 12px; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; border-radius: 10px; cursor: pointer;">
                     🔥 Радар Сборов
                 </button>
-                <button type="button" id="tab-create" onclick="switchTab('create')" class="py-3 text-xs font-bold uppercase tracking-wider rounded-lg text-slate-400 hover:text-white transition-all">
+                <button type="button" id="tab-create" onclick="switchTab('create')" style="background: transparent; color: #94a3b8; border: none; padding: 12px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-radius: 10px; cursor: pointer;">
                     ➕ Создать сбор
                 </button>
             </div>
 
-            <!-- ЭКРАН ЛЕНТЫ СБОРОВ / ПРОВЕРКИ ИЗ КАНАЛА -->
-            <div id="section-feed" class="space-y-4">
+            <!-- ЭКРАН ЛЕНТЫ СБОРОВ -->
+            <div id="section-feed" style="display: flex; flex-direction: column; gap: 16px;">
                 <div id="verification-card-zone" class="hidden"></div>
-                <div class="flex items-center justify-between px-1">
-                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Актуально в Гродно:</span>
-                    <span class="text-[10px] bg-emerald-500/10 text-emerald-400 font-mono px-2.5 py-0.5 rounded-full border border-emerald-500/20">Радар активен</span>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 4px;">
+                    <span class="label-title" style="margin-bottom: 0;">Актуально в Гродно:</span>
+                    <span style="font-size: 10px; background: rgba(16, 185, 129, 0.1); color: #10b981; font-family: monospace; padding: 2px 8px; border-radius: 10px; border: 1px solid rgba(16, 185, 129, 0.2);">Радар активен</span>
                 </div>
-                <div id="radar-cards-container" class="space-y-4">
-                    <div id="feed-empty-state" class="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-8 text-center backdrop-blur-md">
-                        <p class="text-sm font-medium text-slate-400">На радаре пока пусто...</p>
-                        <p class="text-[11px] text-slate-600 mt-1.5">Открой вкладку «Создать сбор» и запусти движ на районе!</p>
+                <div id="radar-cards-container">
+                    <div id="feed-empty-state" class="card" style="text-align: center; padding: 32px;">
+                        <p style="margin: 0; font-size: 14px; font-weight: 500; color: #94a3b8;">На радаре пока пусто...</p>
+                        <p style="margin: 6px 0 0 0; font-size: 11px; color: #64748b;">Открой вкладку «Создать сбор» и запусти движ на районе!</p>
                     </div>
                 </div>
             </div>
 
             <!-- ЭКРАН КОНСТРУКТОРА СБОРОВ -->
-            <div id="section-create" class="hidden bg-slate-900/60 backdrop-blur-lg border border-slate-800/80 rounded-2xl p-5 shadow-xl space-y-5">
+            <div id="section-create" class="hidden card" style="display: flex; flex-direction: column; gap: 20px;">
                 
-                <!-- Выбор района Гродно -->
                 <div>
-                    <label for="location" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">📍 Район Гродно</label>
-                    <select id="location" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3.5 font-bold text-slate-200 focus:outline-none focus:border-indigo-500 text-sm">
+                    <label for="location" class="label-title">📍 Район Гродно</label>
+                    <select id="location" class="input-dark">
                         <option value="Центр (Советская)">Центр (Советская)</option>
                         <option value="ТРК Trinity">ТРК Trinity</option>
                         <option value="Грандичи">Грандичи</option>
@@ -136,16 +247,14 @@
                     </select>
                 </div>
 
-                <!-- Кастомное место встречи -->
                 <div>
-                    <label for="custom-location" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">📍 Своё конкретное место (Необязательно)</label>
-                    <input type="text" id="custom-location" maxlength="40" placeholder="Напр: лавочки за Драмтеатром" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3.5 text-sm font-semibold text-slate-200 focus:outline-none focus:border-indigo-500 placeholder-slate-700">
+                    <label for="custom-location" class="label-title">📍 Своё конкретное место (Необязательно)</label>
+                    <input type="text" id="custom-location" maxlength="40" placeholder="Напр: лавочки за Драмтеатром" class="input-dark" style="font-size: 14px;">
                 </div>
 
-                <!-- Выбор цели сбора -->
                 <div>
-                    <label for="purpose" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">🎯 Цель сбора</label>
-                    <select id="purpose" onchange="handlePurposeChange(this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3.5 font-bold text-slate-200 focus:outline-none focus:border-indigo-500 text-sm">
+                    <label for="purpose" class="label-title">🎯 Цель сбора</label>
+                    <select id="purpose" onchange="handlePurposeChange(this.value)" class="input-dark">
                         <option value="Прогулка / Чилл">Прогулка / Чилл</option>
                         <option value="Футбол / Спорт">Футбол / Спорт</option>
                         <option value="Катка на самокатах / Вело">Катка на самокатах / Вело</option>
@@ -155,97 +264,82 @@
                     </select>
                 </div>
 
-                <!-- Кастомная цель сбора -->
                 <div id="custom-purpose-block" class="hidden">
-                    <label for="custom-purpose" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">🎯 Твоя кастомная цель</label>
-                    <input type="text" id="custom-purpose" maxlength="40" placeholder="Коротко опиши суть движа" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3.5 text-sm font-semibold text-slate-200 focus:outline-none focus:border-indigo-500 placeholder-slate-700">
+                    <label for="custom-purpose" class="label-title">🎯 Твоя кастомная цель</label>
+                    <input type="text" id="custom-purpose" maxlength="40" placeholder="Коротко опиши суть движа" class="input-dark" style="font-size: 14px;">
                 </div>
 
-                <!-- Желаемый возраст компании -->
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">🔞 Желаемый возраст компании</label>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="flex items-center bg-slate-950 border border-slate-700 rounded-xl px-4 py-3">
-                            <span class="text-xs text-slate-500 mr-2 uppercase font-mono">От</span>
-                            <input type="number" id="age-from" value="16" class="w-full bg-transparent font-black text-white focus:outline-none text-sm">
+                    <label class="label-title">🔞 Желаемый возраст компании</label>
+                    <div class="grid-2">
+                        <div style="display: flex; align-items: center; background: #020617; border: 1px solid #475569; border-radius: 12px; padding: 0 16px;">
+                            <span style="font-size: 11px; color: #64748b; font-family: monospace; margin-right: 8px;">От</span>
+                            <input type="number" id="age-from" value="16" style="background: transparent; border: none; color: white; font-weight: 900; padding: 14px 0; outline: none; width: 100%; font-size: 14px;">
                         </div>
-                        <div class="flex items-center bg-slate-950 border border-slate-700 rounded-xl px-4 py-3">
-                            <span class="text-xs text-slate-500 mr-2 uppercase font-mono">До</span>
-                            <input type="number" id="age-to" value="22" class="w-full bg-transparent font-black text-white focus:outline-none text-sm">
+                        <div style="display: flex; align-items: center; background: #020617; border: 1px solid #475569; border-radius: 12px; padding: 0 16px;">
+                            <span style="font-size: 11px; color: #64748b; font-family: monospace; margin-right: 8px;">До</span>
+                            <input type="number" id="age-to" value="22" style="background: transparent; border: none; color: white; font-weight: 900; padding: 14px 0; outline: none; width: 100%; font-size: 14px;">
                         </div>
                     </div>
-                    <p id="corridor-info-text" class="text-[9px] text-slate-500 mt-2 uppercase tracking-wider font-bold"></p>
+                    <p id="corridor-info-text" style="margin: 8px 0 0 0; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;"></p>
                 </div>
 
-                <!-- Чекбокс "Со мной друг" -->
-                <div class="flex items-center justify-between bg-slate-950/40 border border-slate-800 rounded-xl p-3.5">
-                    <span class="text-xs font-bold uppercase tracking-wider text-slate-300">👥 Со мной друг/подруга</span>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" id="with-friend" class="sr-only peer">
-                        <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600 peer-checked:after:bg-white"></div>
+                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(2,6,23,0.4); border: 1px solid #334155; border-radius: 12px; padding: 14px;">
+                    <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #cbd5e1;">👥 Со мной друг/подруга</span>
+                    <label style="position: relative; display: inline-block; width: 44px; height: 24px;">
+                        <input type="checkbox" id="with-friend" style="opacity: 0; width: 0; height: 0;">
+                        <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #334155; transition: .3s; border-radius: 24px;" onclick="this.style.backgroundColor = this.previousElementSibling.checked ? '#334155' : '#4f46e5'"></span>
                     </label>
                 </div>
                                 <!-- Счетчики нужного состава компании -->
-                <div class="grid grid-cols-2 gap-4 pt-1">
-                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 text-center">
-                        <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2.5">Ищу парней</span>
-                        <div class="flex items-center justify-between max-w-[110px] mx-auto">
-                            <button type="button" onclick="changeCounter('count-guys', -1)" class="w-8 h-8 rounded-lg bg-slate-800 text-base font-black flex items-center justify-center border border-slate-700 active:scale-90 text-slate-300">-</button>
-                            <span id="count-guys" class="text-base font-black text-white mx-2">0</span>
-                            <button type="button" onclick="changeCounter('count-guys', 1)" class="w-8 h-8 rounded-lg bg-slate-800 text-base font-black flex items-center justify-center border border-slate-700 active:scale-90 text-slate-300">+</button>
+                <div class="grid-2">
+                    <div style="background: #020617; border: 1px solid #334155; border-radius: 12px; padding: 16px; text-align: center;">
+                        <span class="label-title" style="font-size: 10px; margin-bottom: 10px;">Ищу парней</span>
+                        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 110px; margin: 0 auto;">
+                            <button type="button" onclick="changeCounter('count-guys', -1)" style="width: 32px; height: 32px; border-radius: 8px; background: #1e293b; color: #e2e8f0; border: 1px solid #475569; font-size: 18px; font-weight: 900; cursor: pointer;">-</button>
+                            <span id="count-guys" style="font-size: 16px; font-weight: 900; color: white; margin: 0 8px;">0</span>
+                            <button type="button" onclick="changeCounter('count-guys', 1)" style="width: 32px; height: 32px; border-radius: 8px; background: #1e293b; color: #e2e8f0; border: 1px solid #475569; font-size: 18px; font-weight: 900; cursor: pointer;">+</button>
                         </div>
                     </div>
-                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 text-center">
-                        <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2.5">Ищу девушек</span>
-                        <div class="flex items-center justify-between max-w-[110px] mx-auto">
-                            <button type="button" onclick="changeCounter('count-girls', -1)" class="w-8 h-8 rounded-lg bg-slate-800 text-base font-black flex items-center justify-center border border-slate-700 active:scale-90 text-slate-300">-</button>
-                            <span id="count-girls" class="text-base font-black text-white mx-2">0</span>
-                            <button type="button" onclick="changeCounter('count-girls', 1)" class="w-8 h-8 rounded-lg bg-slate-800 text-base font-black flex items-center justify-center border border-slate-700 active:scale-90 text-slate-300">+</button>
+                    <div style="background: #020617; border: 1px solid #334155; border-radius: 12px; padding: 16px; text-align: center;">
+                        <span class="label-title" style="font-size: 10px; margin-bottom: 10px;">Ищу девушек</span>
+                        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 110px; margin: 0 auto;">
+                            <button type="button" onclick="changeCounter('count-girls', -1)" style="width: 32px; height: 32px; border-radius: 8px; background: #1e293b; color: #e2e8f0; border: 1px solid #475569; font-size: 18px; font-weight: 900; cursor: pointer;">-</button>
+                            <span id="count-girls" style="font-size: 16px; font-weight: 900; color: white; margin: 0 8px;">0</span>
+                            <button type="button" onclick="changeCounter('count-girls', 1)" style="width: 32px; height: 32px; border-radius: 8px; background: #1e293b; color: #e2e8f0; border: 1px solid #475569; font-size: 18px; font-weight: 900; cursor: pointer;">+</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Поле подробного текстового описания анкеты -->
+                <!-- Поле текстового описания анкеты -->
                 <div>
-                    <label for="description" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">📝 Описание анкеты (Макс. 120 символов)</label>
-                    <textarea id="description" maxlength="120" placeholder="Напр: Ищем людей с кальяном, сидим на лавках у Драмтеатра. Ссылки и реклама запрещены!" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3.5 text-xs font-semibold text-slate-200 focus:outline-none focus:border-indigo-500 h-24 resize-none placeholder-slate-700 transition-all"></textarea>
+                    <label for="description" class="label-title">📝 Описание анкеты (Макс. 120 символов)</label>
+                    <textarea id="description" maxlength="120" placeholder="Напр: Ищем людей с кальяном, сидим на лавках у Драмтеатра. Ссылки и реклама запрещены!" class="input-dark" style="font-size: 12px; height: 90px; resize: none; font-weight: 600; font-family: inherit; padding: 12px;"></textarea>
                 </div>
 
-                <!-- Большая кнопка запуска радара -->
-                <button type="button" onclick="submitRadar()" class="w-full bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-600 active:opacity-90 text-white font-black py-4 rounded-xl text-xs uppercase tracking-widest shadow-xl shadow-purple-950/50 transition-all active:scale-[0.98]">
+                <!-- Главная кнопка запуска радара -->
+                <button type="button" onclick="submitRadar()" class="btn-large" style="background: linear-gradient(90deg, #ec4899, #8b5cf6); box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);">
                     🚀 Запустить радар сбора
                 </button>
             </div>
         </main>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО ЖАЛОБ (Пацанские причины со штрафными баллами) -->
-    <div id="report-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-sm p-5 space-y-4 shadow-2xl">
-            <h3 class="text-sm font-black text-rose-400 uppercase tracking-wider">⚠️ Указать статью нарушения</h3>
-            <p class="text-[11px] text-slate-400">Ложные жалобы караются жестким баном твоего профиля. Выбирай причину нарушения строго по факту встречи:</p>
+    <!-- МОДАЛЬНОЕ ОКНО ЖАЛОБ -->
+    <div id="report-modal" class="hidden" style="position: fixed; inset: 0; background: rgba(2,6,23,0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 16px;">
+        <div class="card" style="width: 100%; max-width: 340px; display: flex; flex-direction: column; gap: 16px; background: #0f172a; border: 1px solid #334155;">
+            <h3 style="margin: 0; font-size: 14px; font-weight: 900; color: #f43f5e; text-transform: uppercase; letter-spacing: 1px;">⚠️ Указать статью нарушения</h3>
+            <p style="margin: 0; font-size: 11px; color: #94a3b8;">Ложные жалобы караются жестким баном твоего профиля. Выбирай причину нарушения строго по факту встречи:</p>
             
-            <div class="space-y-2">
-                <button type="button" onclick="confirmReport('Слив в последний момент')" class="w-full text-left py-3 px-4 bg-slate-950 hover:bg-slate-800 rounded-xl text-xs font-bold text-slate-200 transition-all border border-slate-800 active:scale-[0.99]">
-                    🚫 Слив прямо перед сбором (40 ШО)
-                </button>
-                <button type="button" onclick="confirmReport('Грязь / Спам в описании')" class="w-full text-left py-3 px-4 bg-slate-950 hover:bg-slate-800 rounded-xl text-xs font-bold text-slate-200 transition-all border border-slate-800 active:scale-[0.99]">
-                    💬 Грязь, спам или ссылки в анкете (50 ШО)
-                </button>
-                <button type="button" onclick="confirmReport('Неадекват / Агрессия')" class="w-full text-left py-3 px-4 bg-slate-950 hover:bg-slate-800 rounded-xl text-xs font-bold text-slate-200 transition-all border border-slate-800 active:scale-[0.99]">
-                    ⚔️ Неадекватное поведение / Конфликт (60 ШО)
-                </button>
-                <button type="button" onclick="confirmReport('Ошибка возраста (1-3 года)')" class="w-full text-left py-3 px-4 bg-slate-950 hover:bg-slate-800 rounded-xl text-xs font-bold text-slate-200 transition-all border border-slate-800 active:scale-[0.99]">
-                    ⏳ Ошибка в возрасте на 1-3 года (20 ШО)
-                </button>
-                <button type="button" onclick="confirmReport('Фейк возраста (+3 года) / Пола')" class="w-full text-left py-3 px-4 bg-slate-950 hover:bg-slate-800 rounded-xl text-xs font-bold text-rose-400 transition-all border border-rose-900/30 active:scale-[0.99]">
-                    👤 Жесткий фейк пола или возраста (100 ШО -> БАН)
-                </button>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <button type="button" onclick="confirmReport('Слив в последний момент')" style="width: 100%; text-align: left; padding: 12px; background: #020617; border: 1px solid #334155; border-radius: 12px; color: #e2e8f0; font-size: 12px; font-weight: 700; cursor: pointer;">🚫 Слив прямо перед сбором (40 ШО)</button>
+                <button type="button" onclick="confirmReport('Грязь / Спам в описании')" style="width: 100%; text-align: left; padding: 12px; background: #020617; border: 1px solid #334155; border-radius: 12px; color: #e2e8f0; font-size: 12px; font-weight: 700; cursor: pointer;">💬 Грязь, спам или ссылки в анкете (50 ШО)</button>
+                <button type="button" onclick="confirmReport('Неадекват / Агрессия')" style="width: 100%; text-align: left; padding: 12px; background: #020617; border: 1px solid #334155; border-radius: 12px; color: #e2e8f0; font-size: 12px; font-weight: 700; cursor: pointer;">⚔️ Неадекватное поведение / Конфликт (60 ШО)</button>
+                <button type="button" onclick="confirmReport('Ошибка возраста (1-3 года)')" style="width: 100%; text-align: left; padding: 12px; background: #020617; border: 1px solid #334155; border-radius: 12px; color: #e2e8f0; font-size: 12px; font-weight: 700; cursor: pointer;">⏳ Ошибка в возрасте на 1-3 года (20 ШО)</button>
+                <button type="button" onclick="confirmReport('Фейк возраста (+3 года) / Пола')" style="width: 100%; text-align: left; padding: 12px; background: #020617; border: 1px solid #f43f5e; border-radius: 12px; color: #f43f5e; font-size: 12px; font-weight: 700; cursor: pointer;">👤 Жесткий фейк пола или возраста (100 ШО -> БАН)</button>
             </div>
             
-            <button type="button" onclick="closeReportModal()" class="w-full bg-slate-800 py-3 rounded-xl text-xs font-black uppercase tracking-wider text-slate-400 transition-all active:scale-[0.98]">
-                Отмена
-            </button>
+            <button type="button" onclick="closeReportModal()" style="width: 100%; background: #334155; border: none; color: #94a3b8; padding: 12px; font-size: 12px; font-weight: 900; text-transform: uppercase; border-radius: 12px; cursor: pointer;">Отмена</button>
         </div>
     </div>
 
@@ -253,5 +347,3 @@
     <script src="app.js"></script>
 </body>
 </html>
-
-                
