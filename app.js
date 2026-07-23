@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
     checkAdminRights();
     loadSession();
     processIncomingDeepLink();
-    tg.ready(); // Жесткий сигнал Телеграму убрать белый экран загрузки
+    tg.ready(); // Убираем белый экран загрузки Телеграма
 });
 
 // Активация твоего пульта управления модератора
@@ -66,7 +66,7 @@ function loadSession() {
 // БЛОК 2: ЛОГИКА ВХОДНОГО КОНТРОЛЯ (ШАГ 0)
 // ==========================================
 
-// Пацанский выбор пола (меняет рамки и подсветку кнопок)
+// Автономный выбор пола с неоновой подсветкой рамок без Tailwind
 function setGender(gender) {
     userProfile.gender = gender;
     const isMale = gender === "Парень";
@@ -75,14 +75,18 @@ function setGender(gender) {
     const femaleBtn = document.getElementById("gender-female");
     
     if (maleBtn) {
-        maleBtn.className = isMale ? 
-            "py-4 px-4 rounded-xl border-2 border-indigo-500 bg-indigo-600/30 text-sm font-black uppercase tracking-wider text-white transition-all scale-[1.02]" : 
-            "py-4 px-4 rounded-xl border border-slate-700 bg-slate-800/40 text-sm font-bold uppercase tracking-wider text-slate-400 transition-all";
+        if (isMale) {
+            maleBtn.classList.add("active-male");
+        } else {
+            maleBtn.classList.remove("active-male");
+        }
     }
     if (femaleBtn) {
-        femaleBtn.className = !isMale ? 
-            "py-4 px-4 rounded-xl border-2 border-indigo-500 bg-indigo-600/30 text-sm font-black uppercase tracking-wider text-white transition-all scale-[1.02]" : 
-            "py-4 px-4 rounded-xl border border-slate-700 bg-slate-800/40 text-sm font-bold uppercase tracking-wider text-slate-400 transition-all";
+        if (!isMale) {
+            femaleBtn.classList.add("active-female");
+        } else {
+            femaleBtn.classList.remove("active-female");
+        }
     }
 }
 
@@ -104,17 +108,22 @@ function handleAgeInput(value) {
     }
 }
 
-// Пропуск проверенного пользователя внутрь радара
+// Жесткая проверка полей с выводом ошибок
 function verifyAndProceed() {
     const ageInput = document.getElementById("user-age")?.value;
     const age = parseInt(ageInput);
 
+    // ВСПЛЫВАЮЩИЕ ОШИБКИ, ЕСЛИ ДАННЫЕ НЕ ВВЕДЕНЫ
     if (!userProfile.gender) {
-        tg.showAlert("Выбери свой пол перед входом на радар!");
+        tg.showAlert("Ошибка: Выбери свой реальный пол (Парень / Девушка) перед входом на радар!");
         return;
     }
-    if (isNaN(age) || age < 12 || age > 35) {
-        tg.showAlert("Укажи реальный возраст от 12 до 35 лет!");
+    if (isNaN(age)) {
+        tg.showAlert("Ошибка: Поле возраста пустое! Введи свой точный возраст.");
+        return;
+    }
+    if (age < 12 || age > 35) {
+        tg.showAlert("Ошибка: Доступ запрещен. Радар сборов работает строго для молодежи от 12 до 35 лет!");
         return;
     }
 
@@ -145,21 +154,21 @@ function applyAgeCorridorRules() {
         toInput.value = 17;
         toInput.max = 17;
         info.innerText = "⚠️ Авто-шлюз: Вы можете звать только сверстников до 17 лет";
-        info.className = "text-[9px] text-cyan-400 mt-2 uppercase tracking-wider font-bold";
+        info.style.color = "#22d3ee";
     } else if (currentAge === 17) {
         fromInput.value = 16;
         fromInput.min = 16;
         toInput.value = 19;
         toInput.max = 19;
         info.innerText = "⚠️ Авто-шлюз: Доступен переходный коридор (16 - 19 лет)";
-        info.className = "text-[9px] text-amber-400 mt-2 uppercase tracking-wider font-bold";
+        info.style.color = "#f59e0b";
     } else {
         fromInput.value = 18;
         fromInput.min = 18;
         toInput.value = 25;
         toInput.min = 18;
         info.innerText = "⚠️ Авто-шлюз: Доступна только взрослая категория (18+)";
-        info.className = "text-[9px] text-indigo-400 mt-2 uppercase tracking-wider font-bold";
+        info.style.color = "#818cf8";
     }
 }
 
@@ -175,14 +184,12 @@ function toggleFakeGender(gender) {
     const femaleBtn = document.getElementById("fake-sex-female");
     
     if (maleBtn) {
-        maleBtn.className = isMale ? 
-            "py-3 px-4 bg-amber-500 text-slate-950 text-xs font-black uppercase tracking-wider rounded-xl transition-all scale-[1.02]" : 
-            "py-3 px-4 bg-slate-950 border border-slate-800 rounded-xl text-xs font-bold uppercase tracking-wider text-slate-400 transition-all";
+        maleBtn.style.border = isMale ? "1px solid #f59e0b" : "1px solid #475569";
+        maleBtn.style.color = isMale ? "#f59e0b" : "#94a3b8";
     }
     if (femaleBtn) {
-        femaleBtn.className = !isMale ? 
-            "py-3 px-4 bg-amber-500 text-slate-950 text-xs font-black uppercase tracking-wider rounded-xl transition-all scale-[1.02]" : 
-            "py-3 px-4 bg-slate-950 border border-slate-800 rounded-xl text-xs font-bold uppercase tracking-wider text-slate-400 transition-all";
+        femaleBtn.style.border = !isMale ? "1px solid #f59e0b" : "1px solid #475569";
+        femaleBtn.style.color = !isMale ? "#f59e0b" : "#94a3b8";
     }
 }
 
@@ -201,7 +208,6 @@ function triggerAdminAction(type) {
 // БЛОК 5: НАВИГАЦИЯ И УПРАВЛЕНИЕ СЧЕТЧИКАМИ
 // ==========================================
 
-// Переключатель вкладок в Mini App
 function switchTab(tab) {
     const isFeed = tab === "feed";
     const feedSec = document.getElementById("section-feed");
@@ -214,14 +220,12 @@ function switchTab(tab) {
     const tabCreateBtn = document.getElementById("tab-create");
     
     if (tabFeedBtn) {
-        tabFeedBtn.className = isFeed ? 
-            "py-3 text-xs font-black uppercase tracking-wider rounded-lg bg-indigo-600 text-white transition-all shadow-md shadow-indigo-950/50" : 
-            "py-3 text-xs font-bold uppercase tracking-wider rounded-lg text-slate-400 hover:text-white transition-all";
+        tabFeedBtn.style.background = isFeed ? "#4f46e5" : "transparent";
+        tabFeedBtn.style.color = isFeed ? "white" : "#94a3b8";
     }
     if (tabCreateBtn) {
-        tabCreateBtn.className = !isFeed ? 
-            "py-3 text-xs font-black uppercase tracking-wider rounded-lg bg-indigo-600 text-white transition-all shadow-md shadow-indigo-950/50" : 
-            "py-3 text-xs font-bold uppercase tracking-wider rounded-lg text-slate-400 hover:text-white transition-all";
+        tabCreateBtn.style.background = !isFeed ? "#4f46e5" : "transparent";
+        tabCreateBtn.style.color = !isFeed ? "white" : "#94a3b8";
     }
 }
 
@@ -340,7 +344,6 @@ function processIncomingDeepLink() {
     const parts = startParam.split("_");
     if (parts.length < 7) return; 
 
-    // Вставляем индексы элементов массива напрямую
     const orgId = parts[1]; 
     const reqAgeFrom = parseInt(parts[4]) || 12;
     const reqAgeTo = parseInt(parts[5]) || 35;
@@ -353,26 +356,26 @@ function processIncomingDeepLink() {
     switchTab("feed");
     
     let htmlContent = `
-        <div class="bg-slate-900 border-2 border-indigo-500 rounded-2xl p-5 shadow-2xl mb-4 space-y-4">
-            <h3 class="text-xs font-black uppercase text-indigo-400 tracking-wider">🔄 Проверка шлюза фейс-контроля</h3>
-            <p class="text-xs text-slate-300">Вход на радар организатора ID: ${orgId}. Проверяем твое соответствие...</p>
+        <div class="card" style="border: 2px solid #6366f1; padding: 20px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 16px;">
+            <h3 style="margin: 0; font-size: 12px; font-weight: 900; color: #818cf8; text-transform: uppercase; letter-spacing: 1px;">🔄 Проверка шлюза фейс-контроля</h3>
+            <p style="margin: 0; font-size: 12px; color: #cbd5e1;">Вход на радар организатора ID: ${orgId}. Проверяем твое соответствие...</p>
     `;
 
     if (myAge < reqAgeFrom || myAge > reqAgeTo) {
         htmlContent += `
-            <div class="bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs p-3.5 rounded-xl font-bold uppercase tracking-wide">
+            <div style="background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.2); text-color: #f43f5e; font-size: 12px; padding: 14px; border-radius: 12px; font-weight: 700; text-transform: uppercase;">
                 ❌ ОТКАЗ: Твой возраст (${myAge} лет) не подходит под коридор сбора (${reqAgeFrom}-${reqAgeTo} лет).
             </div>`;
     } else {
         htmlContent += `
-            <div class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs p-3.5 rounded-xl font-bold uppercase tracking-wide">
+            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); color: #10b981; font-size: 12px; padding: 14px; border-radius: 12px; font-weight: 700; text-transform: uppercase;">
                 ✅ ПРОЙДЕНО: Твой возраст полностью подходит под критерии сбора.
             </div>
-            <div class="pt-2 space-y-2">
-                <a href="tg://user?id=${orgId}" onclick="registerAcceptAction('${orgId}')" class="w-full block bg-gradient-to-r from-emerald-500 to-teal-600 text-center text-slate-950 font-black py-3.5 rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-emerald-950/30">
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <a href="tg://user?id=${orgId}" onclick="registerAcceptAction('${orgId}')" style="display: block; background: linear-gradient(90deg, #10b981, #059669); text-align: center; color: #020617; font-weight: 900; padding: 14px; border-radius: 12px; font-size: 12px; text-transform: uppercase; text-decoration: none; box-shadow: 0 4px 15px rgba(16,185,129,0.3);">
                     💬 Написать организатору в ЛС
                 </a>
-                <button type="button" onclick="openReportModal('${orgId}')" class="w-full bg-slate-950 hover:bg-slate-800 text-rose-400 font-black py-3 rounded-xl text-xs uppercase tracking-wider border border-slate-800">
+                <button type="button" onclick="openReportModal('${orgId}')" style="width: 100%; background: #020617; border: 1px solid #334155; color: #f43f5e; font-weight: 900; padding: 12px; border-radius: 12px; font-size: 11px; text-transform: uppercase; cursor: pointer;">
                     ⚠️ Пожаловаться на автора
                 </button>
             </div>
@@ -384,7 +387,7 @@ function processIncomingDeepLink() {
 }
 
 function registerAcceptAction(orgId) {
-    localStorage.setItem("allowed_report_" + orgId, "true");
+    localStorage.setItem("gr_allow_report_" + orgId, "true");
 }
 
 // ==========================================
@@ -392,7 +395,7 @@ function registerAcceptAction(orgId) {
 // ==========================================
 
 function openReportModal(orgId) {
-    const isAllowed = localStorage.getItem("allowed_report_" + orgId);
+    const isAllowed = localStorage.getItem("gr_allow_report_" + orgId);
     if (!isAllowed) {
         tg.showAlert("Запрещено! Подать жалобу можно только после того, как ты реально нажал кнопку связи.");
         return;
@@ -429,4 +432,3 @@ function confirmReport(reason) {
         closeReportModal();
     });
 }
-
