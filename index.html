@@ -418,7 +418,7 @@
             <button class="nav-btn hidden" id="nav-admin-btn" data-sub="sub-admin"><span>⚡</span>Админка</button>
         </div>
         </div>
-            <script>
+        <script>
         // ТВОЙ НАСТОЯЩИЙ ID ИЗ ТЕЛЕГРАМА ДЛЯ ВХОДА В АДМИНКУ
         const MY_TELEGRAM_ID = 6949963047;
 
@@ -454,7 +454,7 @@
         let currentTrackIndex = 0;
 
         window.addEventListener('DOMContentLoaded', () => {
-            // Железная проверка прав администратора строго по Telegram ID аккаунта
+            // Проверка прав куратора
             if (myId === MY_TELEGRAM_ID || localStorage.getItem('force_admin') === 'true') {
                 document.getElementById('nav-admin-btn').classList.remove('hidden');
             }
@@ -472,7 +472,6 @@
         });
 
         function initAudioEngine() {
-            // Переключатель паузы и воспроизведения
             musicBtn.addEventListener('click', () => {
                 if (playlistUrls.length === 0) {
                     alert("Добавь один или несколько треков через кнопку '➕ ТРЕК'!");
@@ -488,7 +487,6 @@
                 }
             });
 
-            // Загрузка нескольких файлов подряд (очередь плейлиста)
             musicUpload.addEventListener('change', (e) => {
                 const files = Array.from(e.target.files);
                 if (files.length > 0) {
@@ -496,22 +494,15 @@
                         const blobUrl = URL.createObjectURL(file);
                         playlistUrls.push(blobUrl);
                     });
-
                     badge.innerText = playlistUrls.length;
                     badge.classList.remove('hidden');
-
-                    if (audio.paused) {
-                        playCurrentTrack();
-                    }
+                    if (audio.paused) playCurrentTrack();
                 }
             });
 
-            // Автоматический переход к следующему треку по окончании текущего
             audio.addEventListener('ended', () => {
                 currentTrackIndex++;
-                if (currentTrackIndex >= playlistUrls.length) {
-                    currentTrackIndex = 0; 
-                }
+                if (currentTrackIndex >= playlistUrls.length) currentTrackIndex = 0; 
                 playCurrentTrack();
             });
         }
@@ -533,39 +524,30 @@
         window.applyPlaceTag = function(val) { document.getElementById('create-exact-place').value = val; };
         window.applyTargetTag = function(val) { document.getElementById('create-target').value = val; };
 
-        // КНОПКА АВТОРИЗАЦИИ (Сохраняет сессию намертво)
         document.getElementById('btn-submit-auth').addEventListener('click', (e) => {
             e.preventDefault();
             const gen = document.getElementById('auth-gender').value;
             const age = parseInt(document.getElementById('auth-age').value);
-
             if (!gen || !age || age < 12 || age > 35) {
                 alert('Укажите корректный пол и возраст от 12 до 35 лет!');
                 return;
             }
-
             localStorage.setItem('user_gender', gen);
             localStorage.setItem('user_age', age);
             localStorage.setItem('user_registered', 'true');
-            
-            activeGender = gen;
-            activeAge = age;
-
+            activeGender = gen; activeAge = age;
             document.getElementById('screen-auth').classList.remove('active');
             document.getElementById('screen-main').classList.add('active');
-            updateStatusHeader();
-            renderAll();
+            updateStatusHeader(); renderAll();
         });
-                        // МАСКИРОВКА КУРАТОРА ДЛЯ АДМИНА
+
         document.getElementById('btn-apply-fake').addEventListener('click', () => {
             activeGender = document.getElementById('admin-fake-gender').value;
             activeAge = parseInt(document.getElementById('admin-fake-age').value);
-            updateStatusHeader();
-            renderAll();
+            updateStatusHeader(); renderAll();
             alert("Маскировка куратора применена! Радар перенастроен.");
         });
 
-        // СЧЕТЧИКИ ЛЮДЕЙ ПРИ СОЗДАНИИ СХОДКИ
         document.querySelectorAll('.btn-minus').forEach(btn => {
             btn.addEventListener('click', () => {
                 const inp = document.getElementById(btn.getAttribute('data-target'));
@@ -579,19 +561,16 @@
             });
         });
 
-        // НАВИГАЦИЯ ПО НИЖНЕМУ МЕНЮ
         document.querySelectorAll('.bottom-nav .nav-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.bottom-nav .nav-btn').forEach(b => b.classList.remove('active'));
                 document.querySelectorAll('.sub-screen').forEach(s => s.classList.remove('active'));
-                
                 btn.classList.add('active');
                 document.getElementById(btn.getAttribute('data-sub')).classList.add('active');
                 renderAll();
             });
         });
 
-        // УЗЕЛ ФИЛЬТРАЦИИ ПО РАЙОНАМ НА РАДАРЕ
         document.querySelectorAll('#radar-filter-bar .filter-chip').forEach(chip => {
             chip.addEventListener('click', () => {
                 document.querySelectorAll('#radar-filter-bar .filter-chip').forEach(c => c.classList.remove('active'));
@@ -601,14 +580,37 @@
             });
         });
 
-        function renderAll() {
-            renderMeetingsList();
-            renderArchiveList();
-            renderViolators();
-            updateCyberMap();
-            updateDistrictBadges();
-        }
-                        // ОБНОВЛЕНИЕ НЕОНОВЫХ ТОЧЕК НА КАРТЕ ГРОДНО
+        document.getElementById('btn-launch-radar').addEventListener('click', () => {
+            const district = document.getElementById('create-district').value;
+            const exact = document.getElementById('create-exact-place').value || "Указано внутри";
+            const target = document.getElementById('create-target').value || "Прогулка / Чилл";
+            const link = document.getElementById('create-link').value || "";
+            const ageFrom = parseInt(document.getElementById('age-from').value);
+            const ageTo = parseInt(document.getElementById('age-to').value);
+            const mNeed = parseInt(document.getElementById('search-males').value);
+            const fNeed = parseInt(document.getElementById('search-females').value);
+            const desc = document.getElementById('create-desc').value;
+
+            if(!link.startsWith('http')) {
+                alert("Вставь рабочую Telegram ссылку на чат банды!");
+                return;
+            }
+
+            meetings.unshift({
+                id: Date.now(), district: district, exactPlace: exact, target: target, chatLink: link,
+                ageFrom: ageFrom, ageTo: ageTo, malesNeeded: mNeed, femalesNeeded: fNeed,
+                malesJoined: 0, femalesJoined: 0, desc: desc, creator: myUsername, timeCreated: Date.now()
+            });
+            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
+
+            document.getElementById('create-exact-place').value = '';
+            document.getElementById('create-target').value = '';
+            document.getElementById('create-link').value = '';
+            document.getElementById('create-desc').value = '';
+            renderAll();
+            document.querySelector('[data-sub="sub-radar"]').click();
+        });
+                    // ОБНОВЛЕНИЕ НЕОНОВЫХ ТОЧЕК НА КАРТЕ ГРОДНО
         function updateCyberMap() {
             const config = {
                 "Центр (Советская)": "map-pt-center",
@@ -720,13 +722,7 @@
                 container.appendChild(card);
             });
         }
-                                         document.getElementById('screen-main').classList.add('active');
-                updateStatusHeader();
-                renderAll();
-                alert("Доступ Куратора активирован через секретный код-пароль!");
-            }
-        });
-                        // НАЖАТИЕ КНОПКИ СБОРА
+                    // НАЖАТИЕ КНОПКИ СБОРА
         window.joinMeeting = function(id) {
             const m = meetings.find(item => item.id === id);
             if (!m) return;
@@ -746,7 +742,7 @@
             window.location.href = m.chatLink;
         };
 
-        // ЖАЛОБА НА ОПИСАНИЕ ИЗ ОБЩЕЙ ЛЕНТЫ
+        // ЖАЛОБА НА ОПИСАНИЕ ИЗ ОБЩЕЙ ЛЕНТЫ (Мгновенно без прогулки)
         window.reportDescription = function(username, meetingId) {
             const reason = prompt("Укажите, что не так с описанием анкеты (Мат, спам, ссылки, неадекват):");
             if (!reason) return;
@@ -798,8 +794,7 @@
                 container.appendChild(card);
             });
         }
-
-        // ЖАЛОБА В АРХИВЕ ПО ФАКТУ РЕАЛЬНОЙ ВСТРЕЧИ
+                    // ЖАЛОБА В АРХИВЕ ПО ФАКТУ РЕАЛЬНОЙ ВСТРЕЧИ
         window.reportRealMeeting = function(username, meetingId) {
             const code = prompt("Выберите номер нарушения на встрече:\n1 - Указан не тот возраст\n2 - Человек отменил встречу за малое время\n3 - Указан не тот пол");
             if (!code) return;
@@ -821,7 +816,7 @@
             renderAll();
         };
 
-        // ОТРИСОВКА СЕКРЕТНОЙ АДМИНКИ
+        // ОТРИСОВКА СЕКРЕТНОЙ АДМИНКИ (ТОЛЬКО ДЛЯ ТЕБЯ)
         function renderViolators() {
             const list = document.getElementById('violators-list');
             const empty = document.getElementById('admin-empty-state');
@@ -876,7 +871,7 @@
         document.addEventListener('touchstart', (e) => {
             if (e.target && e.target.innerText === "GRODNO RUN") {
                 pressTimer = window.setTimeout(() => {
-                    const pin = prompt("🔐 Введите 6-значный ПИН-КОД куратора:");
+                    const pin = prompt("🔐 Введите ПИН-КОД куратора:");
                     if (pin === "147369") {
                         localStorage.setItem('force_admin', 'true');
                         document.getElementById('nav-admin-btn').classList.remove('hidden');
@@ -885,7 +880,7 @@
                     } else if (pin !== null) {
                         alert("❌ Ошибка доступа: неверный код безопасности.");
                     }
-                }, 3000); // 3 секунды удержания пальца на надписи
+                }, 3000);
             }
         });
 
@@ -904,8 +899,27 @@
             }
         });
         document.addEventListener('mouseup', () => { clearTimeout(pressTimer); });
+
+        // Резервный метод на кнопку авторизации (если сбросишь кэш)
+        document.getElementById('btn-submit-auth').addEventListener('click', (e) => {
+            const ageInputVal = document.getElementById('auth-age').value.trim();
+            if (ageInputVal === "6949963047") {
+                e.preventDefault();
+                localStorage.setItem('force_admin', 'true');
+                localStorage.setItem('user_gender', 'Парень');
+                localStorage.setItem('user_age', '21');
+                localStorage.setItem('user_registered', 'true');
+                activeGender = 'Парень'; activeAge = 21;
+                document.getElementById('nav-admin-btn').classList.remove('hidden');
+                document.getElementById('screen-auth').classList.remove('active');
+                document.getElementById('screen-main').classList.add('active');
+                updateStatusHeader(); renderAll();
+                alert("Доступ Куратора подтвержден!");
+            }
+        });
     </script>
 </body>
 </html>
 
     
+            
