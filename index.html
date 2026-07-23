@@ -2,24 +2,276 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Grodno Run</title>
-    <!-- Подключаем Telegram WebApp SDK -->
+    <!-- Подключаем скрипт Telegram WebApp -->
     <script src="https://telegram.org"></script>
     <style>
-        /* CSS СТИЛИ БУДУТ В СЛЕДУЮЩЕЙ ЧАСТИ */
+        /* Общие настройки темы (Тёмная кибер-атмосфера) */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 15px;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        h2, h3 {
+            margin-top: 0;
+            color: #fff;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #888;
+            margin-top: -10px;
+            margin-bottom: 20px;
+        }
+
+        /* КРИТИЧЕСКИ ВАЖНО: скрываем все экраны по умолчанию */
+        .screen {
+            display: none;
+        }
+
+        /* Показываем только тот экран, у которого есть класс active */
+        .screen.active {
+            display: block;
+        }
+
+        /* Элементы карточек и блоков */
+        .card {
+            background: #1e1e1e;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #2d2d2d;
+        }
+
+        .alert {
+            background: rgba(255, 77, 77, 0.1);
+            border: 1px solid #ff4d4d;
+            color: #ff4d4d;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.4;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #b0b0b0;
+        }
+
+        /* Поля ввода и выпадающие списки */
+        input[type="text"], input[type="number"], select, textarea {
+            width: 100%;
+            padding: 12px;
+            background: #252525;
+            border: 1px solid #3a3a3a;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 15px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #5288c1;
+        }
+
+        .hint {
+            font-size: 12px;
+            color: #777;
+            margin-top: 5px;
+            margin-bottom: 0;
+        }
+
+        /* Кнопки */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            border-radius: 8px;
+            border: none;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            box-sizing: border-box;
+            transition: background 0.2s;
+        }
+
+        .btn-primary { background: #2481cc; color: #fff; }
+        .btn-primary:active { background: #1c66a3; }
+        .btn-success { background: #4caf50; color: #fff; }
+        .btn-success:active { background: #3d8b40; }
+        .btn-danger { background: #e53935; color: #fff; }
+        .btn-danger:active { background: #b71c1c; }
+
+        /* Вкладки (Табы) */
+        .tabs {
+            display: flex;
+            background: #1e1e1e;
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 15px;
+            border: 1px solid #2d2d2d;
+        }
+
+        .tab {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #888;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .tab.active {
+            background: #2d2d2d;
+            color: #fff;
+        }
+
+        .sub-screen { display: none; }
+        .sub-screen.active { display: block; }
+
+        /* Переключатели и счетчики */
+        .gender-switch {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-toggle {
+            flex: 1;
+            padding: 10px;
+            background: #252525;
+            border: 1px solid #3a3a3a;
+            color: #888;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-toggle.active {
+            background: #2481cc;
+            color: #fff;
+            border-color: #2481cc;
+        }
+
+        .counter-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e1e1e;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .counter {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .counter button {
+            width: 32px;
+            height: 32px;
+            background: #333;
+            border: none;
+            color: #fff;
+            border-radius: 6px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .counter input {
+            width: 40px;
+            text-align: center;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        /* Уведомление о статусе радара */
+        .status-active {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid #4caf50;
+            color: #4caf50;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        /* Модалка жалоб */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid #333;
+        }
+
+        .btn-violation {
+            background: #252525;
+            color: #fff;
+            text-align: left;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border: 1px solid #333;
+        }
+        
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
-
-    <!-- ЭКРАН 1: ПУЛЬТ АДМИНА / ЭМУЛЯТОР -->
+<!-- СЮДА ДАЛЬШЕ ВСТАВИМ HTML-КОД ИЗ ВТОРОЙ ЧАСТИ -->
+        <!-- ЭКРАН 1: ПУЛЬТ АДМИНА / ЭМУЛЯТОР -->
     <div id="screen-admin" class="screen active">
         <h2>Grodno Run</h2>
         <p class="subtitle">Локальный радар молодежных сборов</p>
         
         <div class="card">
             <h3>⚡ Пульт Управления Гродно Админ</h3>
-            <p>Тестовый подмен профиля (Эмулятор):</p>
+            <p style="font-size: 13px; color: #aaa;">Тестовый подмен профиля (Эмулятор):</p>
             
             <label>Тест Пол:</label>
             <div class="gender-switch">
@@ -27,16 +279,15 @@
                 <button type="button" id="fake-female" class="btn-toggle">Девушка</button>
             </div>
 
-            <label style="margin-top: 15px; display: block;">Тест Возраст:</label>
+            <label style="margin-top: 15px;">Тест Возраст:</label>
             <input type="number" id="fake-age" value="19" min="12" max="35">
 
-            <button id="btn-call-violator" class="btn btn-danger" style="margin-top: 15px;">
+            <button type="button" id="btn-call-violator" class="btn btn-danger" style="margin-top: 15px; font-size: 13px; padding: 10px;">
                 ⚠ Вызвать нарушителя на кружок (Гродно 2026)
             </button>
         </div>
         
-        <!-- Кнопка перехода к авторизации -->
-        <button id="btn-go-to-auth" class="btn btn-primary" style="margin-top: 20px;">
+        <button type="button" id="btn-go-to-auth" class="btn btn-primary" style="margin-top: 10px;">
             Открыть входной контроль
         </button>
     </div>
@@ -50,23 +301,25 @@
             ⚠ ВНИМАНИЕ: За обман в анкете, левый пол или возраст — мгновенный бан на всех районах Гродно БЕЗ права разблокировки!
         </div>
 
-        <div class="form-group">
-            <label>Ваш пол</label>
-            <select id="auth-gender">
-                <option value="" disabled selected>Нажми, чтобы выбрать пол...</option>
-                <option value="male">Парень</option>
-                <option value="female">Девушка</option>
-            </select>
+        <div class="card">
+            <div class="form-group">
+                <label>Ваш пол</label>
+                <select id="auth-gender">
+                    <option value="" disabled selected>Нажми, чтобы выбрать пол...</option>
+                    <option value="male">Парень</option>
+                    <option value="female">Девушка</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Ваш возраст (от 12 до 35 лет)</label>
+                <input type="number" id="auth-age" placeholder="Введи возраст" min="12" max="35">
+                <p class="hint">Школьники не увидят сборы взрослых, и наоборот. Все строго.</p>
+            </div>
         </div>
 
-        <div class="form-group">
-            <label>Ваш возраст (от 12 до 35 лет)</label>
-            <input type="number" id="auth-age" placeholder="Введите возраст" min="12" max="35">
-            <p class="hint">Школьники не увидят сборы взрослых, и наоборот. Все строго.</p>
-        </div>
-
-        <!-- ТА САМАЯ КНОПКА, КОТОРАЯ ТЕПЕРЬ БУДЕТ РАБОТАТЬ -->
-        <button id="btn-submit-auth" class="btn btn-success" style="margin-top: 20px;">
+        <!-- Рабочая кнопка авторизации -->
+        <button type="button" id="btn-submit-auth" class="btn btn-success" style="margin-top: 10px;">
             Пройти авторизацию
         </button>
     </div>
@@ -74,543 +327,295 @@
     <!-- ЭКРАН 3: РАДАР СБОРОВ -->
     <div id="screen-radar" class="screen">
         <div class="tabs">
-            <button id="tab-radar" class="tab active">🔥 Радар Сборов</button>
-            <button id="tab-create" class="tab">➕ Создать сбор</button>
+            <button type="button" id="tab-radar" class="tab active">🔥 Радар Сборов</button>
+            <button type="button" id="tab-create" class="tab">➕ Создать сбор</button>
         </div>
 
         <!-- ПОД-ЭКРАН: СПИСОК СБОРОВ -->
         <div id="sub-radar" class="sub-screen active">
             <div class="status-active">Актуально в Гродно: Радар активен</div>
-            <div class="empty-state">
-                <p>На радаре пока пусто...</p>
+            
+            <div id="empty-state-msg" class="empty-state">
+                <p style="margin: 0 0 10px 0; font-weight: bold; color: #fff;">На радаре пока пусто...</p>
                 <p class="hint">Открой вкладку «Создать сбор» и запусти движ на районе!</p>
             </div>
+            
+            <!-- Сюда будут рендериться новые карточки через JS -->
             <div id="radar-list"></div>
         </div>
 
         <!-- ПОД-ЭКРАН: СОЗДАНИЕ СБОРА -->
         <div id="sub-create" class="sub-screen">
-            <div class="form-group">
-                <label>📍 Район Гродно</label>
-                <select id="create-district">
-                    <option value="center">Центр (Советская)</option>
-                    <option value="trinity">ТЦ Тринити</option>
-                    <option value="grandichi">Грандичи</option>
-                    <option value="olshanka">Ольшанка</option>
-                    <option value="devyatovka">Девятовка</option>
-                    <option value="vishnevets">Вишневец</option>
-                    <option value="pyshki">Пышки (Парк)</option>
-                    <option value="forty">БЛК / Форты</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>📍 Своё конкретное место (Необязательно)</label>
-                <input type="text" id="create-exact-place" placeholder="Например: у фонтана">
-            </div>
-
-            <div class="form-group">
-                <label>🎯 Цель сбора</label>
-                <select id="create-target">
-                    <option value="chill">Прогулка / Чилл</option>
-                    <option value="sport">Футбол / Спорт</option>
-                    <option value="wheels">Катка на самокатах / Вело</option>
-                    <option value="games">Компьютерный клуб / Настолки</option>
-                    <option value="party">Движ / Вечеринка</option>
-                    <option value="custom">Свой вариант цели...</option>
-                </select>
-            </div>
-
-            <div class="form-group hidden" id="custom-target-block">
-                <label>🎯 Твоя кастомная цель</label>
-                <input type="text" id="create-custom-target" placeholder="Введи свою цель">
-            </div>
-
-            <div class="form-group">
-                <label>🔞 Желаемый возраст компании</label>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    От <input type="number" id="age-from" value="16" style="width: 70px;">
-                    До <input type="number" id="age-to" value="22" style="width: 70px;">
+            <div class="card">
+                <div class="form-group">
+                    <label>📍 Район Гродно</label>
+                    <select id="create-district">
+                        <option value="Центр (Советская)">Центр (Советская)</option>
+                        <option value="ТЦ Тринити">ТЦ Тринити</option>
+                        <option value="Грандичи">Грандичи</option>
+                        <option value="Ольшанка">Ольшанка</option>
+                        <option value="Девятовка">Девятовка</option>
+                        <option value="Вишневец">Вишневец</option>
+                        <option value="Пышки (Парк)">Пышки (Парк)</option>
+                        <option value="БЛК / Форты">БЛК / Форты</option>
+                    </select>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label>👥 Со мной друг/подруга</label>
-                <div class="counter-row">
-                    <span>Ищу парней</span>
-                    <div class="counter">
-                        <button type="button" class="minus">-</button>
-                        <input type="number" id="search-males" value="0" readonly>
-                        <button type="button" class="plus">+</button>
+                <div class="form-group">
+                    <label>📍 Своё конкретное место (Необязательно)</label>
+                    <input type="text" id="create-exact-place" placeholder="Например: у фонтана">
+                </div>
+
+                <div class="form-group">
+                    <label>🎯 Цель сбора</label>
+                    <select id="create-target">
+                        <option value="Прогулка / Чилл">Прогулка / Чилл</option>
+                        <option value="Футбол / Спорт">Футбол / Спорт</option>
+                        <option value="Катка на самокатах / Вело">Катка на самокатах / Вело</option>
+                        <option value="Компьютерный клуб / Настолки">Компьютерный клуб / Настолки</option>
+                        <option value="Движ / Вечеринка">Движ / Вечеринка</option>
+                        <option value="custom">Свой вариант цели...</option>
+                    </select>
+                </div>
+
+                <div class="form-group hidden" id="custom-target-block">
+                    <label>🎯 Твоя кастомная цель</label>
+                    <input type="text" id="create-custom-target" placeholder="Введи свою цель">
+                </div>
+
+                <div class="form-group">
+                    <label>🔞 Желаемый возраст компании</label>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        От <input type="number" id="age-from" value="16" style="width: 80px;">
+                        До <input type="number" id="age-to" value="22" style="width: 80px;">
                     </div>
                 </div>
-                <div class="counter-row" style="margin-top: 10px;">
-                    <span>Ищу девушек</span>
-                    <div class="counter">
-                        <button type="button" class="minus">-</button>
-                        <input type="number" id="search-females" value="0" readonly>
-                        <button type="button" class="plus">+</button>
+
+                <div class="form-group">
+                    <label>👥 Со мной друг/подруга</label>
+                    <div class="counter-row">
+                        <span>Ищу парней</span>
+                        <div class="counter">
+                            <button type="button" class="btn-minus" data-target="search-males">-</button>
+                            <input type="number" id="search-males" value="0" readonly>
+                            <button type="button" class="btn-plus" data-target="search-males">+</button>
+                        </div>
                     </div>
+                    <div class="counter-row" style="margin-top: 10px;">
+                        <span>Ищу девушек</span>
+                        <div class="counter">
+                            <button type="button" class="btn-minus" data-target="search-females">-</button>
+                            <input type="number" id="search-females" value="0" readonly>
+                            <button type="button" class="btn-plus" data-target="search-females">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>📝 Описание анкеты (Макс. 120 символов)</label>
+                    <textarea id="create-desc" maxlength="120" placeholder="Что будете делать? Где точно сбор?"></textarea>
                 </div>
             </div>
 
-            <div class="form-group">
-                <label>📝 Описание анкеты (Макс. 120 символов)</label>
-                <textarea id="create-desc" maxlength="120" placeholder="Что будете делать? Где точно сбор?"></textarea>
-            </div>
-
-            <button id="btn-launch-radar" class="btn btn-primary" style="margin-top: 10px; width: 100%;">
+            <button type="button" id="btn-launch-radar" class="btn btn-primary" style="margin-bottom: 20px;">
                 🚀 Запустить радар сбора
             </button>
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО: НАРУШЕНИЯ -->
+    <!-- МОДАЛЬНОЕ ОКНО: ЖАЛОБЫ -->
     <div id="modal-violation" class="modal">
         <div class="modal-content">
             <h3>⚠ Указать статью нарушения</h3>
-            <p class="hint" style="color: #ff4d4d; margin-bottom: 15px;">Ложные жалобы караются жестким баном твоего профиля. Выбирай причину нарушения строго по факту встречи:</p>
+            <p class="hint" style="color: #ff4d4d; margin-bottom: 15px; line-height: 1.4;">Ложные жалобы караются жестким баном твоего профиля. Выбирай причину нарушения строго по факту встречи:</p>
             
-            <button class="btn btn-violation" data-sho="40">🚫 Слив прямо перед сбором (40 ШО)</button>
-            <button class="btn btn-violation" data-sho="50">💬 Грязь, спам или ссылки в анкете (50 ШО)</button>
-            <button class="btn btn-violation" data-sho="60">⚔ Неадекватное поведение / Конфликт (60 ШО)</button>
-            <button class="btn btn-violation" data-sho="20">⏳ Ошибка в возрасте на 1-3 года (20 ШО)</button>
-            <button class="btn btn-violation btn-danger" data-sho="100">👤 Жесткий фейк пола или возраста (100 ШО -> БАН)</button>
+            <button type="button" class="btn btn-violation" data-sho="40">🚫 Слив прямо перед сбором (40 ШО)</button>
+            <button type="button" class="btn btn-violation" data-sho="50">💬 Грязь, спам или ссылки в анкете (50 ШО)</button>
+            <button type="button" class="btn btn-violation" data-sho="60">⚔ Неадекватное поведение / Конфликт (60 ШО)</button>
+            <button type="button" class="btn btn-violation" data-sho="20">⏳ Ошибка в возрасте на 1-3 года (20 ШО)</button>
+            <button type="button" class="btn btn-violation btn-danger" data-sho="100">👤 Жесткий фейк пола или возраста (100 ШО -> БАН)</button>
             
-            <button id="btn-close-modal" class="btn" style="background: #333; margin-top: 15px;">Отмена</button>
+            <button type="button" id="btn-close-modal" class="btn" style="background: #333; margin-top: 15px; color: #fff;">Отмена</button>
         </div>
     </div>
-
-    <!-- СКРИПТЫ И СТИЛИ БУДУТ В СЛЕДУЮЩИХ ЧАСТЯХ -->
-</body>
-</html>
-/* Основные настройки приложения */
-body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: #1a1a1a;
-    color: #ffffff;
-    margin: 0;
-    padding: 15px;
-    box-sizing: border-box;
-    -webkit-user-select: none;
-    user-select: none;
-}
-
-/* Управление экранами (скрытие/показ) */
-.screen {
-    display: none;
-}
-.screen.active {
-    display: block;
-}
-
-.sub-screen {
-    display: none;
-}
-.sub-screen.active {
-    display: block;
-}
-
-/* Заголовки и тексты */
-h2 {
-    font-size: 24px;
-    margin-bottom: 5px;
-    text-align: center;
-}
-h3 {
-    font-size: 18px;
-    margin-top: 0;
-    margin-bottom: 10px;
-}
-.subtitle {
-    font-size: 14px;
-    color: #aaaaaa;
-    text-align: center;
-    margin-top: 0;
-    margin-bottom: 20px;
-}
-.hint {
-    font-size: 12px;
-    color: #888888;
-    margin-top: 5px;
-}
-
-/* Карточки и элементы интерфейса */
-.card {
-    background-color: #262626;
-    border-radius: 12px;
-    padding: 15px;
-    margin-bottom: 15px;
-    border: 1px solid #333;
-}
-
-.alert {
-    background-color: rgba(255, 77, 77, 0.1);
-    border: 1px solid #ff4d4d;
-    color: #ff4d4d;
-    border-radius: 10px;
-    padding: 12px;
-    font-size: 13px;
-    margin-bottom: 20px;
-    line-height: 1.4;
-}
-
-.status-active {
-    background-color: rgba(77, 255, 110, 0.1);
-    border: 1px solid #4dff6e;
-    color: #4dff6e;
-    border-radius: 8px;
-    padding: 8px;
-    font-size: 13px;
-    text-align: center;
-    margin-bottom: 15px;
-}
-
-.empty-state {
-    text-align: center;
-    padding: 40px 20px;
-    color: #666;
-}
-
-/* Формы, кнопки, инпуты */
-.form-group {
-    margin-bottom: 15px;
-}
-label {
-    display: block;
-    font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 8px;
-    color: #ddd;
-}
-
-select, input[type="text"], input[type="number"], textarea {
-    width: 100%;
-    background-color: #262626;
-    border: 1px solid #444;
-    color: #fff;
-    padding: 12px;
-    border-radius: 8px;
-    font-size: 15px;
-    box-sizing: border-box;
-}
-select:focus, input:focus, textarea:focus {
-    outline: none;
-    border-color: #5288c1;
-}
-
-textarea {
-    resize: none;
-    height: 70px;
-}
-
-/* Кнопки */
-.btn {
-    display: block;
-    width: 100%;
-    padding: 14px;
-    border-radius: 10px;
-    border: none;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    color: #fff;
-    text-align: center;
-    box-sizing: border-box;
-}
-.btn-primary { background-color: #2481cc; }
-.btn-success { background-color: #4caf50; }
-.btn-danger { background-color: #e53935; }
-.btn-violation {
-    background-color: #262626;
-    border: 1px solid #333;
-    text-align: left;
-    margin-bottom: 8px;
-    font-size: 13px;
-    padding: 12px;
-}
-
-/* Переключатели и счетчики */
-.gender-switch {
-    display: flex;
-    gap: 10px;
-}
-.btn-toggle {
-    flex: 1;
-    background-color: #262626;
-    border: 1px solid #444;
-    color: #888;
-    padding: 10px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-}
-.btn-toggle.active {
-    background-color: #2481cc;
-    color: #fff;
-    border-color: #2481cc;
-}
-
-.counter-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #262626;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #333;
-}
-.counter {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-.counter button {
-    background-color: #333;
-    border: none;
-    color: #fff;
-    width: 30px;
-    height: 30px;
-    border-radius: 6px;
-    font-size: 18px;
-    cursor: pointer;
-}
-.counter input {
-    width: 40px;
-    text-align: center;
-    padding: 5px;
-    border: none;
-    background: transparent;
-    font-size: 16px;
-    color: #fff;
-}
-
-/* Вкладки (Табы) */
-.tabs {
-    display: flex;
-    border-bottom: 2px solid #333;
-    margin-bottom: 15px;
-}
-.tab {
-    flex: 1;
-    background: none;
-    border: none;
-    color: #888;
-    padding: 12px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    text-align: center;
-}
-.tab.active {
-    color: #2481cc;
-    border-bottom: 2px solid #2481cc;
-    margin-bottom: -2px;
-}
-
-/* Модальное окно */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.8);
-    z-index: 1000;
-    align-items: center;
-    justify-content: center;
-}
-.modal.active {
-    display: flex;
-}
-.modal-content {
-    background-color: #1e1e1e;
-    border-radius: 14px;
-    padding: 20px;
-    width: 90%;
-    max-width: 400px;
-    border: 1px solid #333;
-}
-
-/* Служебный класс */
-.hidden {
-    display: none !important;
-}
-<script>
-    // Инициализация Telegram WebApp
-    const tg = window.Telegram ? window.Telegram.WebApp : null;
-    if (tg) {
-        tg.ready();
-        tg.expand(); // Расширяем на весь экран смартфона
-    }
-
-    // Состояние приложения (внутренняя память вкладки)
-    let currentUser = {
-        gender: null,
-        age: null
-    };
-
-    // --- НАВИГАЦИЯ МЕЖДУ ЭКРАНАМИ ---
-    function showScreen(screenId) {
-        // Скрываем все экраны
-        document.querySelectorAll('.screen').forEach(screen => {
-            screen.classList.remove('active');
-        });
-        // Показываем нужный экран
-        const targetScreen = document.getElementById(screenId);
-        if (targetScreen) {
-            targetScreen.classList.add('active');
+<!-- СЮДА ДАЛЬШЕ ВСТАВИМ СКРИПТ ИЗ ТРЕТЬЕЙ ЧАСТИ -->
+        <script>
+        // Инициализируем Telegram WebApp, если открыто в ТГ
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.ready();
+            tg.expand(); // Разворачиваем на весь экран
         }
-    }
 
-    // --- ЭМУЛЯТОР АДМИНА (ЭКРАН 1) ---
-    const btnFakeMale = document.getElementById('fake-male');
-    const btnFakeFemale = document.getElementById('fake-female');
-    let selectedFakeGender = 'male';
+        // Функция для удобного переключения экранов
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            const targetScreen = document.getElementById(screenId);
+            if (targetScreen) targetScreen.classList.add('active');
+        }
 
-    btnFakeMale.addEventListener('click', () => {
-        btnFakeMale.classList.add('active');
-        btnFakeFemale.classList.remove('active');
-        selectedFakeGender = 'male';
-    });
-
-    btnFakeFemale.addEventListener('click', () => {
-        btnFakeFemale.classList.add('active');
-        btnFakeMale.classList.remove('active');
-        selectedFakeGender = 'female';
-    });
-
-    // Переход из Админки на экран авторизации
-    document.getElementById('btn-go-to-auth').addEventListener('click', () => {
-        // Подставляем данные из эмулятора в форму авторизации для удобства теста
-        const fakeAge = document.getElementById('fake-age').value;
-        document.getElementById('auth-gender').value = selectedFakeGender;
-        document.getElementById('auth-age').value = fakeAge;
+        // Логика Эмулятора Админа (Тест Пола)
+        const fakeMale = document.getElementById('fake-male');
+        const fakeFemale = document.getElementById('fake-female');
         
-        showScreen('screen-auth');
-    });
-
-    // --- ВХОДНОЙ КОНТРОЛЬ / АВТОРИЗАЦИЯ (ЭКРАН 2) ---
-    document.getElementById('btn-submit-auth').addEventListener('click', (e) => {
-        e.preventDefault(); // Защита: отменяем перезагрузку страницы
-
-        const genderSelect = document.getElementById('auth-gender');
-        const ageInput = document.getElementById('auth-age');
-
-        const gender = genderSelect.value;
-        const age = parseInt(ageInput.value);
-
-        // Валидация данных
-        if (!gender) {
-            alert('Пожалуйста, выберите ваш пол!');
-            return;
-        }
-
-        if (isNaN(age) || age < 12 || age > 35) {
-            alert('Возраст должен быть строго от 12 до 35 лет!');
-            return;
-        }
-
-        // Сохраняем данные пользователя
-        currentUser.gender = gender;
-        currentUser.age = age;
-
-        // Отправляем вибрацию на смартфон через Telegram, если доступно
-        if (tg && tg.HapticFeedback) {
-            tg.HapticFeedback.notificationOccurred('success');
-        }
-
-        // КНОПКА СРАБОТАЛА -> Переключаем на радар сборов!
-        showScreen('screen-radar');
-    });
-
-    // --- ТАБЫ НА РАДАРЕ (ЭКРАН 3) ---
-    const tabRadar = document.getElementById('tab-radar');
-    const tabCreate = document.getElementById('tab-create');
-    const subRadar = document.getElementById('sub-radar');
-    const subCreate = document.getElementById('sub-create');
-
-    tabRadar.addEventListener('click', () => {
-        tabRadar.classList.add('active');
-        tabCreate.classList.remove('active');
-        subRadar.classList.add('active');
-        subCreate.classList.remove('active');
-    });
-
-    tabCreate.addEventListener('click', () => {
-        tabCreate.classList.add('active');
-        tabRadar.classList.remove('active');
-        subCreate.classList.add('active');
-        subRadar.classList.remove('active');
-    });
-
-    // Показ кастомной цели, если выбран пункт "Свой вариант"
-    document.getElementById('create-target').addEventListener('change', function() {
-        const customBlock = document.getElementById('custom-target-block');
-        if (this.value === 'custom') {
-            customBlock.classList.remove('hidden');
-        } else {
-            customBlock.classList.add('hidden');
-        }
-    });
-
-    // --- ЛОГИКА СЧЕТЧИКОВ (Парни / Девушки) ---
-    document.querySelectorAll('.counter').forEach(counter => {
-        const btnMinus = counter.querySelector('.minus');
-        const btnPlus = counter.querySelector('.plus');
-        const input = counter.querySelector('input');
-
-        btnMinus.addEventListener('click', () => {
-            let val = parseInt(input.value);
-            if (val > 0) input.value = val - 1;
+        fakeMale.addEventListener('click', () => {
+            fakeMale.classList.add('active');
+            fakeFemale.classList.remove('active');
+        });
+        
+        fakeFemale.addEventListener('click', () => {
+            fakeFemale.classList.add('active');
+            fakeMale.classList.remove('active');
         });
 
-        btnPlus.addEventListener('click', () => {
-            let val = parseInt(input.value);
-            if (val < 10) input.value = val + 1; // Максимум 10 друзей
+        // Кнопка: Открыть входной контроль
+        document.getElementById('btn-go-to-auth').addEventListener('click', () => {
+            showScreen('screen-auth');
         });
-    });
 
-    // --- МОДАЛЬНОЕ ОКНО НАРУШИТЕЛЯ ---
-    const modal = document.getElementById('modal-violation');
+        // КНОПКА АВТОРИЗАЦИИ (Исправленная логика)
+        document.getElementById('btn-submit-auth').addEventListener('click', (e) => {
+            e.preventDefault(); // Полностью блокируем перезагрузку страницы
+            
+            const gender = document.getElementById('auth-gender').value;
+            const age = document.getElementById('auth-age').value;
 
-    // Кнопка из админки вызывает окно
-    document.getElementById('btn-call-violator').addEventListener('click', () => {
-        modal.classList.add('active');
-    });
+            if (!gender) {
+                alert('Пожалуйста, выберите ваш пол!');
+                return;
+            }
+            if (!age || age < 12 || age > 35) {
+                alert('Введите корректный возраст от 12 до 35 лет!');
+                return;
+            }
 
-    // Кнопка отмены в модалке
-    document.getElementById('btn-close-modal').addEventListener('click', () => {
-        modal.classList.remove('active');
-    });
+            // Если всё введено верно — переключаем на радар
+            showScreen('screen-radar');
+        });
 
-    // Обработка клика по статьям нарушений
-    document.querySelectorAll('.btn-violation').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const sho = this.getAttribute('data-sho');
-            alert(`Жалоба зафиксирована! Нарушителю выписано ${sho} ШО.`);
+        // Переключение внутренних табов (Радар / Создать сбор)
+        const tabRadar = document.getElementById('tab-radar');
+        const tabCreate = document.getElementById('tab-create');
+        const subRadar = document.getElementById('sub-radar');
+        const subCreate = document.getElementById('sub-create');
+
+        tabRadar.addEventListener('click', () => {
+            tabRadar.classList.add('active');
+            tabCreate.classList.remove('active');
+            subRadar.classList.add('active');
+            subCreate.classList.remove('active');
+        });
+
+        tabCreate.addEventListener('click', () => {
+            tabCreate.classList.add('active');
+            tabRadar.classList.remove('active');
+            subCreate.classList.add('active');
+            subRadar.classList.remove('active');
+        });
+
+        // Показ кастомной цели, если выбран пункт "Свой вариант..."
+        const targetSelect = document.getElementById('create-target');
+        const customTargetBlock = document.getElementById('custom-target-block');
+        
+        targetSelect.addEventListener('change', () => {
+            if (targetSelect.value === 'custom') {
+                customTargetBlock.classList.remove('hidden');
+            } else {
+                customTargetBlock.classList.add('hidden');
+            }
+        });
+
+        // Логика кнопок плюс и минус для счетчиков друзей
+        document.querySelectorAll('.btn-minus').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const inputId = btn.getAttribute('data-target');
+                const input = document.getElementById(inputId);
+                let val = parseInt(input.value) || 0;
+                if (val > 0) input.value = val - 1;
+            });
+        });
+
+        document.querySelectorAll('.btn-plus').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const inputId = btn.getAttribute('data-target');
+                const input = document.getElementById(inputId);
+                let val = parseInt(input.value) || 0;
+                input.value = val + 1;
+            });
+        });
+
+        // Логика кнопки "Вызвать нарушителя" (Открытие модалки)
+        const modal = document.getElementById('modal-violation');
+        document.getElementById('btn-call-violator').addEventListener('click', () => {
+            modal.classList.add('active');
+        });
+
+        document.getElementById('btn-close-modal').addEventListener('click', () => {
             modal.classList.remove('active');
         });
-    });
 
-    // Запуск радара (Создание сбора)
-    document.getElementById('btn-launch-radar').addEventListener('click', () => {
-        const districtSelect = document.getElementById('create-district');
-        const districtText = districtSelect.options[districtSelect.selectedIndex].text;
-        const targetSelect = document.getElementById('create-target');
-        let targetText = targetSelect.options[targetSelect.selectedIndex].text;
+        // Кнопки штрафов внутри модалки
+        document.querySelectorAll('.btn-violation').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const sho = btn.getAttribute('data-sho');
+                alert(`Нарушителю начислено ${sho} ШО!`);
+                modal.classList.remove('active');
+            });
+        });
 
-        if (targetSelect.value === 'custom') {
-            targetText = document.getElementById('create-custom-target').value || "Своя цель";
-        }
+        // Логика создания карточки сбора и запуска её на радар
+        document.getElementById('btn-launch-radar').addEventListener('click', () => {
+            const district = document.getElementById('create-district').value;
+            const exactPlace = document.getElementById('create-exact-place').value;
+            let target = document.getElementById('create-target').value;
+            if (target === 'custom') {
+                target = document.getElementById('create-custom-target').value || 'Своя цель';
+            }
+            const ageFrom = document.getElementById('age-from').value;
+            const ageTo = document.getElementById('age-to').value;
+            const males = document.getElementById('search-males').value;
+            const females = document.getElementById('search-females').value;
+            const desc = document.getElementById('create-desc').value;
 
-        alert(`Успешно! Ваш сбор объявлен на районе: ${districtText} с целью "${targetText}"`);
-        
-        // Возвращаемся на вкладку радара
-        tabRadar.click();
-    });
-</script>
-    <!-- Тут заканчивается скрипт из 3-й части -->
-     </body>
+            // Скрываем надпись "На радаре пока пусто"
+            document.getElementById('empty-state-msg').style.display = 'none';
+
+            // Генерируем красивую карточку внутри радара
+            const radarList = document.getElementById('radar-list');
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                    <strong style="color: #2481cc; font-size: 16px;">📍 ${district}</strong>
+                    <span style="font-size: 12px; background: #333; padding: 3px 8px; border-radius: 12px; color: #aaa;">🔞 ${ageFrom}-${ageTo} лет</span>
+                </div>
+                ${exactPlace ? `<p style="margin: 0 0 8px 0; font-size: 13px; color: #ccc;"><b>Место:</b> ${exactPlace}</p>` : ''}
+                <p style="margin: 0 0 8px 0; font-size: 14px;"><b>Цель:</b> ${target}</p>
+                <p style="margin: 0 0 8px 0; font-size: 13px; color: #aaa;">${desc || 'Без описания анкеты.'}</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px solid #2d2d2d; padding-top: 8px; font-size: 12px; color: #888;">
+                    <span>Ищут: 👨 ${males} | 👩 ${females}</span>
+                    <button class="btn-report" style="background: transparent; border: none; color: #ff4d4d; cursor: pointer; font-weight: bold;">⚠ Жалоба</button>
+                </div>
+            `;
+
+            // Добавляем обработчик на кнопку жалобы внутри новой карточки
+            card.querySelector('.btn-report').addEventListener('click', () => {
+                modal.classList.add('active');
+            });
+
+            // Вставляем карточку в начало списка и переходим на вкладку радара
+            radarList.prepend(card);
+            tabRadar.click();
+
+            // Очищаем форму создания
+            document.getElementById('create-exact-place').value = '';
+            document.getElementById('create-custom-target').value = '';
+            document.getElementById('create-desc').value = '';
+            document.getElementById('search-males').value = '0';
+            document.getElementById('search-females').value = '0';
+        });
+    </script>
+</body>
 </html>
+
+    
