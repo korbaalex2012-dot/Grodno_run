@@ -2,573 +2,615 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grodno Run</title>
-    <!-- Официальный скрипт Telegram Web App API -->
+    <!-- Подключаем Telegram WebApp SDK -->
     <script src="https://telegram.org"></script>
-    
-    <!-- ПОЛНОСТЬЮ АВТОНОМНЫЕ СТИЛИ (РАБОТАЮТ БЕЗ ИНТЕРНЕТА) -->
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #2e104d 100%);
-            color: #f1f5f9;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            min-height: 100vh;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-            box-sizing: border-box;
-            padding-bottom: 40px;
-        }
-        .container {
-            max-width: 440px;
-            margin: 0 auto;
-            padding: 16px;
-        }
-        header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        h1 {
-            margin: 0;
-            font-size: 28px;
-            font-weight: 900;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            background: linear-gradient(90deg, #818cf8, #22d3ee);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .sub-logo {
-            margin: 4px 0 0 0;
-            font-size: 10px;
-            color: #818cf8;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-        }
-        .card {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            margin-bottom: 20px;
-        }
-        .admin-card {
-            background: linear-gradient(90deg, rgba(120, 53, 4, 0.3), rgba(30, 41, 59, 0.8));
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 20px;
-        }
-        .label-title {
-            display: block;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #94a3b8;
-            margin-bottom: 10px;
-        }
-        .btn-large {
-            width: 100%;
-            background: linear-gradient(90deg, #4f46e5, #4338ca);
-            color: white;
-            border: none;
-            padding: 16px;
-            font-size: 13px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            border-radius: 12px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
-            transition: all 0.1s ease;
-            box-sizing: border-box;
-        }
-        .btn-large:active {
-            transform: scale(0.98);
-            opacity: 0.9;
-        }
-        .btn-admin {
-            width: 100%;
-            background: #f59e0b;
-            color: #020617;
-            border: none;
-            padding: 12px;
-            font-size: 11px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border-radius: 12px;
-            cursor: pointer;
-        }
-        .grid-2 {
-            display: grid;
-            grid-template-cols: 1fr 1fr;
-            gap: 12px;
-        }
-        .input-dark {
-            width: 100%;
-            background: #020617;
-            border: 1px solid #475569;
-            border-radius: 12px;
-            padding: 14px;
-            color: white;
-            font-size: 16px;
-            font-weight: 700;
-            box-sizing: border-box;
-            outline: none;
-        }
-        .input-dark:focus {
-            border-color: #6366f1;
-        }
-        .hidden { display: none !important; }
+        /* CSS СТИЛИ БУДУТ В СЛЕДУЮЩЕЙ ЧАСТИ */
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Шапка -->
-        <header>
-            <h1>Grodno Run</h1>
-            <p class="sub-logo">Локальный радар молодежных сборов</p>
-        </header>
-                <!-- АДМИН-ПАНЕЛЬ (РЕЖИМ БОГА) -->
-        <div id="admin-panel" class="hidden admin-card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(245,158,11,0.2); padding-bottom: 6px;">
-                <span style="font-size: 11px; font-weight: 900; color: #f59e0b; text-transform: uppercase; letter-spacing: 1px;">⚡ Пульт Управления Гродно</span>
-                <span style="font-size: 9px; background: rgba(245,158,11,0.2); color: #fba518; font-weight: 700; padding: 2px 6px; border-radius: 10px; text-transform: uppercase;">Админ</span>
+
+    <!-- ЭКРАН 1: ПУЛЬТ АДМИНА / ЭМУЛЯТОР -->
+    <div id="screen-admin" class="screen active">
+        <h2>Grodno Run</h2>
+        <p class="subtitle">Локальный радар молодежных сборов</p>
+        
+        <div class="card">
+            <h3>⚡ Пульт Управления Гродно Админ</h3>
+            <p>Тестовый подмен профиля (Эмулятор):</p>
+            
+            <label>Тест Пол:</label>
+            <div class="gender-switch">
+                <button type="button" id="fake-male" class="btn-toggle active">Парень</button>
+                <button type="button" id="fake-female" class="btn-toggle">Девушка</button>
             </div>
-            <span class="label-title" style="color: #cbd5e1; margin-bottom: 6px;">Тестовый подмен профиля (Эмулятор):</span>
-            <div style="margin-bottom: 12px;">
-                <select id="fake-gender-select" onchange="toggleFakeGender(this.value)" class="input-dark" style="font-size: 14px; padding: 10px; color: white;">
-                    <option value="" disabled selected hidden>Тест Пол...</option>
-                    <option value="Парень">Парень</option>
-                    <option value="Девушка">Девушка</option>
-                </select>
-            </div>
-            <div style="display: flex; align-items: center; background: #020617; border: 1px solid #334155; border-radius: 12px; padding: 10px; margin-bottom: 12px;">
-                <span style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: bold; margin-right: 8px;">Тест Возраст:</span>
-                <input type="number" id="fake-age-input" oninput="updateFakeAge(this.value)" placeholder="Напр: 15 или 30" style="background: transparent; border: none; color: #f59e0b; font-weight: 700; outline: none; width: 100%;">
-            </div>
-            <button type="button" onclick="triggerAdminAction('verify_alert')" class="btn-admin">
-                ⚠️ Вызвать нарушителя на кружок (Гродно 2026)
+
+            <label style="margin-top: 15px; display: block;">Тест Возраст:</label>
+            <input type="number" id="fake-age" value="19" min="12" max="35">
+
+            <button id="btn-call-violator" class="btn btn-danger" style="margin-top: 15px;">
+                ⚠ Вызвать нарушителя на кружок (Гродно 2026)
             </button>
         </div>
+        
+        <!-- Кнопка перехода к авторизации -->
+        <button id="btn-go-to-auth" class="btn btn-primary" style="margin-top: 20px;">
+            Открыть входной контроль
+        </button>
+    </div>
 
-        <!-- ШАГ 0: ВХОДНОЙ КОНТРОЛЬ -->
-        <div id="auth-screen" class="card">
-            <div style="margin-bottom: 16px;">
-                <h2 style="margin: 0; font-size: 16px; font-weight: 900; color: #818cf8; text-transform: uppercase; letter-spacing: 1px;">Входной контроль</h2>
-                <p style="margin: 4px 0 0 0; font-size: 12px; color: #94a3b8;">Введи реальные данные. Они проверяются роботом на Советской.</p>
+    <!-- ЭКРАН 2: ВХОДНОЙ КОНТРОЛЬ (АВТОРИЗАЦИЯ) -->
+    <div id="screen-auth" class="screen">
+        <h2>Входной контроль</h2>
+        <p class="subtitle">Введи реальные данные. Они проверяются роботом на Советской.</p>
+        
+        <div class="alert">
+            ⚠ ВНИМАНИЕ: За обман в анкете, левый пол или возраст — мгновенный бан на всех районах Гродно БЕЗ права разблокировки!
+        </div>
+
+        <div class="form-group">
+            <label>Ваш пол</label>
+            <select id="auth-gender">
+                <option value="" disabled selected>Нажми, чтобы выбрать пол...</option>
+                <option value="male">Парень</option>
+                <option value="female">Девушка</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Ваш возраст (от 12 до 35 лет)</label>
+            <input type="number" id="auth-age" placeholder="Введите возраст" min="12" max="35">
+            <p class="hint">Школьники не увидят сборы взрослых, и наоборот. Все строго.</p>
+        </div>
+
+        <!-- ТА САМАЯ КНОПКА, КОТОРАЯ ТЕПЕРЬ БУДЕТ РАБОТАТЬ -->
+        <button id="btn-submit-auth" class="btn btn-success" style="margin-top: 20px;">
+            Пройти авторизацию
+        </button>
+    </div>
+
+    <!-- ЭКРАН 3: РАДАР СБОРОВ -->
+    <div id="screen-radar" class="screen">
+        <div class="tabs">
+            <button id="tab-radar" class="tab active">🔥 Радар Сборов</button>
+            <button id="tab-create" class="tab">➕ Создать сбор</button>
+        </div>
+
+        <!-- ПОД-ЭКРАН: СПИСОК СБОРОВ -->
+        <div id="sub-radar" class="sub-screen active">
+            <div class="status-active">Актуально в Гродно: Радар активен</div>
+            <div class="empty-state">
+                <p>На радаре пока пусто...</p>
+                <p class="hint">Открой вкладку «Создать сбор» и запусти движ на районе!</p>
             </div>
-            <div style="background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.2); border-radius: 12px; padding: 12px; margin-bottom: 20px;">
-                <p style="margin: 0; font-size: 11px; color: #f43f5e; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.4;">
-                    ⚠️ ВНИМАНИЕ: За обман в анкете, левый пол или возраст — мгновенный бан на всех районах Гродно БЕЗ права разблокировки!
-                </p>
-            </div>
-            <div style="margin-bottom: 20px;">
-                <label for="gender-select" class="label-title">Ваш пол</label>
-                <select id="gender-select" class="input-dark" style="appearance: none; cursor: pointer; font-weight: 700; color: white;">
-                    <option value="" disabled selected hidden>Нажми, чтобы выбрать пол...</option>
-                    <option value="Парень">Парень</option>
-                    <option value="Девушка">Девушка</option>
+            <div id="radar-list"></div>
+        </div>
+
+        <!-- ПОД-ЭКРАН: СОЗДАНИЕ СБОРА -->
+        <div id="sub-create" class="sub-screen">
+            <div class="form-group">
+                <label>📍 Район Гродно</label>
+                <select id="create-district">
+                    <option value="center">Центр (Советская)</option>
+                    <option value="trinity">ТЦ Тринити</option>
+                    <option value="grandichi">Грандичи</option>
+                    <option value="olshanka">Ольшанка</option>
+                    <option value="devyatovka">Девятовка</option>
+                    <option value="vishnevets">Вишневец</option>
+                    <option value="pyshki">Пышки (Парк)</option>
+                    <option value="forty">БЛК / Форты</option>
                 </select>
             </div>
-            <div style="margin-bottom: 24px;">
-                <label for="user-age" class="label-title">Ваш возраст (от 12 до 35 лет)</label>
-                <input type="number" id="user-age" min="12" max="35" oninput="handleAgeInput(this.value)" placeholder="Введите ваш точный возраст" class="input-dark">
-                <p id="age-warning-text" style="margin: 8px 0 0 0; font-size: 10px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Школьники не увидят сборы взрослых, и наоборот. Все строго.</p>
-            </div>
-            
-            <!-- Полностью автономная кнопка-div со сбросом перезагрузки -->
-            <div onclick="event.preventDefault(); verifyAndProceed();" class="btn-large" style="text-align: center; cursor: pointer; box-sizing: border-box;">
-                Пройти авторизацию
-            </div>
-        </div>
-                <!-- ШАГ 1: ГЛАВНЫЙ ЭКРАН ПРИЛОЖЕНИЯ -->
-        <main id="main-app" class="hidden" style="margin-top: 20px;">
-            <div class="card" style="padding: 6px; display: grid; grid-template-cols: 1fr 1fr; gap: 8px; margin-bottom: 16px;">
-                <button type="button" id="tab-feed" onclick="switchTab('feed')" style="background: #4f46e5; color: white; border: none; padding: 12px; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; border-radius: 10px; cursor: pointer;">
-                    🔥 Радар Сборов
-                </button>
-                <button type="button" id="tab-create" onclick="switchTab('create')" style="background: transparent; color: #94a3b8; border: none; padding: 12px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-radius: 10px; cursor: pointer;">
-                    ➕ Создать сбор
-                </button>
+
+            <div class="form-group">
+                <label>📍 Своё конкретное место (Необязательно)</label>
+                <input type="text" id="create-exact-place" placeholder="Например: у фонтана">
             </div>
 
-            <!-- ЭКРАН ЛЕНТЫ -->
-            <div id="section-feed" style="display: flex; flex-direction: column; gap: 16px;">
-                <div id="verification-card-zone" class="hidden"></div>
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 4px;">
-                    <span class="label-title" style="margin-bottom: 0;">Актуально в Гродно:</span>
-                    <span style="font-size: 10px; background: rgba(16, 185, 129, 0.1); color: #10b981; font-family: monospace; padding: 2px 8px; border-radius: 10px; border: 1px solid rgba(16, 185, 129, 0.2);">Радар активен</span>
+            <div class="form-group">
+                <label>🎯 Цель сбора</label>
+                <select id="create-target">
+                    <option value="chill">Прогулка / Чилл</option>
+                    <option value="sport">Футбол / Спорт</option>
+                    <option value="wheels">Катка на самокатах / Вело</option>
+                    <option value="games">Компьютерный клуб / Настолки</option>
+                    <option value="party">Движ / Вечеринка</option>
+                    <option value="custom">Свой вариант цели...</option>
+                </select>
+            </div>
+
+            <div class="form-group hidden" id="custom-target-block">
+                <label>🎯 Твоя кастомная цель</label>
+                <input type="text" id="create-custom-target" placeholder="Введи свою цель">
+            </div>
+
+            <div class="form-group">
+                <label>🔞 Желаемый возраст компании</label>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    От <input type="number" id="age-from" value="16" style="width: 70px;">
+                    До <input type="number" id="age-to" value="22" style="width: 70px;">
                 </div>
-                <div id="radar-cards-container">
-                    <div id="feed-empty-state" class="card" style="text-align: center; padding: 32px;">
-                        <p style="margin: 0; font-size: 14px; font-weight: 500; color: #94a3b8;">На радаре пока пусто...</p>
-                        <p style="margin: 6px 0 0 0; font-size: 11px; color: #64748b;">Открой вкладку «Создать сбор» и запусти движ на районе!</p>
+            </div>
+
+            <div class="form-group">
+                <label>👥 Со мной друг/подруга</label>
+                <div class="counter-row">
+                    <span>Ищу парней</span>
+                    <div class="counter">
+                        <button type="button" class="minus">-</button>
+                        <input type="number" id="search-males" value="0" readonly>
+                        <button type="button" class="plus">+</button>
+                    </div>
+                </div>
+                <div class="counter-row" style="margin-top: 10px;">
+                    <span>Ищу девушек</span>
+                    <div class="counter">
+                        <button type="button" class="minus">-</button>
+                        <input type="number" id="search-females" value="0" readonly>
+                        <button type="button" class="plus">+</button>
                     </div>
                 </div>
             </div>
 
-            <!-- ЭКРАН КОНСТРУКТОРА -->
-            <div id="section-create" class="hidden card" style="display: flex; flex-direction: column; gap: 20px;">
-                <div>
-                    <label for="location" class="label-title">📍 Район Гродно</label>
-                    <select id="location" class="input-dark" style="appearance: none; cursor: pointer; font-weight: 700; color: white;">
-                        <option value="Центр (Советская)">Центр (Советская)</option>
-                        <option value="ТЦ Тринити">ТЦ Тринити</option>
-                        <option value="Грандичи">Грандичи</option>
-                        <option value="Ольшанка">Ольшанка</option>
-                        <option value="Девятовка">Девятовка</option>
-                        <option value="Вишневец">Вишневец</option>
-                        <option value="Пышки (Парк)">Пышки (Парк)</option>
-                        <option value="БЛК / Форты">БЛК / Форты</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="custom-location" class="label-title">📍 Своё конкретное место (Необязательно)</label>
-                    <input type="text" id="custom-location" maxlength="40" placeholder="Напр: лавочки за Драмтеатром" class="input-dark" style="font-size: 14px; font-weight: 600;">
-                </div>
-                <div>
-                    <label for="purpose" class="label-title">🎯 Цель сбора</label>
-                    <select id="purpose" onchange="handlePurposeChange(this.value)" class="input-dark" style="appearance: none; cursor: pointer; font-weight: 700; color: white;">
-                        <option value="Прогулка / Чилл">Прогулка / Чилл</option>
-                        <option value="Футбол / Спорт">Футбол / Спорт</option>
-                        <option value="Катка на самокатах / Вело">Катка на самокатах / Вело</option>
-                        <option value="Компьютерный клуб / Настолки">Компьютерный клуб / Настолки</option>
-                        <option value="Движ / Вечеринка">Движ / Вечеринка</option>
-                        <option value="CUSTOM">Свой вариант цели...</option>
-                    </select>
-                </div>
-                <div id="custom-purpose-block" class="hidden">
-                    <label for="custom-purpose" class="label-title">🎯 Твоя кастомная цель</label>
-                    <input type="text" id="custom-purpose" maxlength="40" placeholder="Коротко опиши суть движа" class="input-dark" style="font-size: 14px; font-weight: 600;">
-                </div>
-                <div>
-                    <label class="label-title">🔞 Желаемый возраст компании</label>
-                    <div class="grid-2">
-                        <div style="display: flex; align-items: center; background: #020617; border: 1px solid #475569; border-radius: 12px; padding: 0 16px;">
-                            <span style="font-size: 11px; color: #64748b; font-family: monospace; margin-right: 8px;">От</span>
-                            <input type="number" id="age-from" value="16" style="background: transparent; border: none; color: white; font-weight: 900; padding: 14px 0; outline: none; width: 100%; font-size: 14px;">
-                        </div>
-                        <div style="display: flex; align-items: center; background: #020617; border: 1px solid #475569; border-radius: 12px; padding: 0 16px;">
-                            <span style="font-size: 11px; color: #64748b; font-family: monospace; margin-right: 8px;">До</span>
-                            <input type="number" id="age-to" value="22" style="background: transparent; border: none; color: white; font-weight: 900; padding: 14px 0; outline: none; width: 100%; font-size: 14px;">
-                        </div>
-                    </div>
-                    <p id="corridor-info-text" style="margin: 8px 0 0 0; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;"></p>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(2,6,23,0.4); border: 1px solid #334155; border-radius: 12px; padding: 14px;">
-                    <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #cbd5e1;">👥 Со мной друг/подруга</span>
-                    <label style="position: relative; display: inline-block; width: 44px; height: 24px;">
-                        <input type="checkbox" id="with-friend" style="opacity: 0; width: 0; height: 0;">
-                        <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #334155; transition: .3s; border-radius: 24px;" onclick="this.style.backgroundColor = this.previousElementSibling.checked ? '#334155' : '#4f46e5'"></span>
-                    </label>
-                </div>
-                <div class="grid-2">
-                    <div style="background: #020617; border: 1px solid #334155; border-radius: 12px; padding: 16px; text-align: center;">
-                        <span class="label-title" style="font-size: 10px; margin-bottom: 10px;">Ищу парней</span>
-                        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 110px; margin: 0 auto;">
-                            <button type="button" onclick="changeCounter('count-guys', -1)" style="width: 32px; height: 32px; border-radius: 8px; background: #1e293b; color: #e2e8f0; border: 1px solid #475569; font-size: 18px; font-weight: 900; cursor: pointer;">-</button>
-                            <span id="count-guys" style="font-size: 16px; font-weight: 900; color: white; margin: 0 8px;">0</span>
-                            <button type="button" onclick="changeCounter('count-guys', 1)" style="width: 32px; height: 32px; border-radius: 8px; background: #1e293b; color: #e2e8f0; border: 1px solid #475569; font-size: 18px; font-weight: 900; cursor: pointer;">+</button>
-                        </div>
-                    </div>
-                    <div style="background: #020617; border: 1px solid #334155; border-radius: 12px; padding: 16px; text-align: center;">
-                        <span class="label-title" style="font-size: 10px; margin-bottom: 10px;">Ищу девушек</span>
-                        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 110px; margin: 0 auto;">
-                            <button type="button" onclick="changeCounter('count-girls', -1)" style="width: 32px; height: 32px; border-radius: 8px; background: #1e293b; color: #e2e8f0; border: 1px solid #475569; font-size: 18px; font-weight: 900; cursor: pointer;">-</button>
-                            <span id="count-girls" style="font-size: 16px; font-weight: 900; color: white; margin: 0 8px;">0</span>
-                            <button type="button" onclick="changeCounter('count-girls', 1)" style="width: 32px; height: 32px; border-radius: 8px; background: #1e293b; color: #e2e8f0; border: 1px solid #475569; font-size: 18px; font-weight: 900; cursor: pointer;">+</button>
-                        </div>
-                    </div>
-                </div>
-                                <!-- Поле подробного текстового описания анкеты -->
-                <div>
-                    <label for="description" class="label-title">📝 Описание анкеты (Макс. 120 символов)</label>
-                    <textarea id="description" maxlength="120" placeholder="Напр: Ищем людей с кальяном, сидим на лавках у Драмтеатра. Ссылки и реклама запрещены!" class="input-dark" style="font-size: 12px; height: 90px; resize: none; font-weight: 600; font-family: inherit; padding: 12px;"></textarea>
-                </div>
-
-                <!-- Большая кнопка запуска радара -->
-                <button type="button" onclick="submitRadar()" class="btn-large" style="background: linear-gradient(90deg, #ec4899, #8b5cf6); box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);">
-                    🚀 Запустить радар сбора
-                </button>
+            <div class="form-group">
+                <label>📝 Описание анкеты (Макс. 120 символов)</label>
+                <textarea id="create-desc" maxlength="120" placeholder="Что будете делать? Где точно сбор?"></textarea>
             </div>
-        </main>
-    </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО ЖАЛОБ -->
-    <div id="report-modal" class="hidden" style="position: fixed; inset: 0; background: rgba(2,6,23,0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 16px;">
-        <div class="card" style="width: 100%; max-width: 340px; display: flex; flex-direction: column; gap: 16px; background: #0f172a; border: 1px solid #334155; box-sizing: border-box;">
-            <h3 style="margin: 0; font-size: 14px; font-weight: 900; color: #f43f5e; text-transform: uppercase; letter-spacing: 1px;">⚠️ Указать статью нарушения</h3>
-            <p style="margin: 0; font-size: 11px; color: #94a3b8;">Ложные жалобы караются жестким баном твоего профиля. Выбирай причину нарушения строго по факту встречи:</p>
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-                <button type="button" onclick="confirmReport('Слив в последний момент')" style="width: 100%; text-align: left; padding: 12px; background: #020617; border: 1px solid #334155; border-radius: 12px; color: #e2e8f0; font-size: 12px; font-weight: 700; cursor: pointer;">🚫 Слив прямо перед сбором (40 ШО)</button>
-                <button type="button" onclick="confirmReport('Грязь / Спам в описании')" style="width: 100%; text-align: left; padding: 12px; background: #020617; border: 1px solid #334155; border-radius: 12px; color: #e2e8f0; font-size: 12px; font-weight: 700; cursor: pointer;">💬 Грязь, спам или ссылки в анкете (50 ШО)</button>
-                <button type="button" onclick="confirmReport('Неадекват / Агрессия')" style="width: 100%; text-align: left; padding: 12px; background: #020617; border: 1px solid #334155; border-radius: 12px; color: #e2e8f0; font-size: 12px; font-weight: 700; cursor: pointer;">⚔️ Неадекватное поведение / Конфликт (60 ШО)</button>
-                <button type="button" onclick="confirmReport('Ошибка возраста (1-3 года)')" style="width: 100%; text-align: left; padding: 12px; background: #020617; border: 1px solid #334155; border-radius: 12px; color: #e2e8f0; font-size: 12px; font-weight: 700; cursor: pointer;">⏳ Ошибка в возрасте на 1-3 года (20 ШО)</button>
-                <button type="button" onclick="confirmReport('Фейк возраста (+3 года) / Пола')" style="width: 100%; text-align: left; padding: 12px; background: #020617; border: 1px solid #f43f5e; border-radius: 12px; color: #f43f5e; font-size: 12px; font-weight: 700; cursor: pointer;">👤 Жесткий фейк пола или возраста (100 ШО -> БАН)</button>
-            </div>
-            <button type="button" onclick="closeReportModal()" style="width: 100%; background: #334155; border: none; color: #94a3b8; padding: 12px; font-size: 12px; font-weight: 900; text-transform: uppercase; border-radius: 12px; cursor: pointer;">Отмена</button>
+            <button id="btn-launch-radar" class="btn btn-primary" style="margin-top: 10px; width: 100%;">
+                🚀 Запустить радар сбора
+            </button>
         </div>
     </div>
 
-        <!-- ПОЛНЫЙ ВСТРОЕННЫЙ JAVASCRIPT-ДВИЖОК -->
-    <script>
-        const BOT_TOKEN = "8829942321:AAHzai6My057v36JiB35izszp5COPg31FCw";
-        const ADMIN_ID = 6949963047;
-        const CHANNEL_ID = "@Grodno_run";
-
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-
-        let userProfile = {
-            tgId: tg.initDataUnsafe?.user?.id || 999999999,
-            username: tg.initDataUnsafe?.user?.username || "",
-            firstName: tg.initDataUnsafe?.user?.first_name || "Пользователь",
-            gender: null,
-            age: null
-        };
-
-        let isAdminMode = false;
-        let fakeGender = null;
-        let fakeAge = null;
-        let selectedReportTarget = null;
-
-        document.addEventListener("DOMContentLoaded", () => {
-            checkAdminRights();
-            loadSession();
-            processIncomingDeepLink();
-            tg.ready();
-        });
-
-        function checkAdminRights() {
-            if (userProfile.tgId === ADMIN_ID) {
-                const panel = document.getElementById("admin-panel");
-                if (panel) panel.style.display = "block";
-                isAdminMode = true;
-            }
-        }
-
-        function loadSession() {
-            const savedGender = localStorage.getItem("gr_gender");
-            const savedAge = localStorage.getItem("gr_age");
-            if (savedGender && savedAge) {
-                userProfile.gender = savedGender;
-                userProfile.age = parseInt(savedAge);
-                
-                if (document.getElementById("auth-screen")) document.getElementById("auth-screen").style.display = "none";
-                if (document.getElementById("main-app")) document.getElementById("main-app").style.display = "block";
-                
-                const selectEl = document.getElementById("gender-select");
-                if (selectEl) selectEl.value = savedGender;
-                
-                applyAgeCorridorRules();
-            }
-        }
-
-        function handleAgeInput(value) {
-            const age = parseInt(value);
-            const warning = document.getElementById("age-warning-text");
-            if (!warning || isNaN(age)) return;
-            if (age >= 12 && age <= 17) {
-                warning.innerText = "Категория: Подростки. Сборы до 17 лет включительно.";
-                warning.style.color = "#22d3ee";
-            } else if (age >= 18 && age <= 35) {
-                warning.innerText = "Категория: Взрослые (18+). Подростковые сборы заблокированы.";
-                warning.style.color = "#818cf8";
-            } else {
-                warning.innerText = "Возрастной лимит радара: от 12 до 35 лет.";
-                warning.style.color = "#f43f5e";
-            }
-        }
-
-        function verifyAndProceed() {
-            if (window.event) window.event.preventDefault();
-
-            const selectEl = document.getElementById("gender-select");
-            if (selectEl) userProfile.gender = selectEl.value;
-
-            const ageInput = document.getElementById("user-age")?.value;
-            const age = parseInt(ageInput);
+    <!-- МОДАЛЬНОЕ ОКНО: НАРУШЕНИЯ -->
+    <div id="modal-violation" class="modal">
+        <div class="modal-content">
+            <h3>⚠ Указать статью нарушения</h3>
+            <p class="hint" style="color: #ff4d4d; margin-bottom: 15px;">Ложные жалобы караются жестким баном твоего профиля. Выбирай причину нарушения строго по факту встречи:</p>
             
-            if (!userProfile.gender) {
-                tg.showAlert("Ошибка: Выбери свой реальный пол через список перед входом!");
-                return;
-            }
-            if (isNaN(age)) {
-                tg.showAlert("Ошибка: Поле возраста пустое! Введи свой точный возраст.");
-                return;
-            }
-            if (age < 12 || age > 35) {
-                tg.showAlert("Ошибка: Радар работает строго для молодежи от 12 до 35 лет!");
-                return;
-            }
-            userProfile.age = age;
-            localStorage.setItem("gr_gender", userProfile.gender);
-            localStorage.setItem("gr_age", age);
+            <button class="btn btn-violation" data-sho="40">🚫 Слив прямо перед сбором (40 ШО)</button>
+            <button class="btn btn-violation" data-sho="50">💬 Грязь, спам или ссылки в анкете (50 ШО)</button>
+            <button class="btn btn-violation" data-sho="60">⚔ Неадекватное поведение / Конфликт (60 ШО)</button>
+            <button class="btn btn-violation" data-sho="20">⏳ Ошибка в возрасте на 1-3 года (20 ШО)</button>
+            <button class="btn btn-violation btn-danger" data-sho="100">👤 Жесткий фейк пола или возраста (100 ШО -> БАН)</button>
             
-            if (document.getElementById("auth-screen")) document.getElementById("auth-screen").style.display = "none";
-            if (document.getElementById("main-app")) document.getElementById("main-app").style.display = "block";
-            
-            applyAgeCorridorRules();
-        }
+            <button id="btn-close-modal" class="btn" style="background: #333; margin-top: 15px;">Отмена</button>
+        </div>
+    </div>
 
-        function applyAgeCorridorRules() {
-            const currentAge = (isAdminMode && fakeAge) ? fakeAge : userProfile.age;
-            const fromInput = document.getElementById("age-from");
-            const toInput = document.getElementById("age-to");
-            const info = document.getElementById("corridor-info-text");
-            if (!fromInput || !toInput || !info) return;
-            if (currentAge >= 12 && currentAge <= 16) {
-                fromInput.value = 12; fromInput.max = 17; toInput.value = 17; toInput.max = 17;
-                info.innerText = "⚠️ Авто-шлюз: Вы можете звать только сверстников до 17 лет";
-                info.style.color = "#22d3ee";
-            } else if (currentAge === 17) {
-                fromInput.value = 16; fromInput.min = 16; toInput.value = 19; toInput.max = 19;
-                info.innerText = "⚠️ Авто-шлюз: Доступен переходный коридор (16 - 19 лет)";
-                info.style.color = "#f59e0b";
-            } else {
-                fromInput.value = 18; fromInput.min = 18; toInput.value = 25; toInput.min = 18;
-                info.innerText = "⚠️ Авто-шлюз: Доступна только взрослая категория (18+)";
-                info.style.color = "#818cf8";
-            }
-        }
-                function toggleFakeGender(val) {
-            fakeGender = val || null;
-            applyAgeCorridorRules();
-        }
-
-        function updateFakeAge(val) {
-            fakeAge = parseInt(val) || null;
-            applyAgeCorridorRules();
-        }
-
-        function triggerAdminAction(type) {
-            if (type === 'verify_alert') {
-                tg.showAlert("Ультиматум отправлен нарушителю: Требуется видео-кружок в ЛС с кодовым словом 'Гродно 2026'!");
-            }
-        }
-
-        function switchTab(tab) {
-            const isFeed = tab === "feed";
-            const feedSec = document.getElementById("section-feed");
-            const createSec = document.getElementById("section-create");
-            if (feedSec) feedSec.style.display = isFeed ? "block" : "none";
-            if (createSec) createSec.style.display = !isFeed ? "block" : "none";
-            
-            const fBtn = document.getElementById("tab-feed");
-            const cBtn = document.getElementById("tab-create");
-            if (fBtn) { fBtn.style.background = isFeed ? "#4f46e5" : "transparent"; fBtn.style.color = isFeed ? "white" : "#94a3b8"; }
-            if (cBtn) { cBtn.style.background = !isFeed ? "#4f46e5" : "transparent"; cBtn.style.color = !isFeed ? "white" : "#94a3b8"; }
-        }
-
-        function handlePurposeChange(value) {
-            const block = document.getElementById("custom-purpose-block");
-            if (block) block.style.display = (value === "CUSTOM") ? "block" : "none";
-        }
-
-        function changeCounter(id, delta) {
-            const el = document.getElementById(id);
-            if (!el) return;
-            let val = parseInt(el.innerText);
-            val = Math.max(0, Math.min(10, val + delta));
-            el.innerText = val;
-        }
-
-        function submitRadar() {
-            let loc = document.getElementById("location")?.value || "";
-            const customLoc = document.getElementById("custom-location")?.value.trim() || "";
-            if (customLoc) loc += " — " + customLoc;
-            let purp = document.getElementById("purpose")?.value || "";
-            if (purp === "CUSTOM") {
-                purp = document.getElementById("custom-purpose")?.value.trim() || "";
-                if (!purp) { tg.showAlert("Введи свой вариант цели сбора!"); return; }
-            }
-            const ageFrom = parseInt(document.getElementById("age-from")?.value || "16");
-            const ageTo = parseInt(document.getElementById("age-to")?.value || "22");
-            const withFriend = document.getElementById("with-friend")?.checked || false;
-            const guys = parseInt(document.getElementById("count-guys")?.innerText || "0");
-            const girls = parseInt(document.getElementById("count-girls")?.innerText || "0");
-            const desc = document.getElementById("description")?.value.trim() || "";
-
-            if (desc.match(/(http|https|t\.me|\x40)/gi)) {
-                tg.showAlert("Ссылки, юзернеймы и реклама в описании строго запрещены!");
-                return;
-            }
-            const effectiveAge = (isAdminMode && fakeAge) ? fakeAge : userProfile.age;
-            const effectiveGender = (isAdminMode && fakeGender) ? fakeGender : userProfile.gender;
-
-            const textMessage = "⚡️ *НОВЫЙ СБОР: Grodno Run*\n\n" +
-                                "📍 *Район:* " + loc + "\n" +
-                                "🎯 *Цель:* " + purp + "\n" +
-                                "🔞 *Коридор возраста:* " + ageFrom + " - " + ageTo + " лет\n" +
-                                "👥 *Состав:* Ищу парней (" + guys + "), Ищу девушек (" + girls + ")\n" +
-                                (withFriend ? "📌 *Со мной уже идёт друг/подруга*\n" : "") +
-                                (desc ? "📝 *Описание:* _" + desc + "_\n" : "") + "\n" +
-                                "⚠️ *Статус автора:* Нарушений не зафиксировано (0 ШО)\n\n" +
-                                "🔒 _Контакты скрыты от спама. Нажми кнопку ниже, чтобы пройти автоматический фейс-контроль._";
-
-            const botUser = tg.initDataUnsafe?.receiver?.username || "GrodnoRunBot"; 
-            const appUrl = "https://t.me" + botUser + "/app?startapp=check_" + userProfile.tgId + "_" + (effectiveGender === "Парень" ? "M" : "F") + "_" + effectiveAge + "_" + ageFrom + "_" + ageTo;
-
-            const replyMarkup = { inline_keyboard: [[{ text: "🔥 Принять сбор / Вступить", url: appUrl }]] };
-
-            fetch("https://telegram.org" + BOT_TOKEN + "/sendMessage", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ chat_id: CHANNEL_ID, text: textMessage, parse_mode: "Markdown", reply_markup: replyMarkup })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.ok) { tg.showAlert("Радар запущен! Сбор опубликован в канале."); switchTab("feed"); }
-                else { tg.showAlert("Ошибка публикации. Убедись, что бот админ в канале."); }
-            });
-        }
-
-                function processIncomingDeepLink() {
-            const startParam = tg.initDataUnsafe?.start_param;
-            if (!startParam || !startParam.startsWith("check_")) return;
-            
-            // Безопасный разбор строки через регулярное выражение в обход багов с массивами
-            const match = startParam.match(/check_([A-Za-z0-9]+)_([MF])_([0-9]+)_([0-9]+)_([0-9]+)/);
-            if (!match) return;
-
-            const orgId = match[1];
-            const reqAgeFrom = parseInt(match[4]) || 12;
-            const reqAgeTo = parseInt(match[5]) || 35;
-            
-            const myAge = (isAdminMode && fakeAge) ? fakeAge : userProfile.age;
-            const zone = document.getElementById("verification-card-zone");
-            if (!zone) return;
-            
-            zone.style.display = "block";
-            switchTab("feed");
-            
-            let htmlContent = `<div class="card" style="border: 2px solid #6366f1; padding: 20px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 16px;"><h3 style="margin: 0; font-size: 12px; font-weight: 900; color: #818cf8; text-transform: uppercase; letter-spacing: 1px;">🔄 Проверка шлюза фейс-контроля</h3><p style="margin: 0; font-size: 12px; color: #cbd5e1;">Вход на радар организатора ID: ${orgId}. Проверяем твое соответствие...</p>`;
-            if (myAge < reqAgeFrom || myAge > reqAgeTo) {
-                htmlContent += `<div style="background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.2); color: #f43f5e; font-size: 12px; padding: 14px; border-radius: 12px; font-weight: 700; text-transform: uppercase;">❌ ОТКАЗ: Твой возраст (${myAge} лет) не подходит под коридор сбора (${reqAgeFrom}-${reqAgeTo} лет).</div>`;
-            } else {
-                htmlContent += `<div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); color: #10b981; font-size: 12px; padding: 14px; border-radius: 12px; font-weight: 700; text-transform: uppercase;">✅ ПРОЙДЕНО: Твой возраст полностью подходит под критерии сбора.</div><div style="display: flex; flex-direction: column; gap: 10px;"><a href="tg://user?id=${orgId}" onclick="registerAcceptAction('${orgId}')" style="display: block; background: linear-gradient(90deg, #10b981, #059669); text-align: center; color: #020617; font-weight: 900; padding: 14px; border-radius: 12px; font-size: 12px; text-transform: uppercase; text-decoration: none; box-shadow: 0 4px 15px rgba(16,185,129,0.3);">💬 Написать организатору в ЛС</a><button type="button" onclick="openReportModal('${orgId}')" style="width: 100%; background: #020617; border: 1px solid #334155; color: #f43f5e; font-weight: 900; padding: 12px; border-radius: 12px; font-size: 11px; text-transform: uppercase; cursor: pointer;">⚠️ Пожаловаться на автора</button></div>`;
-            }
-            htmlContent += `</div>`;
-            zone.innerHTML = htmlContent;
-        }
-
-
-        function registerAcceptAction(orgId) { localStorage.setItem("gr_allow_report_" + orgId, "true"); }
-        function openReportModal(orgId) { const isAllowed = localStorage.getItem("gr_allow_report_" + orgId); if (!isAllowed) { tg.showAlert("Запрещено! Подать жалобу можно только после того, как ты реально нажал кнопку связи."); return; } selectedReportTarget = orgId; document.getElementById("report-modal").style.display = "block"; }
-        function closeReportModal() { if (document.getElementById("report-modal")) document.getElementById("report-modal").style.display = "none"; selectedReportTarget = null; }
-        function confirmReport(reason) { if (!selectedReportTarget) return; const reportText = "🚨 *СИГНАЛ НАРУШЕНИЯ: Grodno Run*\n\n" + "👤 *От кого:* ID " + userProfile.tgId + " (@" + (userProfile.username || "скрыт") + ")\n" + "🫵 *Нарушитель:* ID " + selectedReportTarget + "\n" + "📝 *Статья нарушения:* " + reason + "\n\n" + "⚡️ _Подтверди вину кнопками в своем боте, чтобы начислить Штрафные Очки (ШО) в рейтинг автора._"; fetch("https://telegram.org" + BOT_TOKEN + "/sendMessage", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_ID, text: reportText, parse_mode: "Markdown" }) }).then(() => { tg.showAlert("Жалоба отправлена главному модератору Гродно."); closeReportModal(); }); }
-    </script>
+    <!-- СКРИПТЫ И СТИЛИ БУДУТ В СЛЕДУЮЩИХ ЧАСТЯХ -->
 </body>
 </html>
+/* Основные настройки приложения */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #1a1a1a;
+    color: #ffffff;
+    margin: 0;
+    padding: 15px;
+    box-sizing: border-box;
+    -webkit-user-select: none;
+    user-select: none;
+}
 
-    
-    
+/* Управление экранами (скрытие/показ) */
+.screen {
+    display: none;
+}
+.screen.active {
+    display: block;
+}
+
+.sub-screen {
+    display: none;
+}
+.sub-screen.active {
+    display: block;
+}
+
+/* Заголовки и тексты */
+h2 {
+    font-size: 24px;
+    margin-bottom: 5px;
+    text-align: center;
+}
+h3 {
+    font-size: 18px;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+.subtitle {
+    font-size: 14px;
+    color: #aaaaaa;
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+.hint {
+    font-size: 12px;
+    color: #888888;
+    margin-top: 5px;
+}
+
+/* Карточки и элементы интерфейса */
+.card {
+    background-color: #262626;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border: 1px solid #333;
+}
+
+.alert {
+    background-color: rgba(255, 77, 77, 0.1);
+    border: 1px solid #ff4d4d;
+    color: #ff4d4d;
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 13px;
+    margin-bottom: 20px;
+    line-height: 1.4;
+}
+
+.status-active {
+    background-color: rgba(77, 255, 110, 0.1);
+    border: 1px solid #4dff6e;
+    color: #4dff6e;
+    border-radius: 8px;
+    padding: 8px;
+    font-size: 13px;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+}
+
+/* Формы, кнопки, инпуты */
+.form-group {
+    margin-bottom: 15px;
+}
+label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #ddd;
+}
+
+select, input[type="text"], input[type="number"], textarea {
+    width: 100%;
+    background-color: #262626;
+    border: 1px solid #444;
+    color: #fff;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 15px;
+    box-sizing: border-box;
+}
+select:focus, input:focus, textarea:focus {
+    outline: none;
+    border-color: #5288c1;
+}
+
+textarea {
+    resize: none;
+    height: 70px;
+}
+
+/* Кнопки */
+.btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    border: none;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    color: #fff;
+    text-align: center;
+    box-sizing: border-box;
+}
+.btn-primary { background-color: #2481cc; }
+.btn-success { background-color: #4caf50; }
+.btn-danger { background-color: #e53935; }
+.btn-violation {
+    background-color: #262626;
+    border: 1px solid #333;
+    text-align: left;
+    margin-bottom: 8px;
+    font-size: 13px;
+    padding: 12px;
+}
+
+/* Переключатели и счетчики */
+.gender-switch {
+    display: flex;
+    gap: 10px;
+}
+.btn-toggle {
+    flex: 1;
+    background-color: #262626;
+    border: 1px solid #444;
+    color: #888;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+.btn-toggle.active {
+    background-color: #2481cc;
+    color: #fff;
+    border-color: #2481cc;
+}
+
+.counter-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #262626;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #333;
+}
+.counter {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.counter button {
+    background-color: #333;
+    border: none;
+    color: #fff;
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    font-size: 18px;
+    cursor: pointer;
+}
+.counter input {
+    width: 40px;
+    text-align: center;
+    padding: 5px;
+    border: none;
+    background: transparent;
+    font-size: 16px;
+    color: #fff;
+}
+
+/* Вкладки (Табы) */
+.tabs {
+    display: flex;
+    border-bottom: 2px solid #333;
+    margin-bottom: 15px;
+}
+.tab {
+    flex: 1;
+    background: none;
+    border: none;
+    color: #888;
+    padding: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+}
+.tab.active {
+    color: #2481cc;
+    border-bottom: 2px solid #2481cc;
+    margin-bottom: -2px;
+}
+
+/* Модальное окно */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.8);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+.modal.active {
+    display: flex;
+}
+.modal-content {
+    background-color: #1e1e1e;
+    border-radius: 14px;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    border: 1px solid #333;
+}
+
+/* Служебный класс */
+.hidden {
+    display: none !important;
+}
+<script>
+    // Инициализация Telegram WebApp
+    const tg = window.Telegram ? window.Telegram.WebApp : null;
+    if (tg) {
+        tg.ready();
+        tg.expand(); // Расширяем на весь экран смартфона
+    }
+
+    // Состояние приложения (внутренняя память вкладки)
+    let currentUser = {
+        gender: null,
+        age: null
+    };
+
+    // --- НАВИГАЦИЯ МЕЖДУ ЭКРАНАМИ ---
+    function showScreen(screenId) {
+        // Скрываем все экраны
+        document.querySelectorAll('.screen').forEach(screen => {
+            screen.classList.remove('active');
+        });
+        // Показываем нужный экран
+        const targetScreen = document.getElementById(screenId);
+        if (targetScreen) {
+            targetScreen.classList.add('active');
+        }
+    }
+
+    // --- ЭМУЛЯТОР АДМИНА (ЭКРАН 1) ---
+    const btnFakeMale = document.getElementById('fake-male');
+    const btnFakeFemale = document.getElementById('fake-female');
+    let selectedFakeGender = 'male';
+
+    btnFakeMale.addEventListener('click', () => {
+        btnFakeMale.classList.add('active');
+        btnFakeFemale.classList.remove('active');
+        selectedFakeGender = 'male';
+    });
+
+    btnFakeFemale.addEventListener('click', () => {
+        btnFakeFemale.classList.add('active');
+        btnFakeMale.classList.remove('active');
+        selectedFakeGender = 'female';
+    });
+
+    // Переход из Админки на экран авторизации
+    document.getElementById('btn-go-to-auth').addEventListener('click', () => {
+        // Подставляем данные из эмулятора в форму авторизации для удобства теста
+        const fakeAge = document.getElementById('fake-age').value;
+        document.getElementById('auth-gender').value = selectedFakeGender;
+        document.getElementById('auth-age').value = fakeAge;
+        
+        showScreen('screen-auth');
+    });
+
+    // --- ВХОДНОЙ КОНТРОЛЬ / АВТОРИЗАЦИЯ (ЭКРАН 2) ---
+    document.getElementById('btn-submit-auth').addEventListener('click', (e) => {
+        e.preventDefault(); // Защита: отменяем перезагрузку страницы
+
+        const genderSelect = document.getElementById('auth-gender');
+        const ageInput = document.getElementById('auth-age');
+
+        const gender = genderSelect.value;
+        const age = parseInt(ageInput.value);
+
+        // Валидация данных
+        if (!gender) {
+            alert('Пожалуйста, выберите ваш пол!');
+            return;
+        }
+
+        if (isNaN(age) || age < 12 || age > 35) {
+            alert('Возраст должен быть строго от 12 до 35 лет!');
+            return;
+        }
+
+        // Сохраняем данные пользователя
+        currentUser.gender = gender;
+        currentUser.age = age;
+
+        // Отправляем вибрацию на смартфон через Telegram, если доступно
+        if (tg && tg.HapticFeedback) {
+            tg.HapticFeedback.notificationOccurred('success');
+        }
+
+        // КНОПКА СРАБОТАЛА -> Переключаем на радар сборов!
+        showScreen('screen-radar');
+    });
+
+    // --- ТАБЫ НА РАДАРЕ (ЭКРАН 3) ---
+    const tabRadar = document.getElementById('tab-radar');
+    const tabCreate = document.getElementById('tab-create');
+    const subRadar = document.getElementById('sub-radar');
+    const subCreate = document.getElementById('sub-create');
+
+    tabRadar.addEventListener('click', () => {
+        tabRadar.classList.add('active');
+        tabCreate.classList.remove('active');
+        subRadar.classList.add('active');
+        subCreate.classList.remove('active');
+    });
+
+    tabCreate.addEventListener('click', () => {
+        tabCreate.classList.add('active');
+        tabRadar.classList.remove('active');
+        subCreate.classList.add('active');
+        subRadar.classList.remove('active');
+    });
+
+    // Показ кастомной цели, если выбран пункт "Свой вариант"
+    document.getElementById('create-target').addEventListener('change', function() {
+        const customBlock = document.getElementById('custom-target-block');
+        if (this.value === 'custom') {
+            customBlock.classList.remove('hidden');
+        } else {
+            customBlock.classList.add('hidden');
+        }
+    });
+
+    // --- ЛОГИКА СЧЕТЧИКОВ (Парни / Девушки) ---
+    document.querySelectorAll('.counter').forEach(counter => {
+        const btnMinus = counter.querySelector('.minus');
+        const btnPlus = counter.querySelector('.plus');
+        const input = counter.querySelector('input');
+
+        btnMinus.addEventListener('click', () => {
+            let val = parseInt(input.value);
+            if (val > 0) input.value = val - 1;
+        });
+
+        btnPlus.addEventListener('click', () => {
+            let val = parseInt(input.value);
+            if (val < 10) input.value = val + 1; // Максимум 10 друзей
+        });
+    });
+
+    // --- МОДАЛЬНОЕ ОКНО НАРУШИТЕЛЯ ---
+    const modal = document.getElementById('modal-violation');
+
+    // Кнопка из админки вызывает окно
+    document.getElementById('btn-call-violator').addEventListener('click', () => {
+        modal.classList.add('active');
+    });
+
+    // Кнопка отмены в модалке
+    document.getElementById('btn-close-modal').addEventListener('click', () => {
+        modal.classList.remove('active');
+    });
+
+    // Обработка клика по статьям нарушений
+    document.querySelectorAll('.btn-violation').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const sho = this.getAttribute('data-sho');
+            alert(`Жалоба зафиксирована! Нарушителю выписано ${sho} ШО.`);
+            modal.classList.remove('active');
+        });
+    });
+
+    // Запуск радара (Создание сбора)
+    document.getElementById('btn-launch-radar').addEventListener('click', () => {
+        const districtSelect = document.getElementById('create-district');
+        const districtText = districtSelect.options[districtSelect.selectedIndex].text;
+        const targetSelect = document.getElementById('create-target');
+        let targetText = targetSelect.options[targetSelect.selectedIndex].text;
+
+        if (targetSelect.value === 'custom') {
+            targetText = document.getElementById('create-custom-target').value || "Своя цель";
+        }
+
+        alert(`Успешно! Ваш сбор объявлен на районе: ${districtText} с целью "${targetText}"`);
+        
+        // Возвращаемся на вкладку радара
+        tabRadar.click();
+    });
+</script>
+    <!-- Тут заканчивается скрипт из 3-й части -->
+     </body>
+</html>
