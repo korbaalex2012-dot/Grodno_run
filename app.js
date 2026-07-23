@@ -4,11 +4,11 @@
 
 const BOT_TOKEN = "8829942321:AAHzai6My057v36JiB35izszp5COPg31FCw";
 const ADMIN_ID = 6949963047;
-const CHANNEL_ID = "@Grodno_run"; // Канал Гродно привязан напрямую
+const CHANNEL_ID = "@Grodno_run"; // Твой канал привязан напрямую
 
 // Инициализация Telegram Web App API
 const tg = window.Telegram.WebApp;
-tg.expand(); // Расширяем Mini App на весь экран смартфона
+tg.expand(); // Раскрываем Mini App на весь экран смартфона
 
 // Профиль пользователя из системы Telegram
 let userProfile = {
@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
     checkAdminRights();
     loadSession();
     processIncomingDeepLink();
-    tg.ready(); // Убираем белый экран загрузки Телеграма
+    tg.ready(); // Жесткий сигнал Телеграму убрать белый экран загрузки
 });
 
 // Активация твоего пульта управления модератора
@@ -66,27 +66,19 @@ function loadSession() {
 // БЛОК 2: ЛОГИКА ВХОДНОГО КОНТРОЛЯ (ШАГ 0)
 // ==========================================
 
-// Автономный выбор пола с неоновой подсветкой рамок без Tailwind
+// Дубовая и надежная функция переключения пола с гарантированной подсветкой
 function setGender(gender) {
     userProfile.gender = gender;
-    const isMale = gender === "Парень";
     
     const maleBtn = document.getElementById("gender-male");
     const femaleBtn = document.getElementById("gender-female");
     
-    if (maleBtn) {
-        if (isMale) {
-            maleBtn.classList.add("active-male");
-        } else {
-            maleBtn.classList.remove("active-male");
-        }
-    }
-    if (femaleBtn) {
-        if (!isMale) {
-            femaleBtn.classList.add("active-female");
-        } else {
-            femaleBtn.classList.remove("active-female");
-        }
+    if (gender === "Парень") {
+        if (maleBtn) maleBtn.className = "btn-sex active-male";
+        if (femaleBtn) femaleBtn.className = "btn-sex";
+    } else if (gender === "Девушка") {
+        if (maleBtn) maleBtn.className = "btn-sex";
+        if (femaleBtn) femaleBtn.className = "btn-sex active-female";
     }
 }
 
@@ -108,12 +100,11 @@ function handleAgeInput(value) {
     }
 }
 
-// Жесткая проверка полей с выводом ошибок
+// Пропуск проверенного пользователя внутрь радара с выводом пацанских ошибок
 function verifyAndProceed() {
     const ageInput = document.getElementById("user-age")?.value;
     const age = parseInt(ageInput);
 
-    // ВСПЛЫВАЮЩИЕ ОШИБКИ, ЕСЛИ ДАННЫЕ НЕ ВВЕДЕНЫ
     if (!userProfile.gender) {
         tg.showAlert("Ошибка: Выбери свой реальный пол (Парень / Девушка) перед входом на радар!");
         return;
@@ -123,7 +114,7 @@ function verifyAndProceed() {
         return;
     }
     if (age < 12 || age > 35) {
-        tg.showAlert("Ошибка: Доступ запрещен. Радар сборов работает строго для молодежи от 12 до 35 лет!");
+        tg.showAlert("Ошибка: Доступ заблокирован. Радар сборов работает строго для молодежи от 12 до 35 лет!");
         return;
     }
 
@@ -184,12 +175,14 @@ function toggleFakeGender(gender) {
     const femaleBtn = document.getElementById("fake-sex-female");
     
     if (maleBtn) {
-        maleBtn.style.border = isMale ? "1px solid #f59e0b" : "1px solid #475569";
+        maleBtn.style.border = isMale ? "2px solid #f59e0b" : "1px solid #475569";
         maleBtn.style.color = isMale ? "#f59e0b" : "#94a3b8";
+        maleBtn.style.fontWeight = isMale ? "900" : "700";
     }
     if (femaleBtn) {
-        femaleBtn.style.border = !isMale ? "1px solid #f59e0b" : "1px solid #475569";
+        femaleBtn.style.border = !isMale ? "2px solid #f59e0b" : "1px solid #475569";
         femaleBtn.style.color = !isMale ? "#f59e0b" : "#94a3b8";
+        femaleBtn.style.fontWeight = !isMale ? "900" : "700";
     }
 }
 
@@ -344,6 +337,7 @@ function processIncomingDeepLink() {
     const parts = startParam.split("_");
     if (parts.length < 7) return; 
 
+    // Извлекаем индексы элементов массива напрямую в переменные
     const orgId = parts[1]; 
     const reqAgeFrom = parseInt(parts[4]) || 12;
     const reqAgeTo = parseInt(parts[5]) || 35;
@@ -363,7 +357,7 @@ function processIncomingDeepLink() {
 
     if (myAge < reqAgeFrom || myAge > reqAgeTo) {
         htmlContent += `
-            <div style="background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.2); text-color: #f43f5e; font-size: 12px; padding: 14px; border-radius: 12px; font-weight: 700; text-transform: uppercase;">
+            <div style="background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.2); color: #f43f5e; font-size: 12px; padding: 14px; border-radius: 12px; font-weight: 700; text-transform: uppercase;">
                 ❌ ОТКАЗ: Твой возраст (${myAge} лет) не подходит под коридор сбора (${reqAgeFrom}-${reqAgeTo} лет).
             </div>`;
     } else {
