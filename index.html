@@ -319,7 +319,7 @@
         </div>
     </div>
 
-    <!-- ПОЛНЫЙ ВСТРОЕННЫЙ JAVASCRIPT-ДВИЖОК -->
+        <!-- ПОЛНЫЙ ВСТРОЕННЫЙ JAVASCRIPT-ДВИЖОК -->
     <script>
         const BOT_TOKEN = "8829942321:AAHzai6My057v36JiB35izszp5COPg31FCw";
         const ADMIN_ID = 6949963047;
@@ -414,7 +414,6 @@
             localStorage.setItem("gr_gender", userProfile.gender);
             localStorage.setItem("gr_age", age);
             
-            // ПРИНУДИТЕЛЬНЫЙ ЖЕСТКИЙ СДВИГ ОКОН БЕЗ ПЕРЕЗАГРУЗОК СТРАНИЦЫ
             if (document.getElementById("auth-screen")) document.getElementById("auth-screen").style.display = "none";
             if (document.getElementById("main-app")) document.getElementById("main-app").style.display = "block";
             
@@ -539,6 +538,7 @@
             const parts = startParam.split("_");
             if (parts.length < 6) return; 
             
+            // Чистый разбор массива БЕЗ скрытых сломанных символов
             const orgId = parts[1]; 
             const reqAgeFrom = parseInt(parts[4]) || 12;
             const reqAgeTo = parseInt(parts[5]) || 35;
@@ -547,8 +547,7 @@
             if (!zone) return;
             zone.style.display = "block";
             switchTab("feed");
-            let htmlContent = `<div class="card" style="border: 2px solid #6366f1; padding: 20px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 16px;"><h3 style="margin: 0; font-size: 12px; font-weight: 900; color: #818cf8; text-transform: uppercase; letter-spacing: 1px;">🔄 Проверка шлюза фейс-контроля</h3><p style="margin: 0; font-size: 12px; color: #cbd5e1;">Вход на радар организатора ID: ${orgId}. Проверяем твое соответствие...</p>
-`;
+            let htmlContent = `<div class="card" style="border: 2px solid #6366f1; padding: 20px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 16px;"><h3 style="margin: 0; font-size: 12px; font-weight: 900; color: #818cf8; text-transform: uppercase; letter-spacing: 1px;">🔄 Проверка шлюза фейс-контроля</h3><p style="margin: 0; font-size: 12px; color: #cbd5e1;">Вход на радар организатора ID: ${orgId}. Проверяем твое соответствие...</p>`;
             if (myAge < reqAgeFrom || myAge > reqAgeTo) {
                 htmlContent += `<div style="background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.2); color: #f43f5e; font-size: 12px; padding: 14px; border-radius: 12px; font-weight: 700; text-transform: uppercase;">❌ ОТКАЗ: Твой возраст (${myAge} лет) не подходит под коридор сбора (${reqAgeFrom}-${reqAgeTo} лет).</div>`;
             } else {
@@ -559,9 +558,12 @@
         }
 
         function registerAcceptAction(orgId) { localStorage.setItem("gr_allow_report_" + orgId, "true"); }
-        function openReportModal(orgId) { const isAllowed = localStorage.getItem("gr_allow_report_" + orgId); if (!isAllowed) { tg.showAlert("Запрещено! Подать жалобу можно только после того, как ты реально нажал кнопку связи."); return; } selectedReportTarget = orgId; document.getElementById("report-modal")?.style.display = "block"; }
+        function openReportModal(orgId) { const isAllowed = localStorage.getItem("gr_allow_report_" + orgId); if (!isAllowed) { tg.showAlert("Запрещено! Подать жалобу можно только после того, как ты реально нажал кнопку связи."); return; } selectedReportTarget = orgId; document.getElementById("report-modal").style.display = "block"; }
         function closeReportModal() { if (document.getElementById("report-modal")) document.getElementById("report-modal").style.display = "none"; selectedReportTarget = null; }
         function confirmReport(reason) { if (!selectedReportTarget) return; const reportText = "🚨 *СИГНАЛ НАРУШЕНИЯ: Grodno Run*\n\n" + "👤 *От кого:* ID " + userProfile.tgId + " (@" + (userProfile.username || "скрыт") + ")\n" + "🫵 *Нарушитель:* ID " + selectedReportTarget + "\n" + "📝 *Статья нарушения:* " + reason + "\n\n" + "⚡️ _Подтверди вину кнопками в своем боте, чтобы начислить Штрафные Очки (ШО) в рейтинг автора._"; fetch("https://telegram.org" + BOT_TOKEN + "/sendMessage", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_ID, text: reportText, parse_mode: "Markdown" }) }).then(() => { tg.showAlert("Жалоба отправлена главному модератору Гродно."); closeReportModal(); }); }
     </script>
 </body>
 </html>
+
+    
+    
