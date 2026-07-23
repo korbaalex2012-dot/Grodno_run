@@ -418,7 +418,7 @@
             <button class="nav-btn hidden" id="nav-admin-btn" data-sub="sub-admin"><span>⚡</span>Админка</button>
         </div>
         </div>
-        <script>
+            <script>
         // ТВОЙ НАСТОЯЩИЙ ID ИЗ ТЕЛЕГРАМА ДЛЯ ВХОДА В АДМИНКУ
         const MY_TELEGRAM_ID = 6949963047;
 
@@ -445,17 +445,16 @@
         let activeAge = parseInt(localStorage.getItem('user_age')) || 0;
         let currentDistrictFilter = "all";
 
-        // НОВЫЙ ДВИЖОК ОЧЕРЕДИ МУЗЫКАЛЬНЫХ ТРЕКОВ ПО ИНТЕРНЕТ-ССЫЛКАМ
+        // ВОЗВРАЩАЕМ ПРОВЕРЕННЫЙ ДВИЖОК ЗАГРУЗКИ MP3 ФАЙЛОВ С ТЕЛЕФОНА
         const audio = document.getElementById('bg-audio');
         const musicBtn = document.getElementById('btn-music-toggle');
+        const musicUpload = document.getElementById('music-upload');
         const badge = document.getElementById('track-queue-badge');
-        
-        // Массив ссылок на MP3 по умолчанию (можно добавлять свои)
-        let playlistUrls = JSON.parse(localStorage.getItem('gr_playlist_2026')) || [];
+        let playlistUrls = [];
         let currentTrackIndex = 0;
 
         window.addEventListener('DOMContentLoaded', () => {
-            // Кнопка админки теперь видна всегда, но защищена паролем 147369
+            // Кнопка админки теперь железно видна в меню всегда, вход по ПИН-коду
             document.getElementById('nav-admin-btn').classList.remove('hidden');
 
             if (localStorage.getItem('user_registered') === 'true') {
@@ -470,14 +469,9 @@
         });
 
         function initAudioEngine() {
-            if (playlistUrls.length > 0) {
-                badge.innerText = playlistUrls.length;
-                badge.classList.remove('hidden');
-            }
-
             musicBtn.addEventListener('click', () => {
                 if (playlistUrls.length === 0) {
-                    alert("Вставь ссылку на MP3 трек через кнопку '➕ ТРЕК'!");
+                    alert("Добавь один или несколько треков через кнопку '➕ ТРЕК'!");
                     return;
                 }
                 if (audio.paused) {
@@ -490,23 +484,21 @@
                 }
             });
 
-            // КНОПКА ЗАГРУЗКИ: Ввод прямой ссылки на MP3 трек из интернета
-            document.querySelector('label[for="music-upload"]').addEventListener('click', (e) => {
-                e.preventDefault();
-                const url = prompt("Вставь прямую ссылку на любой MP3 трек из интернета или чата:");
-                if (url && url.startsWith('http')) {
-                    playlistUrls.push(url);
-                    localStorage.setItem('gr_playlist_2026', JSON.stringify(playlistUrls));
-                    
+            // Старая добрая загрузка MP3 файлов прямо из памяти смартфона
+            musicUpload.addEventListener('change', (e) => {
+                const files = Array.from(e.target.files);
+                if (files.length > 0) {
+                    files.forEach(file => {
+                        const blobUrl = URL.createObjectURL(file);
+                        playlistUrls.push(blobUrl);
+                    });
+
                     badge.innerText = playlistUrls.length;
                     badge.classList.remove('hidden');
-                    
+
                     if (audio.paused) {
-                        currentTrackIndex = playlistUrls.length - 1;
                         playCurrentTrack();
                     }
-                } else if (url) {
-                    alert("Ссылка должна начинаться с http:// или https://");
                 }
             });
 
@@ -526,10 +518,9 @@
                 musicBtn.innerText = `🎵 ТРЕК ${currentTrackIndex + 1}`;
                 musicBtn.style.color = "var(--accent-green)";
                 musicBtn.style.boxShadow = "0 0 10px rgba(46, 204, 113, 0.3)";
-            }).catch(err => console.log("Ошибка автоплея:", err));
+            }).catch(err => console.log("Блокировка автоплея:", err));
         }
-
-        function updateStatusHeader() {
+                        function updateStatusHeader() {
             document.getElementById('user-display-status').innerText = `${activeGender}, ${activeAge} л. (@${myUsername})`;
         }
 
@@ -559,7 +550,103 @@
             updateStatusHeader();
             renderAll();
         });
-                    function renderAll() {
+
+        // МАСКИРОВКА КУРАТОРА ДЛЯ АДМИНА
+        document.getElementById('btn-apply-fake').addEventListener('click', () => {
+            activeGender = document.getElementById('admin-fake-gender').value;
+            activeAge = parseInt(document.getElementById('admin-fake-age').value);
+            updateStatusHeader(); renderAll();
+            alert("Маскировка куратора применена! Радар перенастроен.");
+        });
+
+        // СЧЕТЧИКИ ЛЮДЕЙ ПРИ СОЗДАНИИ СХОДКИ
+        document.querySelectorAll('.btn-minus').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const inp = document.getElementById(btn.getAttribute('data-target'));
+                if (inp.value > 0) inp.value = parseInt(inp.value) - 1;
+            });
+        });
+        document.querySelectorAll('.btn-plus').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const inp = document.getElementById(btn.getAttribute('data-target'));
+                inp.value = parseInt(inp.value) + 1;
+            });
+        });
+
+        // ПОЛНОСТЬЮ ПЕРЕПИСАННАЯ НАВИГАЦИЯ ПО НИЖНЕМУ МЕНЮ С КОНТРОЛЕМ ПИН-КОДА
+        document.querySelectorAll('.bottom-nav .nav-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const targetSub = btn.getAttribute('data-sub');
+                
+                // Проверяем пин-код 147369 только для вкладки админки
+                if (targetSub === "sub-admin" && localStorage.getItem('admin_authorized') !== 'true') {
+                    const pin = prompt("🔐 Доступ ограничен. Введите ПИН-КОД куратора:");
+                    if (pin === "147369") {
+                        localStorage.setItem('admin_authorized', 'true');
+                        alert("⚠️ Доступ подтвержден. Добро пожаловать, Куратор!");
+                    } else {
+                        if (pin !== null) alert("❌ Ошибка: неверный код безопасности.");
+                        return; // Полностью стопорим и не переключаем экран
+                    }
+                }
+
+                // Логика чистого переключения вкладок
+                document.querySelectorAll('.bottom-nav .nav-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.sub-screen').forEach(s => s.classList.remove('active'));
+                
+                btn.classList.add('active');
+                document.getElementById(targetSub).classList.add('active');
+                renderAll();
+            });
+        });
+
+        // УЗЕЛ ФИЛЬТРАЦИИ ПО РАЙОНАМ НА РАДАРЕ
+        document.querySelectorAll('#radar-filter-bar .filter-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                document.querySelectorAll('#radar-filter-bar .filter-chip').forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                currentDistrictFilter = chip.getAttribute('data-filter');
+                renderMeetingsList();
+            });
+        });
+
+        // ЗАПУСК НОВОГО СБОРА НА РАДАР
+        document.getElementById('btn-launch-radar').addEventListener('click', () => {
+            const district = document.getElementById('create-district').value;
+            const exact = document.getElementById('create-exact-place').value || "Указано внутри";
+            const target = document.getElementById('create-target').value || "Прогулка / Чилл";
+            const link = document.getElementById('create-link').value || "";
+            const ageFrom = parseInt(document.getElementById('age-from').value);
+            const ageTo = parseInt(document.getElementById('age-to').value);
+            const mNeed = parseInt(document.getElementById('search-males').value);
+            const fNeed = parseInt(document.getElementById('search-females').value);
+            const desc = document.getElementById('create-desc').value;
+
+            if(!link.startsWith('http')) {
+                alert("Вставь рабочую Telegram ссылку на чат банды!");
+                return;
+            }
+
+            const newMeeting = {
+                id: Date.now(), district: district, exactPlace: exact, target: target, chatLink: link,
+                ageFrom: ageFrom, ageTo: ageTo, malesNeeded: mNeed, femalesNeeded: fNeed,
+                malesJoined: 0, femalesJoined: 0, desc: desc, creator: myUsername, timeCreated: Date.now()
+            };
+
+            meetings.unshift(newMeeting);
+            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
+
+            document.getElementById('create-exact-place').value = '';
+            document.getElementById('create-target').value = '';
+            document.getElementById('create-link').value = '';
+            document.getElementById('create-desc').value = '';
+            document.getElementById('search-males').value = '1';
+            document.getElementById('search-females').value = '1';
+
+            renderAll();
+            document.querySelector('[data-sub="sub-radar"]').click();
+        });
+                        function renderAll() {
             renderMeetingsList();
             renderArchiveList();
             renderViolators();
@@ -660,7 +747,7 @@
                 `;
                 container.appendChild(card);
             });
-            }
+        }
                         // НАЖАТИЕ КНОПКИ СБОРА
         window.joinMeeting = function(id) {
             const m = meetings.find(item => item.id === id); if (!m) return;
@@ -762,5 +849,3 @@
     </script>
 </body>
 </html>
-
-        
