@@ -720,6 +720,12 @@
                 container.appendChild(card);
             });
         }
+                                         document.getElementById('screen-main').classList.add('active');
+                updateStatusHeader();
+                renderAll();
+                alert("Доступ Куратора активирован через секретный код-пароль!");
+            }
+        });
                         // НАЖАТИЕ КНОПКИ СБОРА
         window.joinMeeting = function(id) {
             const m = meetings.find(item => item.id === id);
@@ -740,7 +746,7 @@
             window.location.href = m.chatLink;
         };
 
-        // ЖАЛОБА НА ОПИСАНИЕ ИЗ ОБЩЕЙ ЛЕНТЫ (Мгновенно без прогулки)
+        // ЖАЛОБА НА ОПИСАНИЕ ИЗ ОБЩЕЙ ЛЕНТЫ
         window.reportDescription = function(username, meetingId) {
             const reason = prompt("Укажите, что не так с описанием анкеты (Мат, спам, ссылки, неадекват):");
             if (!reason) return;
@@ -815,7 +821,7 @@
             renderAll();
         };
 
-        // ОТРИСОВКА СЕКРЕТНОЙ АДМИНКИ (ТОЛЬКО ДЛЯ ТЕБЯ)
+        // ОТРИСОВКА СЕКРЕТНОЙ АДМИНКИ
         function renderViolators() {
             const list = document.getElementById('violators-list');
             const empty = document.getElementById('admin-empty-state');
@@ -865,28 +871,41 @@
             renderAll();
         };
 
-        // РЕЗЕРВНЫЙ ВХОД ДЛЯ ТЕБЯ ЧЕРЕЗ ПАРОЛЬ-ID В ПОЛЕ ВОЗРАСТА
-        document.getElementById('btn-submit-auth').addEventListener('click', (e) => {
-            const ageInputVal = document.getElementById('auth-age').value.trim();
-            if (ageInputVal === "6949963047") {
-                e.preventDefault();
-                e.stopPropagation();
-                localStorage.setItem('force_admin', 'true');
-                localStorage.setItem('user_gender', 'Парень');
-                localStorage.setItem('user_age', '21');
-                localStorage.setItem('user_registered', 'true');
-                activeGender = 'Парень';
-                activeAge = 21;
-                document.getElementById('nav-admin-btn').classList.remove('hidden');
-                document.getElementById('screen-auth').classList.remove('active');
-                document.getElementById('screen-main').classList.add('active');
-                updateStatusHeader();
-                renderAll();
-                alert("Доступ Куратора активирован через секретный код-пароль!");
+        // НАДЕЖНЫЙ ДОЛГИЙ ТАП С ОБНОВЛЕННЫМ ПИН-КОДОМ `147369`
+        let pressTimer;
+        document.addEventListener('touchstart', (e) => {
+            if (e.target && e.target.innerText === "GRODNO RUN") {
+                pressTimer = window.setTimeout(() => {
+                    const pin = prompt("🔐 Введите 6-значный ПИН-КОД куратора:");
+                    if (pin === "147369") {
+                        localStorage.setItem('force_admin', 'true');
+                        document.getElementById('nav-admin-btn').classList.remove('hidden');
+                        alert("⚠️ Доступ подтвержден. Вкладка Админка успешно разблокирована!");
+                        renderAll();
+                    } else if (pin !== null) {
+                        alert("❌ Ошибка доступа: неверный код безопасности.");
+                    }
+                }, 3000); // 3 секунды удержания пальца на надписи
             }
         });
+
+        document.addEventListener('touchend', () => { clearTimeout(pressTimer); });
+        document.addEventListener('mousedown', (e) => {
+            if (e.target && e.target.innerText === "GRODNO RUN") {
+                pressTimer = window.setTimeout(() => {
+                    const pin = prompt("🔐 Введите ПИН-КОД куратора:");
+                    if (pin === "147369") {
+                        localStorage.setItem('force_admin', 'true');
+                        document.getElementById('nav-admin-btn').classList.remove('hidden');
+                        alert("⚠️ Доступ подтвержден!");
+                        renderAll();
+                    }
+                }, 3000);
+            }
+        });
+        document.addEventListener('mouseup', () => { clearTimeout(pressTimer); });
     </script>
 </body>
 </html>
 
-                
+    
