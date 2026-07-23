@@ -32,6 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
     checkAdminRights();
     loadSession();
     processIncomingDeepLink();
+    tg.ready(); // Сигнал Телеграму, что приложение успешно загрузилось
 });
 
 // Проверка на твой личный Telegram ID (Активация пульта модератора)
@@ -65,7 +66,7 @@ function loadSession() {
 // БЛОК 2: ЛОГИКА ВХОДНОГО КОНТРОЛЯ (ШАГ 0)
 // ==========================================
 
-// Интерактивный пацанский выбор пола (меняет рамки кнопок)
+// Пацанский выбор пола (меняет рамки и подсветку кнопок)
 function setGender(gender) {
     userProfile.gender = gender;
     const isMale = gender === "Парень";
@@ -85,7 +86,7 @@ function setGender(gender) {
     }
 }
 
-// Живая проверка возраста с подсказкой категорий
+// Живая проверка возраста с подсказкой категорий для Гродно
 function handleAgeInput(value) {
     const age = parseInt(value);
     const warning = document.getElementById("age-warning-text");
@@ -103,7 +104,7 @@ function handleAgeInput(value) {
     }
 }
 
-// Жесткая проверка перед окончательным пропуском в радар
+// Пропуск проверенного пользователя внутрь радара
 function verifyAndProceed() {
     const ageInput = document.getElementById("user-age")?.value;
     const age = parseInt(ageInput);
@@ -124,6 +125,119 @@ function verifyAndProceed() {
     document.getElementById("auth-screen")?.classList.add("hidden");
     document.getElementById("main-app")?.classList.remove("hidden");
     applyAgeCorridorRules();
+}
+
+// ==========================================
+// БЛОК 3: ВОЗРАСТНЫЕ ШЛЮЗЫ И КОРИДОРЫ БЕЗОПАСНОСТИ
+// ==========================================
+
+function applyAgeCorridorRules() {
+    const currentAge = (isAdminMode && fakeAge) ? fakeAge : userProfile.age;
+    const fromInput = document.getElementById("age-from");
+    const toInput = document.getElementById("age-to");
+    const info = document.getElementById("corridor-info-text");
+
+    if (!fromInput || !toInput || !info) return;
+
+    if (currentAge >= 12 && currentAge <= 16) {
+        fromInput.value = 12;
+        fromInput.max = 17;
+        toInput.value = 17;
+        toInput.max = 17;
+        info.innerText = "⚠️ Авто-шлюз: Вы можете звать только сверстников до 17 лет";
+        info.className = "text-[9px] text-cyan-400 mt-2 uppercase tracking-wider font-bold";
+    } else if (currentAge === 17) {
+        fromInput.value = 16;
+        fromInput.min = 16;
+        toInput.value = 19;
+        toInput.max = 19;
+        info.innerText = "⚠️ Авто-шлюз: Доступен переходный коридор (16 - 19 лет)";
+        info.className = "text-[9px] text-amber-400 mt-2 uppercase tracking-wider font-bold";
+    } else {
+        fromInput.value = 18;
+        fromInput.min = 18;
+        toInput.value = 25;
+        toInput.min = 18;
+        info.innerText = "⚠️ Авто-шлюз: Доступна только взрослая категория (18+)";
+        info.className = "text-[9px] text-indigo-400 mt-2 uppercase tracking-wider font-bold";
+    }
+}
+
+// ==========================================
+// БЛОК 4: АДМИН-ПУЛЬТ (ЭМУЛЯТОР ПРОФИЛЯ)
+// ==========================================
+
+function toggleFakeGender(gender) {
+    fakeGender = gender;
+    const isMale = gender === "Парень";
+    
+    const maleBtn = document.getElementById("fake-sex-male");
+    const femaleBtn = document.getElementById("fake-sex-female");
+    
+    if (maleBtn) {
+        maleBtn.className = isMale ? 
+            "py-3 px-4 bg-amber-500 text-slate-950 text-xs font-black uppercase tracking-wider rounded-xl transition-all scale-[1.02]" : 
+            "py-3 px-4 bg-slate-950 border border-slate-800 rounded-xl text-xs font-bold uppercase tracking-wider text-slate-400 transition-all";
+    }
+    if (femaleBtn) {
+        femaleBtn.className = !isMale ? 
+            "py-3 px-4 bg-amber-500 text-slate-950 text-xs font-black uppercase tracking-wider rounded-xl transition-all scale-[1.02]" : 
+            "py-3 px-4 bg-slate-950 border border-slate-800 rounded-xl text-xs font-bold uppercase tracking-wider text-slate-400 transition-all";
+    }
+}
+
+function updateFakeAge(val) {
+    fakeAge = parseInt(val) || null;
+    applyAgeCorridorRules();
+}
+
+function triggerAdminAction(type) {
+    if (type === 'verify_alert') {
+        tg.showAlert("Ультиматум отправлен нарушителю: Требуется видео-кружок в ЛС с кодовым словом 'Гродно 2026' и лицом, либо подтверждение шапки профиля соцсети со словом 'GrodnoRun'!");
+    }
+}
+
+// ==========================================
+// БЛОК 5: НАВИГАЦИЯ И УПРАВЛЕНИЕ СЧЕТЧИКАМИ
+// ==========================================
+
+function switchTab(tab) {
+    const isFeed = tab === "feed";
+    const feedSec = document.getElementById("section-feed");
+    const createSec = document.getElementById("section-create");
+    
+    if (feedSec) feedSec.classList.toggle("hidden", !isFeed);
+    if (createSec) createSec.classList.toggle("hidden", isFeed);
+    
+    const tabFeedBtn = document.getElementById("tab-feed");
+    const tabCreateBtn = document.getElementById("tab-create");
+    
+    if (tabFeedBtn) {
+        tabFeedBtn.className = isFeed ? 
+            "py-3 text-xs font-black uppercase tracking-wider rounded-lg bg-indigo-600 text-white transition-all shadow-md shadow-indigo-950/50" : 
+            "py-3 text-xs font-bold uppercase tracking-wider rounded-lg text-slate-400 hover:text-white transition-all";
+    }
+    if (tabCreateBtn) {
+        tabCreateBtn.className = !isFeed ? 
+            "py-3 text-xs font-black uppercase tracking-wider rounded-lg bg-indigo-600 text-white transition-all shadow-md shadow-indigo-950/50" : 
+            "py-3 text-xs font-bold uppercase tracking-wider rounded-lg text-slate-400 hover:text-white transition-all";
+    }
+}
+
+function handlePurposeChange(value) {
+    const block = document.getElementById("custom-purpose-block");
+    if (block) {
+        if (value === "CUSTOM") block.classList.remove("hidden");
+        else block.classList.add("hidden");
+    }
+}
+
+function changeCounter(id, delta) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    let val = parseInt(el.innerText);
+    val = Math.max(0, Math.min(10, val + delta));
+    el.innerText = val;
 }
 // ==========================================
 // БЛОК 6: СБОР ДАННЫХ И ПРЯМАЯ ОТПРАВКА В ТГК
@@ -217,6 +331,7 @@ function submitRadar() {
     })
     .catch(() => tg.showAlert("Ошибка сети при отправке радара."));
 }
+
 // ==========================================
 // БЛОК 7: ОБРАБОТКА ОТКЛИКОВ И ФЕЙС-КОНТРОЛЬ
 // ==========================================
@@ -226,9 +341,11 @@ function processIncomingDeepLink() {
     if (!startParam || !startParam.startsWith("check_")) return;
 
     const parts = startParam.split("_");
+    if (parts.length < 7) return; // Защита от битых ссылок
+
     const orgId = parts[1];
-    const reqAgeFrom = parseInt(parts[4]);
-    const reqAgeTo = parseInt(parts[5]);
+    const reqAgeFrom = parseInt(parts[4]) || 12;
+    const reqAgeTo = parseInt(parts[5]) || 35;
 
     const myAge = (isAdminMode && fakeAge) ? fakeAge : userProfile.age;
     const zone = document.getElementById("verification-card-zone");
@@ -243,7 +360,6 @@ function processIncomingDeepLink() {
             <p class="text-xs text-slate-300">Вход на радар организатора ID: ${orgId}. Проверяем твое соответствие...</p>
     `;
 
-    // Жесткая проверка соответствия возрасту компании организатора
     if (myAge < reqAgeFrom || myAge > reqAgeTo) {
         htmlContent += `
             <div class="bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs p-3.5 rounded-xl font-bold uppercase tracking-wide">
@@ -269,7 +385,6 @@ function processIncomingDeepLink() {
     zone.innerHTML = htmlContent;
 }
 
-// Запись в память, что пользователь нажал связь (Защита от ложных ЖБ)
 function registerAcceptAction(orgId) {
     localStorage.setItem(`allowed_report_${orgId}`, "true");
 }
@@ -296,7 +411,6 @@ function closeReportModal() {
 function confirmReport(reason) {
     if (!selectedReportTarget) return;
 
-    // Прямой пуш сигнала тебе (админу) в ЛС с указанием статьи и ID нарушителя
     const reportText = `🚨 *СИГНАЛ НАРУШЕНИЯ: Grodno Run*\n\n` +
                        `👤 *От кого:* ID ${userProfile.tgId} (@${userProfile.username || 'скрыт'})\n` +
                        `🫵 *Нарушитель:* ID ${selectedReportTarget}\n` +
@@ -317,3 +431,4 @@ function confirmReport(reason) {
         closeReportModal();
     });
 }
+
