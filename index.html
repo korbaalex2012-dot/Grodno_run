@@ -419,11 +419,8 @@
         </div>
         </div>
         <script>
-        // ⚙️ НАСТРОЙКА КИБЕР-СЕРВЕРА ДЛЯ ТВОЕГО КАНАЛА
-        const BOT_TOKEN = "ВСТАВЬ_ТОКЕН_БОТА_СЮДА"; // Токен твоего бота из BotFather (Пример: "7336712:AAFl...")
-        const CHANNEL_ID = "@Grodno_run";          // Твой канал привязан намертво!
-        const BOT_USERNAME = "ВСТАВЬ_ЮЗЕРНЕЙМ_БОТА";  // Юзернейм твоего бота без знака @
-        const MY_TELEGRAM_ID = 6949963047;         // Твой личный Telegram ID
+        // ТВОЙ НАСТОЯЩИЙ ID ИЗ ТЕЛЕГРАМА ДЛЯ ВХОДА В АДМИНКУ
+        const MY_TELEGRAM_ID = 6949963047;
 
         const tg = window.Telegram?.WebApp;
         let myId = 0;
@@ -438,8 +435,8 @@
             }
         }
 
-        // Базы данных приложения
-        let meetings = [];
+        // Локальные базы данных
+        let meetings = JSON.parse(localStorage.getItem('gr_meetings_2026')) || [];
         let archive = JSON.parse(localStorage.getItem('gr_archive_2026')) || [];
         let complaints = JSON.parse(localStorage.getItem('gr_complaints_2026')) || [];
 
@@ -459,73 +456,40 @@
         window.addEventListener('DOMContentLoaded', () => {
             document.getElementById('nav-admin-btn').classList.remove('hidden');
 
+            // Автоочистка сходок старше 3 часов (10800000 мс)
+            const now = Date.now();
+            meetings = meetings.filter(m => (now - m.timeCreated) < 10800000);
+            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
+
             if (localStorage.getItem('user_registered') === 'true') {
                 document.getElementById('screen-auth').classList.remove('active');
                 document.getElementById('screen-main').classList.add('active');
                 updateStatusHeader();
-                loadMeetingsFromChannel(); // Сканируем ТГК-Сервер при старте
+                renderAll();
             } else {
                 document.getElementById('screen-auth').classList.add('active');
             }
             initAudioEngine();
         });
 
-        // 📡 ЖЕЛЕЗНОЕ СКАНИРОВАНИЕ КАНАЛА ЧЕРЕЗ API БЕЗ СБОЕВ
-        function loadMeetingsFromChannel() {
-            const documentStatus = document.getElementById('user-display-status');
-            if (documentStatus) documentStatus.innerText = "Синхронизация с @Grodno_run...";
-
-            // Делаем официальный проверочный запрос к Telegram API
-            fetch(`https://telegram.org{BOT_TOKEN}/getChat?chat_id=${CHANNEL_ID}`)
-            .then(res => res.json())
-            .then(chatData => {
-                if (chatData.ok) {
-                    const now = Date.now();
-                    let savedData = JSON.parse(localStorage.getItem('gr_global_sync_2026')) || [];
-                    
-                    // Фильтруем сходки по времени: удаляем всё, что старше 3 часов (10800000 мс)
-                    meetings = savedData.filter(m => (now - m.timeCreated) < 10800000);
-                    localStorage.setItem('gr_global_sync_2026', JSON.stringify(meetings));
-
-                    if (documentStatus) documentStatus.innerText = `${activeGender}, ${activeAge} л. (@${myUsername}) 🛰 СЕТЬ`;
-                    renderAll();
-                } else {
-                    // Если выбило ошибку — выводим подсказку юзеру
-                    if (documentStatus) documentStatus.innerText = "❌ Ошибка: Бот не админ в @Grodno_run";
-                    meetings = JSON.parse(localStorage.getItem('gr_global_sync_2026')) || [];
-                    renderAll();
-                }
-            })
-            .catch(err => {
-                console.error("Ошибка сети:", err);
-                if (documentStatus) documentStatus.innerText = "⏳ Офлайн-режим радара";
-                meetings = JSON.parse(localStorage.getItem('gr_global_sync_2026')) || [];
-                renderAll();
-            });
-        }
-                    function initAudioEngine() {
+        function initAudioEngine() {
             musicBtn.addEventListener('click', () => {
                 if (playlistUrls.length === 0) {
-                    alert("Добавь один или несколько треков через кнопку '➕ ТРЕК'!");
+                    alert("Добавь треки через кнопку '➕ ТРЕК'!");
                     return;
                 }
-                if (audio.paused) {
-                    playCurrentTrack();
-                } else {
+                if (audio.paused) { playCurrentTrack(); } 
+                else {
                     audio.pause();
                     musicBtn.innerText = "🎵 OFF";
                     musicBtn.style.color = "var(--text-muted)";
-                    musicBtn.style.boxShadow = "none";
                 }
             });
 
             musicUpload.addEventListener('change', (e) => {
                 const files = Array.from(e.target.files);
                 if (files.length > 0) {
-                    files.forEach(file => {
-                        const blobUrl = URL.createObjectURL(file);
-                        playlistUrls.push(blobUrl);
-                    });
+                    files.forEach(file => playlistUrls.push(URL.createObjectURL(file)));
                     badge.innerText = playlistUrls.length;
                     badge.classList.remove('hidden');
                     if (audio.paused) playCurrentTrack();
@@ -545,8 +509,7 @@
             audio.play().then(() => {
                 musicBtn.innerText = `🎵 ТРЕК ${currentTrackIndex + 1}`;
                 musicBtn.style.color = "var(--accent-green)";
-                musicBtn.style.boxShadow = "0 0 10px rgba(46, 204, 113, 0.3)";
-            }).catch(err => console.log("Блокировка автоплея:", err));
+            }).catch(err => console.log(err));
         }
 
         function updateStatusHeader() {
@@ -556,33 +519,22 @@
         window.applyPlaceTag = function(val) { document.getElementById('create-exact-place').value = val; };
         window.applyTargetTag = function(val) { document.getElementById('create-target').value = val; };
 
-        // 🏙 УМНАЯ СИСТЕМА ДИНАМИЧЕСКИХ ЛОКАЦИЙ ДЛЯ ГРОДНО
-        // Автоматически меняет теги-подсказки в зависимости от выбранного района
+        // ДИНАМИЧЕСКИЕ ЛОКАЦИИ ГРОДНО
         function updateDynamicPlaceTags() {
             const district = document.getElementById('create-district').value;
             const tagsContainer = document.querySelector('.tags-suggest');
             if (!tagsContainer) return;
 
             let tags = [];
-            if (district === "Центр (Советская)") {
-                tags = ["у фонтана", "качели у Немана", "около Фары Витовта", "Драмтеатр"];
-            } else if (district === "ТЦ Тринити") {
-                tags = ["фудкорт 3 этаж", "у Кравта", "главный инфоцентр", "ледовая арена"];
-            } else if (district === "OldCity (Олд Сити)") {
-                tags = ["у замка в центре", "фудкорт", "главный вход", "парковка"];
-            } else if (district === "Ольшанка") {
-                tags = ["СШ 41", "ТЦ OldCity Ольшанка", "сквер Наполеона Орды", "конечная остановка"];
-            } else if (district === "Грандичи") {
-                tags = ["новая школа", "амфитеатр", "у синего дома", "аллея"];
-            } else if (district === "Девятовка") {
-                tags = ["у Алми", "Белые Росы", "мини-рынок", "дворик с колодцем"];
-            } else if (district === "Пышки (Парк)") {
-                tags = ["Тропа здоровья", "у Немана", "веревочный парк", "Тортуога"];
-            } else if (district === "БЛК / Форты") {
-                tags = ["Мини-рынок Форты", "пышечная", "у стадиона", "универсам"];
-            }
+            if (district === "Центр (Советская)") tags = ["у фонтана", "качели у Немана", "около Фары Витовта", "Драмтеатр"];
+            else if (district === "ТЦ Тринити") tags = ["фудкорт 3 этаж", "у Кравта", "инфоцентр", "ледовая арена"];
+            else if (district === "OldCity (Олд Сити)") tags = ["у замка в центре", "фудкорт", "главный вход"];
+            else if (district === "Ольшанка") tags = ["СШ 41", "ТЦ Ольшанка", "сквер Наполеона Орды"];
+            else if (district === "Грандичи") tags = ["новая школа", "амфитеатр", "аллея"];
+            else if (district === "Девятовка") tags = ["у Алми", "Белые Росы", "дворик с колодцем"];
+            else if (district === "Пышки (Парк)") tags = ["Тропа здоровья", "у Немана", "Тортуога"];
+            else if (district === "БЛК / Форты") tags = ["Мини-рынок Форты", "пышечная", "у стадиона"];
 
-            // Перерисовываем кнопки тегов на лету
             tagsContainer.innerHTML = '';
             tags.forEach(t => {
                 const span = document.createElement('span');
@@ -593,9 +545,7 @@
             });
         }
 
-        // Слушаем изменения в выпадающем списке районов
         document.getElementById('create-district').addEventListener('change', updateDynamicPlaceTags);
-        // Запускаем один раз при загрузке страницы, чтобы сразу стоял Центр
         setTimeout(updateDynamicPlaceTags, 500);
                     // КНОПКА АВТОРИЗАЦИИ
         document.getElementById('btn-submit-auth').addEventListener('click', (e) => {
@@ -612,7 +562,7 @@
             activeGender = gen; activeAge = age;
             document.getElementById('screen-auth').classList.remove('active');
             document.getElementById('screen-main').classList.add('active');
-            loadMeetingsFromChannel();
+            updateStatusHeader(); renderAll();
         });
 
         // МАСКИРОВКА АДМИНА
@@ -667,7 +617,7 @@
             });
         });
 
-        // 🚀 ОТПРАВКА СХОДКИ НА ЗАКРЫТЫЙ ТГК-СЕРВЕР (Фоновое логирование)
+        // 🚀 БЕЗОПАСНАЯ ОТПРАВКА СХОДКИ ЧЕРЕЗ ВСТРОЕННЫЙ МЕТОД TELEGRAM (БЕЗ FETCH!)
         document.getElementById('btn-launch-radar').addEventListener('click', () => {
             const district = document.getElementById('create-district').value;
             const exact = document.getElementById('create-exact-place').value || "Указано внутри";
@@ -690,44 +640,23 @@
                 malesJoined: 0, femalesJoined: 0, desc: desc, creator: myUsername, timeCreated: Date.now()
             };
 
-            // Формируем скрытый пост-лог для твоего личного сервера
-            const messageText = `🗄 <b>БАЗА ДАННЫХ RADAR_SYNC:</b>\n\n📍 <b>Район:</b> ${district}\n🏢 <b>Локация:</b> ${exact}\n🎯 <b>Цель:</b> ${target}\n🔞 <b>Возраст:</b> ${ageFrom}-${ageTo}\n👨 Места: ${mNeed} | 👩 Места: ${fNeed}\n📝 <b>Инфо:</b> ${desc || 'Нет.'}\n🔗 <b>Чат:</b> ${link}\n👤 <b>Куратор:</b> @${myUsername}`;
+            // Сохраняем себе локально
+            meetings.unshift(meetingData);
+            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
 
-            const keyboard = {
-                inline_keyboard: [[
-                    { text: "🛰 Открыть Радар Сходок", url: `https://t.me{BOT_USERNAME}/app` }
-                ]]
-            };
-
-            // Бот тихо отправляет данные в твой скрытый канал (Бот выступает сервером для всех)
-            fetch(`https://telegram.org{BOT_TOKEN}/sendMessage`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    chat_id: CHANNEL_ID, text: messageText, parse_mode: "HTML", reply_markup: keyboard
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.ok) {
-                    alert("🚀 СБОР УСПЕШНО ЗАПУЩЕН!\n\nДанные синхронизированы через твой секретный ТГК-Сервер. Новая точка загорелась на карте города!");
-                    
-                    let syncPool = JSON.parse(localStorage.getItem('gr_global_sync_2026')) || [];
-                    syncPool.unshift(meetingData);
-                    localStorage.setItem('gr_global_sync_2026', JSON.stringify(syncPool));
-                    
-                    document.getElementById('create-exact-place').value = '';
-                    document.getElementById('create-target').value = '';
-                    document.getElementById('create-link').value = '';
-                    document.getElementById('create-desc').value = '';
-                    
-                    loadMeetingsFromChannel();
-                    document.querySelector('[data-sub="sub-radar"]').click();
-                } else {
-                    alert("Ошибка ТГК-Сервера: Проверь токен бота, ID канала и права бота в канале!");
-                }
-            })
-            .catch(() => alert("Ошибка подключения к ТГК-Серверу. Проверь сеть."));
+            // Передаем данные боту железным методом Telegram WebApp. Защита CORS его не заблокирует!
+            if (tg && tg.sendData) {
+                tg.sendData(JSON.stringify({ type: "new_meeting", data: meetingData }));
+            } else {
+                // Если тестируешь с ПК-браузера, просто переключит экран
+                alert("Сбор создан локально! (Для отправки в ТГК запусти через бота на телефоне)");
+                document.getElementById('create-exact-place').value = '';
+                document.getElementById('create-target').value = '';
+                document.getElementById('create-link').value = '';
+                document.getElementById('create-desc').value = '';
+                renderAll();
+                document.querySelector('[data-sub="sub-radar"]').click();
+            }
         });
                     function renderAll() {
             renderMeetingsList();
@@ -777,7 +706,7 @@
             });
         }
 
-        // ОТРИСОВКА ЛЕНТЫ СБОРОВ
+        // ОТРИСОВКА ЛЕНТЫ СБОРОВ С АВТОБАЛАНСОМ
         function renderMeetingsList() {
             const container = document.getElementById('radar-list');
             const emptyMsg = document.getElementById('empty-state-msg');
@@ -835,11 +764,14 @@
             });
         }
                     window.deleteMyMeeting = function(id) {
-            if (confirm("Удалить этот сбор с глобального кибер-радара?")) {
-                let syncPool = JSON.parse(localStorage.getItem('gr_global_sync_2026')) || [];
-                syncPool = syncPool.filter(m => m.id !== id);
-                localStorage.setItem('gr_global_sync_2026', JSON.stringify(syncPool));
-                loadMeetingsFromChannel();
+            if (confirm("Удалить этот сбор?")) {
+                meetings = meetings.filter(m => m.id !== id);
+                localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
+                renderAll();
+                // Сообщаем боту об удалении
+                if (tg && tg.sendData) {
+                    tg.sendData(JSON.stringify({ type: "delete_meeting", id: id }));
+                }
             }
         };
 
@@ -851,11 +783,7 @@
             if (!archive.some(item => item.id === id)) {
                 archive.unshift(m); localStorage.setItem('gr_archive_2026', JSON.stringify(archive));
             }
-            let syncPool = JSON.parse(localStorage.getItem('gr_global_sync_2026')) || [];
-            const syncIdx = syncPool.findIndex(item => item.id === id);
-            if (syncIdx !== -1) syncPool[syncIdx] = m;
-            localStorage.setItem('gr_global_sync_2026', JSON.stringify(syncPool));
-            
+            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
             renderAll();
             alert("Ты вписался в компанию! Открываем чат встречи.");
             window.location.href = m.chatLink;
@@ -929,7 +857,7 @@
         }
 
         window.copyUltimatum = function(username) {
-            const text = `ВНИМАНИЕ! На твой профиль поступила официальная жалоба за нарушение правил Grodno Run 2026.\n\nУ тебя есть выбор (выбери ОДИН вариант):\n1. ВИДЕО-КРУЖОК с лицом и фразой: „Гродно 2026“.\n2. Ссылка на открытый Instagram с био: „Гродно 2026“.\n\nНа ответ 2 часа. Иначе — перманентный БАН на радаре.`;
+            const text = `ВНИМАНИЕ! На твой профиль поступила официальная жалоба.\n\nУ тебя есть выбор (выбери ОДИН вариант):\n1. ВИДЕО-КРУЖОК с лицом и фразой: „Гродно 2026“.\n2. Ссылка на открытый Instagram с био: „Гродно 2026“.`;
             navigator.clipboard.writeText(text).then(() => alert(`Ультиматум для @${username} скопирован!`));
         };
 
@@ -942,4 +870,4 @@
 </body>
 </html>
 
-        
+       
