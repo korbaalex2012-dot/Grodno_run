@@ -2,473 +2,312 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Grodno Run 2026 — Cyber Radar Premium</title>
     <script src="https://telegram.org"></script>
     <style>
         :root {
-            --bg-main: #0a0a12;
-            --bg-card: rgba(20, 20, 35, 0.65);
-            --bg-input: #121224;
-            --accent: #00a2ff;
-            --accent-glow: rgba(0, 162, 255, 0.4);
-            --accent-green: #2ecc71;
-            --accent-red: #ff3838;
-            --accent-purple: #b33771;
-            --text-main: #f5f6fa;
-            --text-muted: #8e8ea0;
-            --border: rgba(255, 255, 255, 0.08);
-            --glass-blur: blur(12px);
+            --neon-blue: #00f0ff;
+            --neon-purple: #9400d3;
+            --cyber-bg: #0a0a12;
+            --panel-bg: rgba(16, 16, 30, 0.85);
+            --text-main: #e2e8f0;
         }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: radial-gradient(circle at top right, #13132b, var(--bg-main) 70%);
+            background-color: var(--cyber-bg);
             color: var(--text-main);
-            margin: 0;
-            padding: 15px 15px 100px 15px;
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-user-select: none;
             overflow-x: hidden;
+            background-image: radial-gradient(circle at 50% 50%, #14142b 0%, #0a0a12 100%);
+            padding-bottom: 80px;
         }
-
-        h2, h3 {
-            margin: 0 0 10px 0;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            text-transform: uppercase;
-            background: linear-gradient(90deg, #fff, var(--text-muted));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .network-scan {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: #000; z-index: 9999; display: flex;
+            flex-direction: column; align-items: center; justify-content: center;
         }
-
-        .subtitle {
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-top: -6px;
-            margin-bottom: 20px;
-            font-weight: 500;
+        .scan-line {
+            width: 80%; height: 2px; background: var(--neon-blue);
+            box-shadow: 0 0 15px var(--neon-blue);
+            animation: scan 2s linear infinite;
         }
-
-        .screen { display: none; }
-        .screen.active { display: block; animation: fadeIn 0.3s ease-in-out; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes scan {
+            0% { transform: translateY(-50px); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(50px); opacity: 0; }
         }
-
-        .card {
-            background: var(--bg-card);
-            backdrop-filter: var(--glass-blur);
-            -webkit-backdrop-filter: var(--glass-blur);
-            padding: 18px;
-            border-radius: 16px;
-            margin-bottom: 16px;
-            border: 1px solid var(--border);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-            position: relative;
+        .app-container { max-width: 600px; margin: 0 auto; padding: 15px; }
+        .header-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--neon-purple);
+            box-shadow: 0 0 15px rgba(148, 0, 211, 0.3);
+            border-radius: 12px; padding: 15px; margin-bottom: 15px;
+            display: flex; justify-content: space-between; align-items: center;
         }
-
-        .card.status-planning { border-left: 4px solid var(--accent); }
-        .card.status-active-now { border-left: 4px solid var(--accent-green); box-shadow: 0 0 20px rgba(46, 204, 113, 0.15); }
-        .card.status-mega { border-left: 4px solid var(--accent-purple); box-shadow: 0 0 25px rgba(179, 55, 113, 0.25); }
-
-        .alert {
-            background: rgba(255, 56, 56, 0.07);
-            border: 1px solid rgba(255, 56, 56, 0.3);
-            color: #ff6b6b;
-            padding: 14px;
-            border-radius: 12px;
-            font-size: 13px;
-            line-height: 1.4;
-            margin-bottom: 25px;
+        .logo-text { font-weight: 800; letter-spacing: 1.5px; color: var(--neon-blue); text-shadow: 0 0 8px var(--neon-blue); }
+        .player-controls { display: flex; gap: 8px; }
+        .track-btn {
+            background: transparent; border: 1px solid var(--neon-blue);
+            color: var(--neon-blue); padding: 6px 12px; border-radius: 20px;
+            font-size: 12px; cursor: pointer; transition: 0.3s;
         }
-
-        .form-group { margin-bottom: 18px; }
-
-        label {
-            display: block;
-            font-size: 11px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: #a4b0be;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        .track-btn.playing { background: var(--neon-blue); color: #000; box-shadow: 0 0 10px var(--neon-blue); }
+        .alert-box {
+            background: rgba(255, 0, 60, 0.1); border: 1px solid #ff003c;
+            border-radius: 8px; padding: 12px; font-size: 12px; color: #ff8093;
+            margin-bottom: 15px; line-height: 1.4;
         }
-
-        input[type="text"], input[type="number"], select, textarea {
-            width: 100%;
-            padding: 14px;
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            color: #fff;
-            font-size: 15px;
-            box-sizing: border-box;
-            outline: none;
-            transition: all 0.25s ease;
+        .district-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
+        .district-tag {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px; border-radius: 6px; text-align: center; font-size: 13px;
+            cursor: pointer; transition: 0.2s;
         }
-
-        input:focus, select:focus, textarea:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 12px var(--accent-glow);
-        }
-
-        .tags-suggest { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-        .tag-btn {
-            background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: #cbd5e1;
-            padding: 6px 14px; border-radius: 20px; font-size: 12px; cursor: pointer;
-        }
-        .tag-btn:active { background: var(--accent); color: #fff; }
+        .district-tag.active { border-color: var(--neon-blue); background: rgba(0,240,255,0.1); color: var(--neon-blue); }
+        .app-section { display: none; }
+        .app-section.active { display: block; }
     </style>
 </head>
 <body>
-        <style>
-        /* Интерактивная кибер-карта Гродно */
-        .cyber-map {
-            position: relative;
-            width: 100%; height: 190px;
-            background: #06060c; border: 1px solid var(--border);
-            border-radius: 16px; margin-bottom: 20px;
-            overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
-        }
 
-        .map-bg-grid {
-            position: absolute; width: 100%; height: 100%;
-            background-image: linear-gradient(rgba(0, 162, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 162, 255, 0.05) 1px, transparent 1px);
-            background-size: 16px 16px;
-        }
+<div class="network-scan" id="scanner">
+    <h2 style="color: var(--neon-blue); margin-bottom: 20px; font-weight: 300;">GRODNO RUN</h2>
+    <div class="scan-line"></div>
+    <p style="margin-top: 15px; color: #666; font-size: 14px;">Сканирование сети...</p>
+</div>
 
-        .map-point {
-            position: absolute; width: 12px; height: 12px;
-            background: #232335; border-radius: 50%;
-            transform: translate(-50%, -50%); transition: all 0.3s ease;
-        }
-
-        .map-point.active {
-            background: var(--accent-red); box-shadow: 0 0 12px var(--accent-red), 0 0 25px var(--accent-red);
-            animation: pulse-dot 1.4s infinite;
-        }
-
-        .map-point.mega {
-            background: var(--accent-purple); box-shadow: 0 0 18px var(--accent-purple), 0 0 35px var(--accent-purple);
-            animation: pulse-mega 0.7s infinite;
-        }
-
-        @keyframes pulse-dot {
-            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-            50% { transform: translate(-50%, -50%) scale(1.7); opacity: 0.4; }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        }
-
-        @keyframes pulse-mega {
-            0% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(1.9); opacity: 0.5; }
-            100% { transform: translate(-50%, -50%) scale(1); }
-        }
-
-        .map-label {
-            position: absolute; font-size: 10px; color: #4b5361;
-            transform: translate(-50%, 9px); white-space: nowrap;
-            font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
-        }
-        .map-point.active + .map-label { color: #fff; text-shadow: 0 0 6px rgba(255,255,255,0.5); }
-        .map-point.mega + .map-label { color: #f8a5c2; text-shadow: 0 0 8px var(--accent-purple); }
-
-        .btn {
-            display: block; width: 100%; padding: 15px; border-radius: 12px; border: none;
-            font-size: 15px; font-weight: 700; cursor: pointer; text-align: center; box-sizing: border-box;
-            transition: all 0.2s ease; text-transform: uppercase; letter-spacing: 0.5px;
-        }
-        .btn-primary { background: linear-gradient(135deg, var(--accent), #0066ff); color: #fff; box-shadow: 0 4px 15px rgba(0, 162, 255, 0.3); }
-        .btn-success { background: linear-gradient(135deg, var(--accent-green), #27ae60); color: #fff; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3); }
-        .btn-danger { background: linear-gradient(135deg, var(--accent-red), #c0392b); color: #fff; box-shadow: 0 4px 15px rgba(255, 56, 56, 0.3); }
-
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10, 10, 18, 0.85);
-            backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-            border-top: 1px solid var(--border); display: flex; padding: 10px 6px; z-index: 999;
-        }
-
-        .nav-btn {
-            flex: 1; background: transparent; border: none; color: var(--text-muted);
-            padding: 8px 4px; font-size: 11px; font-weight: 700; cursor: pointer;
-            display: flex; flex-direction: column; align-items: center; gap: 5px;
-            transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.5px;
-        }
-
-        .nav-btn.active { color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); }
-        .sub-screen { display: none; }
-        .sub-screen.active { display: block; }
-
-        .filter-bar { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 18px; padding-bottom: 6px; }
-        .filter-bar::-webkit-scrollbar { display: none; }
-        .filter-chip {
-            background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: var(--text-muted);
-            padding: 9px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; white-space: nowrap; cursor: pointer;
-        }
-        .filter-chip.active { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
-
-        .counter-row {
-            display: flex; justify-content: space-between; align-items: center;
-            background: var(--bg-input); padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border);
-        }
-        .counter { display: flex; align-items: center; gap: 10px; }
-        .counter button {
-            width: 36px; height: 36px; background: rgba(255,255,255,0.05); border: 1px solid var(--border);
-            color: #fff; border-radius: 8px; font-size: 20px; font-weight: bold; cursor: pointer;
-        }
-        .counter input { width: 35px; text-align: center; background: transparent; border: none; color: #fff; font-size: 16px; font-weight: bold; }
-        .empty-state { text-align: center; padding: 45px 20px; color: var(--text-muted); font-size: 14px; }
-        .violator-item { background: rgba(255, 56, 56, 0.04); border: 1px solid rgba(255, 56, 56, 0.15); padding: 16px; border-radius: 14px; margin-bottom: 12px; }
-        .track-counter { font-size: 11px; background: var(--accent); color: #fff; padding: 1px 6px; border-radius: 10px; font-weight: bold; margin-left: 4px; }
-        .hidden { display: none !important; }
-    </style>
-
-    <audio id="bg-audio"></audio>
-
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: rgba(15, 15, 27, 0.7); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); padding: 12px 16px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+<div class="app-container">
+    <div class="header-panel">
         <div>
-            <div style="font-weight: 900; font-size: 15px; letter-spacing: 1px; color: var(--accent); text-shadow: 0 0 10px var(--accent-glow);">GRODNO RUN</div>
-            <p style="font-size: 11px; color: var(--text-muted); margin: 3px 0 0 0; font-weight: 600;" id="user-display-status">Сканирование сети...</p>
+            <div class="logo-text">GRODNO RUN 2026</div>
+            <div style="font-size: 11px; color: #666;">Cyber Radar Premium</div>
         </div>
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <label for="music-upload" style="margin: 0; padding: 7px 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 20px; font-size: 11px; font-weight: bold; cursor: pointer;">
-                ➕ ТРЕК<span id="track-queue-badge" class="track-counter hidden">0</span>
-            </label>
-            <input type="file" id="music-upload" accept="audio/*" multiple class="hidden">
-            <button type="button" id="btn-music-toggle" style="background: var(--bg-input); border: 1px solid var(--border); color: var(--text-muted); padding: 7px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; font-weight: 800;">🎵 OFF</button>
+        <div class="player-controls">
+            <button class="track-btn" id="trackBtn">➕ ТРЕК 0 🎵 OFF</button>
         </div>
     </div>
 
-    <div id="screen-auth" class="screen">
-        <div class="alert">
-            ⚠ ВНИМАНИЕ: Все данные проверяются роботом. За ложный пол или возраст — моментальный бан на всех районах Гродно БЕЗ права разблокировки!
+    <div class="alert-box">
+        ⚠ **ВНИМАНИЕ:** Все данные проверяются роботом. За ложный пол или возраст — моментальный бан на всех районах Гродно БЕЗ права разблокировки!
+    </div>
+        <!-- БЛОК АВТОРИЗАЦИИ / ВХОДНОЙ КОНТРОЛЬ -->
+    <div class="header-panel" id="authSection" style="flex-direction: column; align-items: stretch; gap: 15px;">
+        <h3 style="color: var(--neon-blue); font-size: 16px; border-bottom: 1px solid rgba(0,240,255,0.2); padding-bottom: 8px;">### Входной контроль</h3>
+        
+        <div>
+            <label style="display: block; font-size: 13px; color: #888; margin-bottom: 5px;">Ваш пол</label>
+            <select id="userSex" style="width: 100%; background: #16162a; border: 1px solid var(--neon-purple); color: #fff; padding: 10px; border-radius: 6px; outline: none;">
+                <option value="">Выбрать пол...</option>
+                <option value="Парень">Парень</option>
+                <option value="Девушка">Девушка</option>
+            </select>
         </div>
-        <div class="card" style="border-top: 4px solid var(--accent-red);">
-            <h3>Входной контроль</h3>
-            <div class="form-group">
-                <label>Ваш пол</label>
-                <select id="auth-gender">
-                    <option value="" disabled selected>Выбрать пол...</option>
-                    <option value="Парень">Парень</option>
-                    <option value="Девушка">Девушка</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Ваш возраст (от 12 до 35 лет)</label>
-                <input type="number" id="auth-age" placeholder="Введите ваш точный возраст" min="12" max="35">
-            </div>
-            <button type="button" id="btn-submit-auth" class="btn btn-success">Пройти авторизацию</button>
+
+        <div>
+            <label style="display: block; font-size: 13px; color: #888; margin-bottom: 5px;">Ваш возраст (от 12 до 35 лет)</label>
+            <input type="number" id="userAge" min="12" max="35" placeholder="Введите возраст" style="width: 100%; background: #16162a; border: 1px solid var(--neon-purple); color: #fff; padding: 10px; border-radius: 6px; outline: none;">
+        </div>
+
+        <button class="track-btn" id="authBtn" style="width: 100%; padding: 12px; font-size: 14px; background: rgba(148, 0, 211, 0.2); border-color: var(--neon-purple); color: #fff; border-radius: 6px;">Пройти авторизацию</button>
+    </div>
+
+    <!-- ОСНОВНЫЕ РАЗДЕЛЫ ПРИЛОЖЕНИЯ -->
+    
+    <!-- РАЗДЕЛ 1: РАДАР -->
+    <div id="section-radar" class="app-section active">
+        <div class="district-grid">
+            <div class="district-tag active" data-dist="all">Все районы</div>
+            <div class="district-tag" data-dist="Советская">Советская</div>
+            <div class="district-tag" data-dist="Тринити">Тринити</div>
+            <div class="district-tag" data-dist="OldCity">OldCity</div>
+            <div class="district-tag" data-dist="Ольшанка">Ольшанка</div>
+            <div class="district-tag" data-dist="Грандичи">Грандичи</div>
+            <div class="district-tag" data-dist="Девятовка">Девятовка</div>
+            <div class="district-tag" data-dist="Пышки">Пышки</div>
+            <div class="district-tag" data-dist="Форты">Форты</div>
+        </div>
+
+        <div class="header-panel" style="flex-direction: column; justify-content: center; padding: 40px 20px; text-align: center; gap: 10px;">
+            <div style="font-size: 48px;">📡</div>
+            <div style="font-size: 15px; font-weight: 600; color: var(--neon-blue);">На радаре пока пусто...</div>
+            <div style="font-size: 13px; color: #666;">Запусти движ сам во вкладке «Создать»!</div>
         </div>
     </div>
-        <div id="screen-main" class="screen">
-        <!-- ПОД-ЭКРАН 1: ЛЕНТА РАДАРА С НЕОНОВОЙ КАРТОЙ -->
-        <div id="sub-radar" class="sub-screen active">
-            <div class="cyber-map">
-                <div class="map-bg-grid"></div>
-                <div class="map-point" id="map-pt-center" style="top: 40%; left: 50%;"></div><div class="map-label" style="top: 40%; left: 50%;">Советская</div>
-                <div class="map-point" id="map-pt-trinity" style="top: 72%; left: 66%;"></div><div class="map-label" style="top: 72%; left: 66%;">Тринити</div>
-                <div class="map-point" id="map-pt-oldcity" style="top: 25%; left: 45%;"></div><div class="map-label" style="top: 25%; left: 45%;">OldCity</div>
-                <div class="map-point" id="map-pt-olshanka" style="top: 86%; left: 33%;"></div><div class="map-label" style="top: 86%; left: 33%;">Ольшанка</div>
-                <div class="map-point" id="map-pt-grandichi" style="top: 14%; left: 58%;"></div><div class="map-label" style="top: 14%; left: 58%;">Грандичи</div>
-                <div class="map-point" id="map-pt-devyatovka" style="top: 32%; left: 64%;"></div><div class="map-label" style="top: 32%; left: 64%;">Девятовка</div>
-                <div class="map-point" id="map-pt-pyshki" style="top: 46%; left: 18%;"></div><div class="map-label" style="top: 46%; left: 18%;">Пышки</div>
-                <div class="map-point" id="map-pt-forty" style="top: 34%; left: 28%;"></div><div class="map-label" style="top: 34%; left: 28%;">Форты</div>
-            </div>
-
-            <div class="filter-bar" id="radar-filter-bar">
-                <div class="filter-chip active" data-filter="all">Все районы</div>
-                <div class="filter-chip" data-filter="Центр (Советская)">Советская <span id="b-center"></span></div>
-                <div class="filter-chip" data-filter="ТЦ Тринити">Тринити <span id="b-trinity"></span></div>
-                <div class="filter-chip" data-filter="OldCity (Олд Сити)">OldCity <span id="b-oldcity"></span></div>
-                <div class="filter-chip" data-filter="Ольшанка">Ольшанка <span id="b-olshanka"></span></div>
-                <div class="filter-chip" data-filter="Грандичи">Грандичи <span id="b-grandichi"></span></div>
-                <div class="filter-chip" data-filter="Девятовка">Девятовка <span id="b-devyatovka"></span></div>
-                <div class="filter-chip" data-filter="Пышки (Парк)">Пышки <span id="b-pyshki"></span></div>
-                <div class="filter-chip" data-filter="БЛК / Форты">Форты <span id="b-forty"></span></div>
-            </div>
-            <div id="empty-state-msg" class="empty-state">На радаре пока пусто... Запусти движ сам!</div>
-            <div id="radar-list"></div>
-        </div>
-
-        <!-- ПОД-ЭКРАН 2: НАЧАЛО ФОРМЫ СОЗДАНИЯ СБОРА -->
-        <div id="sub-create" class="sub-screen">
-            <h2>➕ Запустить сбор</h2>
-            <p class="subtitle">Отметь локацию на общем радаре Гродно</p>
-            <div class="card" style="border-top: 4px solid var(--accent);">
-                <div class="form-group">
-                    <label>📍 Выберите район для карты и фильтра</label>
-                    <select id="create-district">
-                        <option value="Центр (Советская)">Центр (Советская)</option>
-                        <option value="ТЦ Тринити">ТЦ Тринити</option>
-                        <option value="OldCity (Олд Сити)">OldCity (Олд Сити)</option>
+        <!-- РАЗДЕЛ 2: СОЗДАТЬ СХОДКУ -->
+    <div id="section-create" class="app-section">
+        <div class="header-panel" style="flex-direction: column; align-items: stretch; gap: 15px;">
+            <h3 style="color: var(--neon-blue); font-size: 16px; border-bottom: 1px solid rgba(0,240,255,0.2); padding-bottom: 8px;">➕ Запустить сбор</h3>
+            <p style="font-size: 12px; color: #888;">Отметь локацию на общего радаре Гродно</p>
+            
+            <form id="radarForm" style="display: flex; flex-direction: column; gap: 15px;">
+                <div>
+                    <label style="display: block; font-size: 13px; color: #888; margin-bottom: 5px;">📍 Выберите район для карты и фильтра</label>
+                    <select id="district-select" style="width: 100%; background: #16162a; border: 1px solid var(--neon-purple); color: #fff; padding: 10px; border-radius: 6px; outline: none;">
+                        <option value="Советская">Центр (Советская)</option>
+                        <option value="Тринити">ТЦ Тринити</option>
+                        <option value="OldCity">OldCity (Олд Сити)</option>
                         <option value="Ольшанка">Ольшанка</option>
                         <option value="Девятовка">Девятовка</option>
                         <option value="Грандичи">Грандичи</option>
-                        <option value="Пышки (Парк)">Пышки (Парк)</option>
-                        <option value="БЛК / Форты">БЛК / Форты</option>
+                        <option value="Пышки">Пышки (Парк)</option>
+                        <option value="Форты">БЛК / Форты</option>
                     </select>
                 </div>
 
-                <div class="form-group">
-                    <label>🏢 Точный адрес / Точка встречи (Пиши сам руками)</label>
-                    <input type="text" id="create-exact-place" placeholder="Например: у фонтана / фудкорт 2 этаж / лавочки">
-                    <div class="tags-suggest">
-                        <span class="tag-btn" onclick="applyPlaceTag('возле фонтана')">#у_фонтана</span>
-                        <span class="tag-btn" onclick="applyPlaceTag('на фудкорте')">#на_фудкорте</span>
-                        <span class="tag-btn" onclick="applyPlaceTag('главный вход')">#главный_вход</span>
-                    </div>
-                </div>
-                                <div class="form-group">
-                    <label>🎯 Цель сбора (Свободный ввод руками)</label>
-                    <input type="text" id="create-target" placeholder="Например: Поиграть в футбол / Катка на самокатах / Чилл">
-                    <div class="tags-suggest">
-                        <span class="tag-btn" onclick="applyTargetTag('Прогулка / Чилл')">#progulka</span>
-                        <span class="tag-btn" onclick="applyTargetTag('Погонять в футбол')">#football</span>
-                        <span class="tag-btn" onclick="applyTargetTag('Катка на самокатах')">#samokaty</span>
-                    </div>
+                <div>
+                    <label style="display: block; font-size: 13px; color: #888; margin-bottom: 5px;">🏢 Точный адрес / Точка встречи (Пиши сам руками)</label>
+                    <input type="text" id="address-input" placeholder="#у_фонтана #на_фудкорте #главный_вход" style="width: 100%; background: #16162a; border: 1px solid var(--neon-purple); color: #fff; padding: 10px; border-radius: 6px; outline: none;">
                 </div>
 
-                <div class="form-group">
-                    <label>🔗 Ссылка на чат банды (Telegram ссылка)</label>
-                    <input type="text" id="create-link" placeholder="https://t.me">
-                    <p class="hint">Сюда автоматически перейдут все, кто нажмет кнопку «⚡ Буду на месте»</p>
+                <div>
+                    <label style="display: block; font-size: 13px; color: #888; margin-bottom: 5px;">🎯 Цель сбора (Свободный ввод руками)</label>
+                    <input type="text" id="target-input" placeholder="#progulka #football #samokaty" style="width: 100%; background: #16162a; border: 1px solid var(--neon-purple); color: #fff; padding: 10px; border-radius: 6px; outline: none;">
                 </div>
 
-                <div class="form-group">
-                    <label>🔞 Желаемый возраст компании</label>
-                    <div style="display: flex; gap: 10px; align-items: center;">
-                        От <input type="number" id="age-from" value="16" style="width: 80px;">
-                        До <input type="number" id="age-to" value="22" style="width: 80px;">
+                <div>
+                    <label style="display: block; font-size: 13px; color: #888; margin-bottom: 5px;">🔗 Ссылка на чат банды (Telegram ссылка)</label>
+                    <input type="text" id="tg-link" placeholder="https://t.me..." style="width: 100%; background: #16162a; border: 1px solid var(--neon-purple); color: #fff; padding: 10px; border-radius: 6px; outline: none;">
+                    <span style="font-size: 11px; color: #555; display: block; margin-top: 3px;">Сюда автоматически перейдут все, кто нажмет кнопку «⚡ Буду на месте»</span>
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 13px; color: #888; margin-bottom: 5px;">🔞 Желаемый возраст компании</label>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="color: #666; font-size: 13px;">От</span>
+                        <input type="number" id="age-from" value="16" style="width: 70px; background: #16162a; border: 1px solid var(--neon-purple); color: #fff; padding: 8px; border-radius: 6px; text-align: center;">
+                        <span style="color: #666; font-size: 13px;">До</span>
+                        <input type="number" id="age-to" value="22" style="width: 70px; background: #16162a; border: 1px solid var(--neon-purple); color: #fff; padding: 8px; border-radius: 6px; text-align: center;">
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label>👥 Сколько человек не хватает в команде?</label>
-                    <div class="counter-row">
-                        <span>Нужно парней</span>
-                        <div class="counter">
-                            <button type="button" class="btn-minus" data-target="search-males">-</button>
-                            <input type="number" id="search-males" value="1" readonly>
-                            <button type="button" class="btn-plus" data-target="search-males">+</button>
+                <div>
+                    <label style="display: block; font-size: 13px; color: #888; margin-bottom: 5px;">👥 Сколько человек не хватает в команде?</label>
+                    <div style="display: flex; gap: 20px; margin-top: 5px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 13px; color: #aaa;">Нужно парней:</span>
+                            <button type="button" onclick="let c=document.getElementById('guys-count'); let v=parseInt(c.innerText); if(v>0)c.innerText=v-1" style="background:#16162a; border:1px solid #444; color:#fff; width:28px; height:28px; border-radius:4px; font-weight:bold;">-</button>
+                            <span id="guys-count" style="font-weight: bold; color: var(--neon-blue); min-width: 15px; text-align: center;">1</span>
+                            <button type="button" onclick="let c=document.getElementById('guys-count'); c.innerText=parseInt(c.innerText)+1" style="background:#16162a; border:1px solid #444; color:#fff; width:28px; height:28px; border-radius:4px; font-weight:bold;">+</button>
                         </div>
-                    </div>
-                    <div class="counter-row" style="margin-top: 10px;">
-                        <span>Нужно девушек</span>
-                        <div class="counter">
-                            <button type="button" class="btn-minus" data-target="search-females">-</button>
-                            <input type="number" id="search-females" value="1" readonly>
-                            <button type="button" class="btn-plus" data-target="search-females">+</button>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 13px; color: #aaa;">Нужно девушек:</span>
+                            <button type="button" onclick="let c=document.getElementById('girls-count'); let v=parseInt(c.innerText); if(v>0)c.innerText=v-1" style="background:#16162a; border:1px solid #444; color:#fff; width:28px; height:28px; border-radius:4px; font-weight:bold;">-</button>
+                            <span id="girls-count" style="font-weight: bold; color: var(--neon-purple); min-width: 15px; text-align: center;">1</span>
+                            <button type="button" onclick="let c=document.getElementById('girls-count'); c.innerText=parseInt(c.innerText)+1" style="background:#16162a; border:1px solid #444; color:#fff; width:28px; height:28px; border-radius:4px; font-weight:bold;">+</button>
                         </div>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label>📝 Описание (Макс. 120 символов)</label>
-                    <textarea id="create-desc" maxlength="120" placeholder="Что конкретно будете делать? Сбор строго вовремя!"></textarea>
+                <div>
+                    <label style="display: block; font-size: 13px; color: #888; margin-bottom: 5px;">📝 Описание (Макс. 120 символов)</label>
+                    <textarea id="desc-input" maxlength="120" style="width: 100%; height: 60px; background: #16162a; border: 1px solid var(--neon-purple); color: #fff; padding: 10px; border-radius: 6px; outline: none; resize: none;"></textarea>
                 </div>
-            </div>
 
-            <button type="button" id="btn-launch-radar" class="btn btn-primary" style="margin-bottom: 25px;">
-                🚀 Запустить радар сбора
-            </button>
+                <button type="button" class="btn-submit" style="background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple)); border: none; color: #000; font-weight: bold; padding: 14px; border-radius: 6px; margin-top: 10px; cursor: pointer; text-shadow: 0 0 2px rgba(255,255,255,0.5); font-size: 15px; letter-spacing: 0.5px;">🚀 Запустить радар сбора</button>
+            </form>
         </div>
-
-        <!-- ПОД-ЭКРАН 3: АРХИВ «МОИ СХОДКИ» -->
-        <div id="sub-archive" class="sub-screen">
-            <h2>💼 Мои Сходки</h2>
-            <p class="subtitle">Сходки, на которые ты вписался. Жалобы доступны через 1 час.</p>
-            <div id="archive-empty-state" class="empty-state">Ты еще не вписался ни в один движ.</div>
-            <div id="archive-list"></div>
+    </div>
+        <!-- РАЗДЕЛ 3: МОИ СХОДКИ -->
+    <div id="section-my" class="app-section">
+        <div class="header-panel" style="flex-direction: column; align-items: stretch; gap: 10px;">
+            <h3 style="color: var(--neon-blue); font-size: 16px; border-bottom: 1px solid rgba(0,240,255,0.2); padding-bottom: 8px;">💼 Мои Сходки</h3>
+            <p style="font-size: 12px; color: #888;">Сходки, на которые ты вписался. Жалобы доступны через 1 час.</p>
+            <p style="font-size: 13px; color: #666; text-align: center; padding: 20px 0;">Ты еще не вписался ни в один движ.</p>
         </div>
+    </div>
 
-        <!-- ПОД-ЭКРАН 4: ЛИЧНАЯ СКРЫТАЯ АДМИНКА -->
-        <div id="sub-admin" class="sub-screen">
-            <h2>⚡ Админка куратора</h2>
-            <p class="subtitle">Панель тотального контроля проверок и жалоб</p>
+    <!-- РАЗДЕЛ 4: АДМИНКА КУРАТОРА -->
+    <div id="section-admin" class="app-section">
+        <div class="header-panel" style="flex-direction: column; align-items: stretch; gap: 15px;">
+            <h3 style="color: var(--neon-purple); font-size: 16px; border-bottom: 1px solid rgba(148,0,211,0.2); padding-bottom: 8px;">⚡ Админка куратора</h3>
+            <p style="font-size: 12px; color: #888;">Панель тотального контроля проверок и жалоб</p>
             
-            <div class="card" style="border: 1px solid var(--accent); background: rgba(0, 162, 255, 0.03);">
-                <h3>🕵️ Эмулятор Профиля (Маскировка)</h3>
-                <p class="hint" style="margin-bottom: 12px; color: var(--accent);">Измени свои параметры, чтобы тайно просматривать анкеты любых возрастов и полов:</p>
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid #333; padding: 12px; border-radius: 6px;">
+                <h4 style="font-size: 14px; color: var(--neon-blue); margin-bottom: 10px;">🕵 Эмулятор Профиля (Маскировка)</h4>
+                <p style="font-size: 11px; color: #666; margin-bottom: 10px;">Измени свои параметры, чтобы тайно просматривать анкеты любых возрастов и полов:</p>
                 <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                    <select id="admin-fake-gender" style="flex: 1;">
-                        <option value="Парень">Маскировка: Парень</option>
-                        <option value="Девушка">Маскировка: Девушка</option>
-                    </select>
-                    <input type="number" id="admin-fake-age" value="18" style="width: 90px;" min="12" max="35">
+                    <button class="track-btn" style="flex:1;">Маскировка: Парень</button>
+                    <button class="track-btn" style="flex:1;">Маскировка: Девушка</button>
                 </div>
-                <button type="button" class="btn btn-primary" id="btn-apply-fake" style="padding: 10px; font-size: 13px;">💾 Применить маскировку</button>
+                <input type="number" value="18" style="width: 100%; background: #16162a; border: 1px solid #444; color: #fff; padding: 8px; border-radius: 6px; text-align: center; margin-bottom: 10px;">
+                <button class="track-btn" style="width: 100%; border-color: var(--neon-purple); color: var(--neon-purple);">💾 Применить маскировку</button>
             </div>
 
-            <div class="card" style="border-top: 4px solid var(--accent-red);">
-                <h3>📋 Поступившие дела и жалобы</h3>
-                <div id="admin-empty-state" class="empty-state" style="padding: 10px 0;">Нарушителей не обнаружено. Претензий нет.</div>
-                <div id="violators-list"></div>
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid #333; padding: 12px; border-radius: 6px;">
+                <h4 style="font-size: 14px; color: #ff003c; margin-bottom: 5px;">📋 Поступившие дела и жалобы</h4>
+                <p style="font-size: 13px; color: #666; text-align: center; padding: 10px 0;">Нарушителей не обнаружено. Претензий нет.</p>
             </div>
         </div>
+    </div>
 
-        <!-- НИЖНЕЕ МЕНЮ НАВИГАЦИИ -->
-        <div class="bottom-nav">
-            <button class="nav-btn active" data-sub="sub-radar"><span>🛰</span>Радар</button>
-            <button class="nav-btn" data-sub="sub-create"><span>➕</span>Создать</button>
-            <button class="nav-btn" data-sub="sub-archive"><span>💼</span>Мои Сходки</button>
-            <button class="nav-btn hidden" id="nav-admin-btn" data-sub="sub-admin"><span>⚡</span>Админка</button>
-        </div>
-        </div>
-   <script src="https://telegram.org"></script>
+</div> <!-- КОНЕЦ CONTAINER -->
+
+<!-- СТИЛЬНАЯ НИЖНЯЯ ПАНЕЛЬ НАВИГАЦИИ (МЕНЮ) -->
+<div style="position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(10, 10, 18, 0.95); border-top: 1px solid var(--neon-purple); display: flex; justify-content: space-around; padding: 12px; z-index: 999; box-shadow: 0 -5px 15px rgba(148,0,211,0.1);">
+    <button class="nav-menu-btn active" data-target="section-radar" style="background:none; border:none; color: var(--neon-blue); font-size: 12px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;"><span>🛰</span> Радар</button>
+    <button class="nav-menu-btn" data-target="section-create" style="background:none; border:none; color: #666; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;"><span>➕</span> Создать</button>
+    <button class="nav-menu-btn" data-target="section-my" style="background:none; border:none; color: #666; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;"><span>💼</span> Мои Сходки</button>
+    <button class="nav-menu-btn" data-target="section-admin" style="background:none; border:none; color: #666; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;"><span>⚡</span> Админка</button>
+</div>
+
+<!-- ИСПРАВЛЕННЫЙ ЛОГИЧЕСКИЙ СКРИПТ -->
 <script>
-    // 1. ИНИЦИАЛИЗАЦИЯ И СТАРТ ТЕЛЕГРАМ-ИНТЕРФЕЙСА
     const tg = window.Telegram.WebApp;
     tg.ready();
     tg.expand();
 
-    // Скрываем загрузочный экран сканирования сети, чтобы отобразить весь твой дизайн
+    // Симуляция и скрытие загрузки сети (через 1 сек)
     document.addEventListener("DOMContentLoaded", function() {
-        const scanner = document.querySelector('.network-scan') || document.getElementById('scanner');
+        const scanner = document.getElementById('scanner');
         if (scanner) {
-            setTimeout(() => {
-                scanner.style.display = 'none'; // Убираем заставку сканирования
-            }, 1000);
+            setTimeout(() => { scanner.style.display = 'none'; }, 1000);
         }
     });
 
-    // 2. УПРАВЛЕНИЕ ТВОИМ МЕНЮ И НАВИГАЦИЕЙ (ВЕРСТКА И ТАБЫ)
-    const tabs = document.querySelectorAll('.tab-btn');
-    const sections = document.querySelectorAll('.app-section');
+    // Навигация нижнего меню (Табы)
+    const menuButtons = document.querySelectorAll('.nav-menu-btn');
+    const appSections = document.querySelectorAll('.app-section');
 
-    tabs.forEach((tab, index) => {
-        tab.addEventListener('click', () => {
-            // Переключаем активные кнопки в меню
-            tabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            
-            // Переключаем твои красивые разделы (Радар, Создать, Админка)
-            sections.forEach(s => s.style.display = 'none');
-            if (sections[index]) sections[index].style.display = 'block';
+    menuButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            menuButtons.forEach(b => { b.style.color = '#666'; b.classList.remove('active'); });
+            btn.classList.add('active');
+            btn.style.color = btn.getAttribute('data-target') === 'section-admin' ? 'var(--neon-purple)' : 'var(--neon-blue)';
+
+            appSections.forEach(sec => sec.style.display = 'none');
+            const targetId = btn.getAttribute('data-target');
+            const targetSec = document.getElementById(targetId);
+            if (targetSec) targetSec.style.display = 'block';
         });
     });
 
-    // 3. УПРАВЛЕНИЕ МУЗЫКАЛЬНЫМ ПЛЕЕРОМ ("ТРЕК 0")
-    const trackBtn = document.querySelector('.track-btn');
-    let isPlaying = false;
+    // Кнопка трека
+    const trackBtn = document.getElementById('trackBtn');
+    let playing = false;
     if (trackBtn) {
         trackBtn.addEventListener('click', () => {
-            isPlaying = !isPlaying;
-            trackBtn.innerHTML = isPlaying ? "➕ ТРЕК 0 🎵 ON" : "➕ ТРЕК 0 🎵 OFF";
-            trackBtn.classList.toggle('playing', isPlaying);
+            playing = !playing;
+            trackBtn.innerHTML = playing ? "➕ ТРЕК 0 🎵 ON" : "➕ ТРЕК 0 🎵 OFF";
+            trackBtn.style.borderColor = playing ? 'var(--neon-purple)' : 'var(--neon-blue)';
+            trackBtn.style.color = playing ? 'var(--neon-purple)' : 'var(--neon-blue)';
         });
     }
 
-    // 4. ИСПРАВЛЕННАЯ ОТПРАВКА СБОРА (БЕЗ УТКИ И ERR_NAME)
-    const submitBtn = document.querySelector('.btn-submit');
-    if (submitBtn) {
-        submitBtn.addEventListener('click', function(e) {
-            e.preventDefault(); // Запрещаем перезагрузку твоих стилей
+    // Переключение тегов фильтра на радаре
+    const tags = document.querySelectorAll('.district-tag');
+    tags.forEach(tag => {
+        tag.addEventListener('click', () => {
+            tags.forEach(t => t.classList.remove('active'));
+            tag.classList.add('active');
+        });
+    });
 
-            // Вытаскиваем данные из формы радара Гродно
+    // Финал: Кнопка запуска радара (Отправка без утки и ERR)
+    const submitButton = document.querySelector('.btn-submit');
+    if (submitButton) {
+        submitButton.addEventListener('click', function(e) {
+            e.preventDefault();
+
             let district = document.getElementById('district-select')?.value || 'Не указан';
             let address = document.getElementById('address-input')?.value || 'Не указана';
             let target = document.getElementById('target-input')?.value || 'Прогулка';
@@ -479,7 +318,6 @@
             let girls = document.getElementById('girls-count')?.textContent || '0';
             let desc = document.getElementById('desc-input')?.value || '';
 
-            // Формируем красивый текст сообщения для твоего ТГ-канала
             let messageText = `🚀 **НОВЫЙ СБОР НА РАДАРЕ ГРОДНО!**\n\n` +
                               `📍 Район: ${district}\n` +
                               `🏢 Точка: ${address}\n` +
@@ -489,17 +327,14 @@
                               `📝 Описание: ${desc}\n\n` +
                               `🔗 Чат банды: ${link}`;
 
-            // Безопасно закрываем приложение и шлем данные боту
             if (tg.sendData) {
                 tg.sendData(messageText);
                 tg.close();
             } else {
-                alert("Открывай приложение строго внутри Telegram!");
+                alert("Ошибка: Открывай радар строго внутри Telegram!");
             }
         });
     }
 </script>
 </body>
 </html>
-
-       
