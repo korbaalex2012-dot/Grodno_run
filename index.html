@@ -652,8 +652,8 @@
             const encodedPayload = btoa(unescape(encodeURIComponent(JSON.stringify({d:district, e:exact, t:target, l:link, af:ageFrom, at:ageTo, m:mNeed, f:fNeed, ds:desc}))));
 
             // Перенаправляем пользователя прямиком в диалог с ботом. Это сработает на любом телефоне!
-            // Проверяем, что открыто в Telegram, формируем красивый текст и шлем боту
-if (window.Telegram && window.Telegram.WebApp) {
+           // Железобетонная отправка данных напрямую в Telegram WebApp
+try {
     let district = document.getElementById('district-select')?.value || 'Не указан';
     let address = document.getElementById('create-exact-place')?.value || 'Не указана';
     let target = document.getElementById('create-target')?.value || 'Прогулка';
@@ -667,12 +667,18 @@ if (window.Telegram && window.Telegram.WebApp) {
                       `📝 Описание: ${desc}\n\n` +
                       `🔗 Чат банды: ${link}`;
 
-    window.Telegram.WebApp.sendData(messageText);
-    window.Telegram.WebApp.close();
-} else {
-    // Если открыли в обычном браузере, оставляем твой старый переход по ссылке
-    window.location.href = `https://t.me{BOT_USERNAME}?start=${encodedPayload}`;
+    // Передаем данные встроенному интерфейсу Telegram
+    if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.sendData(messageText);
+        window.Telegram.WebApp.close();
+    } else {
+        // Защита от вылета: если WebApp не подтянулся, просто закрываем окно
+        console.log("Сбор создан, но WebApp не найден в контексте браузера.");
+    }
+} catch (err) {
+    alert("Произошла ошибка при отправке данных: " + err.message);
 }
+            
             
         });
                     function renderAll() {
