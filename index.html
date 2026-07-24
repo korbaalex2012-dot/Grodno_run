@@ -652,7 +652,7 @@
             const encodedPayload = btoa(unescape(encodeURIComponent(JSON.stringify({d:district, e:exact, t:target, l:link, af:ageFrom, at:ageTo, m:mNeed, f:fNeed, ds:desc}))));
 
             // Перенаправляем пользователя прямиком в диалог с ботом. Это сработает на любом телефоне!
-            if (BOT_USERNAME === "@Grodno_Run_bot") {
+            if (BOT_USERNAME === "Grodno_Run_bot") {
                 alert("Сбор создан локально! Чтобы бот слал посты в ТГК, впиши его юзернейм в код на GitHub.");
                 document.getElementById('create-exact-place').value = '';
                 document.getElementById('create-target').value = '';
