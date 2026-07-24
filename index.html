@@ -418,45 +418,86 @@
             <button class="nav-btn hidden" id="nav-admin-btn" data-sub="sub-admin"><span>⚡</span>Админка</button>
         </div>
         </div>
-    <script src="https://telegram.org"></script>
+   <script src="https://telegram.org"></script>
 <script>
-    // Инициализируем Telegram WebApp
+    // 1. ИНИЦИАЛИЗАЦИЯ И СТАРТ ТЕЛЕГРАМ-ИНТЕРФЕЙСА
     const tg = window.Telegram.WebApp;
     tg.ready();
     tg.expand();
 
-    // Вешаем событие на твою кнопку "Запустить радар сбора"
-    document.querySelector('.btn-submit').addEventListener('click', function(e) {
-        e.preventDefault(); // Отключаем перезагрузку страницы
-
-        // Собираем данные из твоих полей ввода
-        let district = document.getElementById('district-select')?.value || 'Не указан';
-        let address = document.getElementById('address-input')?.value || 'Не указана';
-        let target = document.getElementById('target-input')?.value || 'Прогулка';
-        let link = document.getElementById('tg-link')?.value || 'Нет ссылки';
-        let ageFrom = document.getElementById('age-from')?.value || '16';
-        let ageTo = document.getElementById('age-to')?.value || '22';
-        let guys = document.getElementById('guys-count')?.textContent || '0';
-        let girls = document.getElementById('girls-count')?.textContent || '0';
-        let desc = document.getElementById('desc-input')?.value || '';
-                // Формируем красивый текст сообщения для твоего канала
-        let messageText = `🚀 **НОВЫЙ СБОР НА РАДАРЕ ГРОДНО!**\n\n` +
-                          `📍 Район: ${district}\n` +
-                          `🏢 Точка: ${address}\n` +
-                          `🎯 Цель: ${target}\n` +
-                          `🔞 Возраст: от ${ageFrom} до ${ageTo} лет\n` +
-                          `👥 Нужно: 👦 ${guys} | 👧 ${girls}\n` +
-                          `📝 Описание: ${desc}\n\n` +
-                          `🔗 Чат банды: ${link}`;
-
-        // Безопасно отправляем данные боту и закрываем радар
-        if (tg.sendData) {
-            tg.sendData(messageText);
-            tg.close();
-        } else {
-            alert("Ошибка: Открывай радар строго внутри Telegram!");
+    // Скрываем загрузочный экран сканирования сети, чтобы отобразить весь твой дизайн
+    document.addEventListener("DOMContentLoaded", function() {
+        const scanner = document.querySelector('.network-scan') || document.getElementById('scanner');
+        if (scanner) {
+            setTimeout(() => {
+                scanner.style.display = 'none'; // Убираем заставку сканирования
+            }, 1000);
         }
     });
+
+    // 2. УПРАВЛЕНИЕ ТВОИМ МЕНЮ И НАВИГАЦИЕЙ (ВЕРСТКА И ТАБЫ)
+    const tabs = document.querySelectorAll('.tab-btn');
+    const sections = document.querySelectorAll('.app-section');
+
+    tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => {
+            // Переключаем активные кнопки в меню
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            // Переключаем твои красивые разделы (Радар, Создать, Админка)
+            sections.forEach(s => s.style.display = 'none');
+            if (sections[index]) sections[index].style.display = 'block';
+        });
+    });
+
+    // 3. УПРАВЛЕНИЕ МУЗЫКАЛЬНЫМ ПЛЕЕРОМ ("ТРЕК 0")
+    const trackBtn = document.querySelector('.track-btn');
+    let isPlaying = false;
+    if (trackBtn) {
+        trackBtn.addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            trackBtn.innerHTML = isPlaying ? "➕ ТРЕК 0 🎵 ON" : "➕ ТРЕК 0 🎵 OFF";
+            trackBtn.classList.toggle('playing', isPlaying);
+        });
+    }
+
+    // 4. ИСПРАВЛЕННАЯ ОТПРАВКА СБОРА (БЕЗ УТКИ И ERR_NAME)
+    const submitBtn = document.querySelector('.btn-submit');
+    if (submitBtn) {
+        submitBtn.addEventListener('click', function(e) {
+            e.preventDefault(); // Запрещаем перезагрузку твоих стилей
+
+            // Вытаскиваем данные из формы радара Гродно
+            let district = document.getElementById('district-select')?.value || 'Не указан';
+            let address = document.getElementById('address-input')?.value || 'Не указана';
+            let target = document.getElementById('target-input')?.value || 'Прогулка';
+            let link = document.getElementById('tg-link')?.value || 'Нет ссылки';
+            let ageFrom = document.getElementById('age-from')?.value || '16';
+            let ageTo = document.getElementById('age-to')?.value || '22';
+            let guys = document.getElementById('guys-count')?.textContent || '0';
+            let girls = document.getElementById('girls-count')?.textContent || '0';
+            let desc = document.getElementById('desc-input')?.value || '';
+
+            // Формируем красивый текст сообщения для твоего ТГ-канала
+            let messageText = `🚀 **НОВЫЙ СБОР НА РАДАРЕ ГРОДНО!**\n\n` +
+                              `📍 Район: ${district}\n` +
+                              `🏢 Точка: ${address}\n` +
+                              `🎯 Цель: ${target}\n` +
+                              `🔞 Возраст: от ${ageFrom} до ${ageTo} лет\n` +
+                              `👥 Нужно: 👦 ${guys} | 👧 ${girls}\n` +
+                              `📝 Описание: ${desc}\n\n` +
+                              `🔗 Чат банды: ${link}`;
+
+            // Безопасно закрываем приложение и шлем данные боту
+            if (tg.sendData) {
+                tg.sendData(messageText);
+                tg.close();
+            } else {
+                alert("Открывай приложение строго внутри Telegram!");
+            }
+        });
+    }
 </script>
 </body>
 </html>
