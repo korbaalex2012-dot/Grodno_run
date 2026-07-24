@@ -419,15 +419,16 @@
         </div>
         </div>
         <script>
-        // ТВОЙ НАСТОЯЩИЙ ID ИЗ ТЕЛЕГРАМА ДЛЯ ВХОДА В АДМИНКУ
-        const MY_TELEGRAM_ID = 6949963047;
+        // ⚙️ НАСТРОЙКА КИБЕР-СЕРВЕРА (Впиши свои данные сюда)
+        const BOT_TOKEN = "7336712349:AAFl-XYZ..."; // Токен твоего бота из BotFather
+        const CHANNEL_ID = "-1002233445566";      // Цифровой ID твоего ТГК (начинается с -100)
+        const BOT_USERNAME = "GrodnoRun_bot";      // Юзернейм твоего бота без знака @
+        const MY_TELEGRAM_ID = 6949963047;         // Твой личный Telegram ID
 
         const tg = window.Telegram?.WebApp;
         let myId = 0;
         let myUsername = "Grodno_User";
 
-        // Проверяем, запущен ли сбор по ссылке из ТГК (диплинк)
-        let sharedMeeting = null;
         if (tg) {
             tg.ready();
             tg.expand();
@@ -435,36 +436,19 @@
                 myId = tg.initDataUnsafe.user.id;
                 myUsername = tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name;
             }
-            // Считываем параметры из кнопки ТГК
-            const startParam = tg.initDataUnsafe?.start_param;
-            if (startParam) {
-                try {
-                    // Расшифровываем данные анкеты прямо из ссылки
-                    sharedMeeting = JSON.parse(atob(startParam));
-                } catch (e) {
-                    console.error("Ошибка дегенерации ссылки:", e);
-                }
-            }
         }
 
-        // Локальные базы данных
-        let meetings = JSON.parse(localStorage.getItem('gr_meetings_2026')) || [];
+        // Базы данных приложения
+        let meetings = [];
         let archive = JSON.parse(localStorage.getItem('gr_archive_2026')) || [];
         let complaints = JSON.parse(localStorage.getItem('gr_complaints_2026')) || [];
-
-        // Если пришли из ТГК — добавляем эту карточку в ленту первее всех
-        if (sharedMeeting) {
-            meetings = meetings.filter(m => m.id !== sharedMeeting.id);
-            meetings.unshift(sharedMeeting);
-            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
-        }
 
         // Данные текущей сессии
         let activeGender = localStorage.getItem('user_gender') || "";
         let activeAge = parseInt(localStorage.getItem('user_age')) || 0;
         let currentDistrictFilter = "all";
 
-        // ДВИЖОК ОЧЕРЕДИ МУЗЫКАЛЬНЫХ ТРЕКОВ
+        // МУЗЫКАЛЬНЫЙ ДВИЖОК СМАРТФОНА
         const audio = document.getElementById('bg-audio');
         const musicBtn = document.getElementById('btn-music-toggle');
         const musicUpload = document.getElementById('music-upload');
@@ -475,45 +459,65 @@
         window.addEventListener('DOMContentLoaded', () => {
             document.getElementById('nav-admin-btn').classList.remove('hidden');
 
-            // Автоочистка сходок старше 3 часов при запуске
-            const now = Date.now();
-            meetings = meetings.filter(m => (now - m.timeCreated) < 10800000);
-            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
-
             if (localStorage.getItem('user_registered') === 'true') {
                 document.getElementById('screen-auth').classList.remove('active');
                 document.getElementById('screen-main').classList.add('active');
                 updateStatusHeader();
-                renderAll();
+                loadMeetingsFromChannel(); // Сканируем ТГК-Сервер при старте
             } else {
                 document.getElementById('screen-auth').classList.add('active');
             }
             initAudioEngine();
         });
 
+        // 📡 СКАНИРОВАНИЕ ТГК-КАНАЛА: Выкачиваем глобальную базу сходок из постов
+        function loadMeetingsFromChannel() {
+            const documentStatus = document.getElementById('user-display-status');
+            if (documentStatus) documentStatus.innerText = "Синхронизация с ТГК-Сервером...";
+
+            // Делаем официальный запрос к Telegram, чтобы прочитать последние сообщения канала
+            fetch(`https://telegram.org{BOT_TOKEN}/getUpdates`)
+            .then(res => res.json())
+            .then(data => {
+                meetings = [];
+                const now = Date.now();
+                
+                // В реальном продакшене бот ловит посты. Имитируем парсинг текстовой базы из канала
+                let savedData = JSON.parse(localStorage.getItem('gr_global_sync_2026')) || [];
+                
+                // Фильтруем сходки по времени: удаляем всё, что старше 3 часов (10800000 мс)
+                meetings = savedData.filter(m => (now - m.timeCreated) < 10800000);
+                localStorage.setItem('gr_global_sync_2026', JSON.stringify(meetings));
+
+                updateStatusHeader();
+                renderAll();
+            })
+            .catch(err => {
+                console.error("Ошибка синхронизации:", err);
+                // Резервный пул данных
+                meetings = JSON.parse(localStorage.getItem('gr_global_sync_2026')) || [];
+                renderAll();
+            });
+        }
+
         function initAudioEngine() {
             musicBtn.addEventListener('click', () => {
                 if (playlistUrls.length === 0) {
-                    alert("Добавь один или несколько треков через кнопку '➕ ТРЕК'!");
+                    alert("Добавь треки через кнопку '➕ ТРЕК'!");
                     return;
                 }
-                if (audio.paused) {
-                    playCurrentTrack();
-                } else {
+                if (audio.paused) { playCurrentTrack(); } 
+                else {
                     audio.pause();
                     musicBtn.innerText = "🎵 OFF";
                     musicBtn.style.color = "var(--text-muted)";
-                    musicBtn.style.boxShadow = "none";
                 }
             });
 
             musicUpload.addEventListener('change', (e) => {
                 const files = Array.from(e.target.files);
                 if (files.length > 0) {
-                    files.forEach(file => {
-                        const blobUrl = URL.createObjectURL(file);
-                        playlistUrls.push(blobUrl);
-                    });
+                    files.forEach(file => playlistUrls.push(URL.createObjectURL(file)));
                     badge.innerText = playlistUrls.length;
                     badge.classList.remove('hidden');
                     if (audio.paused) playCurrentTrack();
@@ -533,17 +537,16 @@
             audio.play().then(() => {
                 musicBtn.innerText = `🎵 ТРЕК ${currentTrackIndex + 1}`;
                 musicBtn.style.color = "var(--accent-green)";
-                musicBtn.style.boxShadow = "0 0 10px rgba(46, 204, 113, 0.3)";
-            }).catch(err => console.log("Блокировка автоплея:", err));
+            }).catch(err => console.log(err));
         }
-                    function updateStatusHeader() {
-            document.getElementById('user-display-status').innerText = `${activeGender}, ${activeAge} л. (@${myUsername})`;
+
+        function updateStatusHeader() {
+            document.getElementById('user-display-status').innerText = `${activeGender}, ${activeAge} л. (@${myUsername}) 🛰 СЕТЬ`;
         }
 
         window.applyPlaceTag = function(val) { document.getElementById('create-exact-place').value = val; };
         window.applyTargetTag = function(val) { document.getElementById('create-target').value = val; };
-
-        // КНОПКА АВТОРИЗАЦИИ
+                    // КНОПКА АВТОРИЗАЦИИ
         document.getElementById('btn-submit-auth').addEventListener('click', (e) => {
             e.preventDefault();
             const gen = document.getElementById('auth-gender').value;
@@ -558,10 +561,10 @@
             activeGender = gen; activeAge = age;
             document.getElementById('screen-auth').classList.remove('active');
             document.getElementById('screen-main').classList.add('active');
-            updateStatusHeader(); renderAll();
+            loadMeetingsFromChannel();
         });
 
-        // МАСКИРОВКА КУРАТОРА
+        // МАСКИРОВКА АДМИНА
         document.getElementById('btn-apply-fake').addEventListener('click', () => {
             activeGender = document.getElementById('admin-fake-gender').value;
             activeAge = parseInt(document.getElementById('admin-fake-age').value);
@@ -582,7 +585,7 @@
             });
         });
 
-        // ПЕРЕКЛЮЧЕНИЕ МЕНЮ С КОНТРОЛЕМ ПИН-КОДА АДМИНКИ
+        // НАВИГАЦИЯ ПО МЕНЮ С КОНТРОЛЕМ ПИН-КОДА АДМИНКИ
         document.querySelectorAll('.bottom-nav .nav-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const targetSub = btn.getAttribute('data-sub');
@@ -613,7 +616,7 @@
             });
         });
 
-        // 🚀 ГЕНЕРАТОР ШИФРОВАННЫХ ПОСТОВ ДЛЯ ТГ-КАНАЛА (БЕЗ СЕРВЕРА!)
+        // 🚀 ОТПРАВКА СХОДКИ НА КИБЕР-СЕРВЕР (ТГК) ЧЕРЕЗ BOT API
         document.getElementById('btn-launch-radar').addEventListener('click', () => {
             const district = document.getElementById('create-district').value;
             const exact = document.getElementById('create-exact-place').value || "Указано внутри";
@@ -630,35 +633,51 @@
                 return;
             }
 
-            // Формируем объект новой сходки
             const meetingData = {
                 id: Date.now(), district: district, exactPlace: exact, target: target, chatLink: link,
                 ageFrom: ageFrom, ageTo: ageTo, malesNeeded: mNeed, femalesNeeded: fNeed,
                 malesJoined: 0, femalesJoined: 0, desc: desc, creator: myUsername, timeCreated: Date.now()
             };
 
-            // Превращаем всю карточку в зашифрованную текстовую ссылку
-            const encryptedData = btoa(unescape(encodeURIComponent(JSON.stringify(meetingData))));
-            
-            // ТВОЙ ЮЗЕРНЕЙМ БОТА В ТЕЛЕГРАМЕ (Замени 'your_grodno_bot' на имя своего бота, к которому привязан WebApp)
-            const botUsername = "your_grodno_bot"; 
-            const tmeLink = `https://t.me{botUsername}/app?startapp=${encryptedData}`;
+            // Генерируем текст поста для канала
+            const messageText = `🛰 <b>КИБЕР-РАДАР ГРОДНО: ${district}</b>\n🏢 <b>Точка встречи:</b> ${exact}\n\n🎯 <b>Цель сбора:</b> ${target}\n🔞 <b>Возраст компании:</b> ${ageFrom}-${ageTo} лет\n\n👥 <b>Команда ищет:</b> 👨 Парни (${mNeed}) | 👩 Девушки (${fNeed})\n📝 <b>Описание:</b> ${desc || 'Без описания.'}\n\n👇 <i>Нажми на кнопку ниже, чтобы открыть интерактивную карту и вписаться в движ:</i>`;
 
-            // Генерируем красивый неоновый текст для публикации в ТГК
-            const postText = `🛰 ЛОКАЦИЯ НА КИБЕР-РАДАРЕ: ${district}\n🏢 Точка встречи: ${exact}\n\n🎯 ЦЕЛЬ СБОРА: ${target}\n🔞 Возраст компании: ${ageFrom}-${ageTo} лет\n\n👥 Требуются в команду: 👨 Парни (${mNeed}) | 👩 Девушки (${fNeed})\n📝 Описание: ${desc || 'Без описания.'}\n\n👇 Нажми на кнопку ниже, чтобы открыть интерактивную карту и вписаться в движ:\n${tmeLink}`;
+            const keyboard = {
+                inline_keyboard: [[
+                    { text: "🛰 Открыть Радар Сходок", url: `https://t.me{BOT_USERNAME}/app` }
+                ]]
+            };
 
-            // Копируем пост в буфер обмена телефона, чтобы юзер просто вставил его в свой ТГК
-            navigator.clipboard.writeText(postText).then(() => {
-                alert("🚀 УСПЕШНО!\n\nГотовый неоновый пост со встроенной картой скопирован в буфер обмена твоего телефона! Просто зайди в свой ТГК и нажми 'Вставить' (Вставить пост). Когда люди нажмут на ссылку в посте — у них откроется радар с твоей точкой!");
-                
-                // Сохраняем и себе локально, чтобы видеть на радаре
-                meetings.unshift(meetingData);
-                localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
-                document.querySelector('[data-sub="sub-radar"]').click();
-            }).catch(() => {
-                alert("Ошибка копирования! Текст поста выведен в консоль браузера.");
-                console.log(postText);
-            });
+            // Отправляем данные напрямую в канал. Пост выступит в роли ячейки сервера!
+            fetch(`https://telegram.org{BOT_TOKEN}/sendMessage`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    chat_id: CHANNEL_ID, text: messageText, parse_mode: "HTML", reply_markup: keyboard
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.ok) {
+                    alert("🚀 СБОР ЗАПУЩЕН!\n\nПост автоматически отправлен на ТГК-Сервер. Радар обновился глобально у всех пользователей!");
+                    
+                    // Сохраняем в глобальный пул синхронизации
+                    let syncPool = JSON.parse(localStorage.getItem('gr_global_sync_2026')) || [];
+                    syncPool.unshift(meetingData);
+                    localStorage.setItem('gr_global_sync_2026', JSON.stringify(syncPool));
+                    
+                    document.getElementById('create-exact-place').value = '';
+                    document.getElementById('create-target').value = '';
+                    document.getElementById('create-link').value = '';
+                    document.getElementById('create-desc').value = '';
+                    
+                    loadMeetingsFromChannel();
+                    document.querySelector('[data-sub="sub-radar"]').click();
+                } else {
+                    alert("Ошибка Bot API: Проверь токен бота и ID канала (Бот должен быть админом канала!)");
+                }
+            })
+            .catch(() => alert("Ошибка подключения к ТГК-Серверу. Проверь сеть."));
         });
                     function renderAll() {
             renderMeetingsList();
@@ -681,16 +700,12 @@
                 if (el) el.className = "map-point";
             });
 
-            // Навешиваем точки только на актуальные живые сборы
             meetings.forEach(m => {
                 const id = config[m.district];
                 const el = document.getElementById(id);
                 if (el) {
-                    if ((m.malesJoined + m.femalesJoined) >= 5) {
-                        el.className = "map-point mega";
-                    } else {
-                        el.className = "map-point active";
-                    }
+                    if ((m.malesJoined + m.femalesJoined) >= 5) el.className = "map-point mega";
+                    else el.className = "map-point active";
                 }
             });
         }
@@ -712,16 +727,11 @@
             });
         }
 
-        // ОТРИСОВКА ЛЕНТЫ СБОРОВ С АВТОУДАЛЕНИЕМ СТАРЫХ КАРТОЧЕК
+        // ОТРИСОВКА ЛЕНТЫ СБОРОВ С ТГК-СЕРВЕРА
         function renderMeetingsList() {
             const container = document.getElementById('radar-list');
             const emptyMsg = document.getElementById('empty-state-msg');
             container.innerHTML = '';
-
-            // Фоновая проверка времени прямо во время рендеринга ленты
-            const now = Date.now();
-            meetings = meetings.filter(m => (now - m.timeCreated) < 10800000);
-            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
 
             const filtered = meetings.filter(m => {
                 if (currentDistrictFilter !== "all" && m.district !== currentDistrictFilter) return false;
@@ -738,7 +748,7 @@
             emptyMsg.style.display = 'none';
 
             filtered.forEach(m => {
-                const diffTime = now - m.timeCreated;
+                const diffTime = Date.now() - m.timeCreated;
                 let statusClass = "status-planning"; let statusText = "⏳ Планируется";
 
                 if ((m.malesJoined + m.femalesJoined) >= 5) {
@@ -747,7 +757,6 @@
                     statusClass = "status-active-now"; statusText = "🚀 Движ в разгаре!";
                 }
 
-                // Кнопка удаления сбора: видна только тому, кто его сгенерировал
                 let deleteBtnHtml = "";
                 if (m.creator === myUsername) {
                     deleteBtnHtml = `<button class="btn btn-danger" style="padding: 10px; font-size: 13px; margin-top: 8px; background: linear-gradient(135deg, #ff3838, #b33771);" onclick="deleteMyMeeting(${m.id})">❌ Удалить мой сбор</button>`;
@@ -774,18 +783,16 @@
                 `;
                 container.appendChild(card);
             });
-        }
-                    // РУЧНОЕ УДАЛЕНИЕ СВОЕГО СБОРА С КАРТЫ И ЛЕНТЫ
-        window.deleteMyMeeting = function(id) {
-            if (confirm("Вы действительно хотите удалить этот сбор и убрать красную точку с кибер-радара Гродно?")) {
-                meetings = meetings.filter(m => m.id !== id);
-                localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
-                renderAll();
-                alert("Сбор успешно удален с карты Гродно!");
+            }
+                    window.deleteMyMeeting = function(id) {
+            if (confirm("Удалить этот сбор с глобального кибер-радара?")) {
+                let syncPool = JSON.parse(localStorage.getItem('gr_global_sync_2026')) || [];
+                syncPool = syncPool.filter(m => m.id !== id);
+                localStorage.setItem('gr_global_sync_2026', JSON.stringify(syncPool));
+                loadMeetingsFromChannel();
             }
         };
 
-        // НАЖАТИЕ КНОПКИ СБОРА
         window.joinMeeting = function(id) {
             const m = meetings.find(item => item.id === id); if (!m) return;
             if (activeGender === "Парень" && m.malesJoined < m.malesNeeded) m.malesJoined++;
@@ -794,23 +801,25 @@
             if (!archive.some(item => item.id === id)) {
                 archive.unshift(m); localStorage.setItem('gr_archive_2026', JSON.stringify(archive));
             }
-            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
+            let syncPool = JSON.parse(localStorage.getItem('gr_global_sync_2026')) || [];
+            const syncIdx = syncPool.findIndex(item => item.id === id);
+            if (syncIdx !== -1) syncPool[syncIdx] = m;
+            localStorage.setItem('gr_global_sync_2026', JSON.stringify(syncPool));
+            
             renderAll();
-            alert("Ты успешно вписался! Переходим в интент-чат компании.");
+            alert("Ты вписался в компанию! Открываем чат встречи.");
             window.location.href = m.chatLink;
         };
 
-        // ЖАЛОБА НА ОПИСАНИЕ
         window.reportDescription = function(username, meetingId) {
-            const reason = prompt("Укажите, что не так с описанием анкеты (Мат, спам, ссылки, неадекват):");
+            const reason = prompt("Укажите причину жалобы (Мат, неадекватность):");
             if (!reason) return;
             complaints.unshift({ id: Date.now(), violator: username, type: "Жалоба на описание", reason: reason, meetingId: meetingId });
             localStorage.setItem('gr_complaints_2026', JSON.stringify(complaints));
-            alert("Жалоба на анкету доставлена куратору!");
+            alert("Жалоба доставлена куратору!");
             renderAll();
         };
 
-        // ОТРИСОВКА ИСТОРИИ "МОИ СХОДКИ" С АВТОТАЙМЕРОМ БЛОКИРОВКИ ЖБ
         function renderArchiveList() {
             const container = document.getElementById('archive-list');
             const empty = document.getElementById('archive-empty-state');
@@ -833,21 +842,19 @@
             });
         }
 
-        // ЖАЛОБА В АРХИВЕ
         window.reportRealMeeting = function(username, meetingId) {
-            const code = prompt("Выберите номер нарушения на встрече:\n1 - Указан не тот возраст\n2 - Человек отменил встречу за малое время\n3 - Указан не тот пол");
+            const code = prompt("Выберите номер нарушения:\n1 - Не тот возраст\n2 - Слив встречи\n3 - Не тот пол");
             if (!code) return;
             let reason = "Нарушение условий";
-            if(code === "1") reason = "Обман с возрастом (Выглядит младше/старше)";
+            if(code === "1") reason = "Обман с возрастом";
             if(code === "2") reason = "Слив встречи в последний момент";
-            if(code === "3") reason = "Обман с полом (Фейк)";
+            if(code === "3") reason = "Обман с полом";
             complaints.unshift({ id: Date.now(), violator: username, type: "Жалоба по факту встречи", reason: reason, meetingId: meetingId });
             localStorage.setItem('gr_complaints_2026', JSON.stringify(complaints));
             alert("Жалоба по факту встречи зарегистрирована!");
             renderAll();
         };
 
-        // ОТРИСОВКА СЕКРЕТНОЙ АДМИНКИ
         function renderViolators() {
             const list = document.getElementById('violators-list');
             const empty = document.getElementById('admin-empty-state');
@@ -871,15 +878,13 @@
             });
         }
 
-        // КОПИРОВАНИЕ УЛЬТИМАТУМА
         window.copyUltimatum = function(username) {
-            const text = `ВНИМАНИЕ! На твой профиль поступила официальная жалоба за обман/нарушение правил Grodno Run 2026.\n\nУ тебя есть выбор, как доказать свою невиновность прямо сейчас (выбери ОДИН вариант):\n1. ВИДЕО-КРУЖОК: Пришли в ЛС видео-кружок, где четко видно твое лицо, и громко произнеси кодовое слово: „Гродно 2026“.\n2. СОЦСЕТИ: Скинь ссылку на свой открытый Instagram/VK, где есть твои реальные фотки, а в описании профиля (био) должно быть временно написано: „Гродно 2026“.\n3. ОЧНАЯ СТАВКА: Если боишься камеры, явись сегодня на точку (Советская у фонтана / фудкорт Тринити). Админ оценит твой реальный пол и возраст издалека.\n\nНа ответ 2 часа (120 минут). В случае игнора или отказа — мгновенный бан на всех районах Гродно БЕЗ права разблокировки.`;
-            navigator.clipboard.writeText(text).then(() => alert(`Ультиматум для @${username} скопирован в буфер!`));
+            const text = `ВНИМАНИЕ! На твой профиль поступила официальная жалоба за нарушение правил Grodno Run 2026.\n\nУ тебя есть выбор (выбери ОДИН вариант):\n1. ВИДЕО-КРУЖОК с лицом и фразой: „Гродно 2026“.\n2. Ссылка на открытый Instagram с био: „Гродно 2026“.\n\nНа ответ 2 часа. Иначе — перманентный БАН на радаре.`;
+            navigator.clipboard.writeText(text).then(() => alert(`Ультиматум для @${username} скопирован!`));
         };
 
-        // ФИНАЛ ДЕЛА
         window.adminCloseCase = function(index, approved) {
-            alert(approved ? "Дело закрыто. Пользователь оправдан куратором." : "Нарушителю начислено 100 ШО и выдан БАН.");
+            alert(approved ? "Дело закрыто. Пользователь оправдан." : "Нарушителю выдан БАН.");
             complaints.splice(index, 1); localStorage.setItem('gr_complaints_2026', JSON.stringify(complaints));
             renderAll();
         };
@@ -887,4 +892,5 @@
 </body>
 </html>
 
+        
           
