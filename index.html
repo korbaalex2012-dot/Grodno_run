@@ -652,17 +652,28 @@
             const encodedPayload = btoa(unescape(encodeURIComponent(JSON.stringify({d:district, e:exact, t:target, l:link, af:ageFrom, at:ageTo, m:mNeed, f:fNeed, ds:desc}))));
 
             // Перенаправляем пользователя прямиком в диалог с ботом. Это сработает на любом телефоне!
-            if (BOT_USERNAME === "Grodno_Run_bot") {
-                alert("Сбор создан локально! Чтобы бот слал посты в ТГК, впиши его юзернейм в код на GitHub.");
-                document.getElementById('create-exact-place').value = '';
-                document.getElementById('create-target').value = '';
-                document.getElementById('create-link').value = '';
-                document.getElementById('create-desc').value = '';
-                renderAll();
-                document.querySelector('[data-sub="sub-radar"]').click();
-            } else {
-                window.location.href = `https://t.me{BOT_USERNAME}?start=${encodedPayload}`;
-            }
+            // Проверяем, что открыто в Telegram, формируем красивый текст и шлем боту
+if (window.Telegram && window.Telegram.WebApp) {
+    let district = document.getElementById('district-select')?.value || 'Не указан';
+    let address = document.getElementById('create-exact-place')?.value || 'Не указана';
+    let target = document.getElementById('create-target')?.value || 'Прогулка';
+    let link = document.getElementById('create-link')?.value || 'Нет ссылки';
+    let desc = document.getElementById('create-desc')?.value || '';
+
+    let messageText = `🚀 **НОВЫЙ СБОР НА РАДАРЕ ГРОДНО!**\n\n` +
+                      `📍 Район: ${district}\n` +
+                      `🏢 Точка: ${address}\n` +
+                      `🎯 Цель: ${target}\n` +
+                      `📝 Описание: ${desc}\n\n` +
+                      `🔗 Чат банды: ${link}`;
+
+    window.Telegram.WebApp.sendData(messageText);
+    window.Telegram.WebApp.close();
+} else {
+    // Если открыли в обычном браузере, оставляем твой старый переход по ссылке
+    window.location.href = `https://t.me{BOT_USERNAME}?start=${encodedPayload}`;
+}
+            
         });
                     function renderAll() {
             renderMeetingsList();
