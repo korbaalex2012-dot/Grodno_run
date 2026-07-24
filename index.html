@@ -418,7 +418,7 @@
             <button class="nav-btn hidden" id="nav-admin-btn" data-sub="sub-admin"><span>⚡</span>Админка</button>
         </div>
         </div>
-            <script>
+        <script>
         // ТВОЙ НАСТОЯЩИЙ ID ИЗ ТЕЛЕГРАМА ДЛЯ ВХОДА В АДМИНКУ
         const MY_TELEGRAM_ID = 6949963047;
 
@@ -426,6 +426,8 @@
         let myId = 0;
         let myUsername = "Grodno_User";
 
+        // Проверяем, запущен ли сбор по ссылке из ТГК (диплинк)
+        let sharedMeeting = null;
         if (tg) {
             tg.ready();
             tg.expand();
@@ -433,19 +435,36 @@
                 myId = tg.initDataUnsafe.user.id;
                 myUsername = tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name;
             }
+            // Считываем параметры из кнопки ТГК
+            const startParam = tg.initDataUnsafe?.start_param;
+            if (startParam) {
+                try {
+                    // Расшифровываем данные анкеты прямо из ссылки
+                    sharedMeeting = JSON.parse(atob(startParam));
+                } catch (e) {
+                    console.error("Ошибка дегенерации ссылки:", e);
+                }
+            }
         }
 
-        // Локальные базы данных из памяти браузера
+        // Локальные базы данных
         let meetings = JSON.parse(localStorage.getItem('gr_meetings_2026')) || [];
         let archive = JSON.parse(localStorage.getItem('gr_archive_2026')) || [];
         let complaints = JSON.parse(localStorage.getItem('gr_complaints_2026')) || [];
+
+        // Если пришли из ТГК — добавляем эту карточку в ленту первее всех
+        if (sharedMeeting) {
+            meetings = meetings.filter(m => m.id !== sharedMeeting.id);
+            meetings.unshift(sharedMeeting);
+            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
+        }
 
         // Данные текущей сессии
         let activeGender = localStorage.getItem('user_gender') || "";
         let activeAge = parseInt(localStorage.getItem('user_age')) || 0;
         let currentDistrictFilter = "all";
 
-        // ВОЗВРАЩАЕМ ПРОВЕРЕННЫЙ ДВИЖОК ЗАГРУЗКИ MP3 ФАЙЛОВ С ТЕЛЕФОНА
+        // ДВИЖОК ОЧЕРЕДИ МУЗЫКАЛЬНЫХ ТРЕКОВ
         const audio = document.getElementById('bg-audio');
         const musicBtn = document.getElementById('btn-music-toggle');
         const musicUpload = document.getElementById('music-upload');
@@ -454,8 +473,12 @@
         let currentTrackIndex = 0;
 
         window.addEventListener('DOMContentLoaded', () => {
-            // Кнопка админки теперь железно видна в меню всегда, вход по ПИН-коду
             document.getElementById('nav-admin-btn').classList.remove('hidden');
+
+            // Автоочистка сходок старше 3 часов при запуске
+            const now = Date.now();
+            meetings = meetings.filter(m => (now - m.timeCreated) < 10800000);
+            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
 
             if (localStorage.getItem('user_registered') === 'true') {
                 document.getElementById('screen-auth').classList.remove('active');
@@ -484,7 +507,6 @@
                 }
             });
 
-            // Старая добрая загрузка MP3 файлов прямо из памяти смартфона
             musicUpload.addEventListener('change', (e) => {
                 const files = Array.from(e.target.files);
                 if (files.length > 0) {
@@ -492,21 +514,15 @@
                         const blobUrl = URL.createObjectURL(file);
                         playlistUrls.push(blobUrl);
                     });
-
                     badge.innerText = playlistUrls.length;
                     badge.classList.remove('hidden');
-
-                    if (audio.paused) {
-                        playCurrentTrack();
-                    }
+                    if (audio.paused) playCurrentTrack();
                 }
             });
 
             audio.addEventListener('ended', () => {
                 currentTrackIndex++;
-                if (currentTrackIndex >= playlistUrls.length) {
-                    currentTrackIndex = 0; 
-                }
+                if (currentTrackIndex >= playlistUrls.length) currentTrackIndex = 0; 
                 playCurrentTrack();
             });
         }
@@ -520,7 +536,7 @@
                 musicBtn.style.boxShadow = "0 0 10px rgba(46, 204, 113, 0.3)";
             }).catch(err => console.log("Блокировка автоплея:", err));
         }
-                        function updateStatusHeader() {
+                    function updateStatusHeader() {
             document.getElementById('user-display-status').innerText = `${activeGender}, ${activeAge} л. (@${myUsername})`;
         }
 
@@ -532,26 +548,20 @@
             e.preventDefault();
             const gen = document.getElementById('auth-gender').value;
             const age = parseInt(document.getElementById('auth-age').value);
-
             if (!gen || !age || age < 12 || age > 35) {
                 alert('Укажите корректный пол и возраст от 12 до 35 лет!');
                 return;
             }
-
             localStorage.setItem('user_gender', gen);
             localStorage.setItem('user_age', age);
             localStorage.setItem('user_registered', 'true');
-            
-            activeGender = gen;
-            activeAge = age;
-
+            activeGender = gen; activeAge = age;
             document.getElementById('screen-auth').classList.remove('active');
             document.getElementById('screen-main').classList.add('active');
-            updateStatusHeader();
-            renderAll();
+            updateStatusHeader(); renderAll();
         });
 
-        // МАСКИРОВКА КУРАТОРА ДЛЯ АДМИНА
+        // МАСКИРОВКА КУРАТОРА
         document.getElementById('btn-apply-fake').addEventListener('click', () => {
             activeGender = document.getElementById('admin-fake-gender').value;
             activeAge = parseInt(document.getElementById('admin-fake-age').value);
@@ -559,7 +569,6 @@
             alert("Маскировка куратора применена! Радар перенастроен.");
         });
 
-        // СЧЕТЧИКИ ЛЮДЕЙ ПРИ СОЗДАНИИ СХОДКИ
         document.querySelectorAll('.btn-minus').forEach(btn => {
             btn.addEventListener('click', () => {
                 const inp = document.getElementById(btn.getAttribute('data-target'));
@@ -573,12 +582,10 @@
             });
         });
 
-        // ПОЛНОСТЬЮ ПЕРЕПИСАННАЯ НАВИГАЦИЯ ПО НИЖНЕМУ МЕНЮ С КОНТРОЛЕМ ПИН-КОДА
+        // ПЕРЕКЛЮЧЕНИЕ МЕНЮ С КОНТРОЛЕМ ПИН-КОДА АДМИНКИ
         document.querySelectorAll('.bottom-nav .nav-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const targetSub = btn.getAttribute('data-sub');
-                
-                // Проверяем пин-код 147369 только для вкладки админки
                 if (targetSub === "sub-admin" && localStorage.getItem('admin_authorized') !== 'true') {
                     const pin = prompt("🔐 Доступ ограничен. Введите ПИН-КОД куратора:");
                     if (pin === "147369") {
@@ -586,21 +593,17 @@
                         alert("⚠️ Доступ подтвержден. Добро пожаловать, Куратор!");
                     } else {
                         if (pin !== null) alert("❌ Ошибка: неверный код безопасности.");
-                        return; // Полностью стопорим и не переключаем экран
+                        return;
                     }
                 }
-
-                // Логика чистого переключения вкладок
                 document.querySelectorAll('.bottom-nav .nav-btn').forEach(b => b.classList.remove('active'));
                 document.querySelectorAll('.sub-screen').forEach(s => s.classList.remove('active'));
-                
                 btn.classList.add('active');
                 document.getElementById(targetSub).classList.add('active');
                 renderAll();
             });
         });
 
-        // УЗЕЛ ФИЛЬТРАЦИИ ПО РАЙОНАМ НА РАДАРЕ
         document.querySelectorAll('#radar-filter-bar .filter-chip').forEach(chip => {
             chip.addEventListener('click', () => {
                 document.querySelectorAll('#radar-filter-bar .filter-chip').forEach(c => c.classList.remove('active'));
@@ -610,7 +613,7 @@
             });
         });
 
-        // ЗАПУСК НОВОГО СБОРА НА РАДАР
+        // 🚀 ГЕНЕРАТОР ШИФРОВАННЫХ ПОСТОВ ДЛЯ ТГ-КАНАЛА (БЕЗ СЕРВЕРА!)
         document.getElementById('btn-launch-radar').addEventListener('click', () => {
             const district = document.getElementById('create-district').value;
             const exact = document.getElementById('create-exact-place').value || "Указано внутри";
@@ -623,30 +626,41 @@
             const desc = document.getElementById('create-desc').value;
 
             if(!link.startsWith('http')) {
-                alert("Вставь рабочую Telegram ссылку на чат банды!");
+                alert("Вставь рабочую Telegram ссылку на чат компании!");
                 return;
             }
 
-            const newMeeting = {
+            // Формируем объект новой сходки
+            const meetingData = {
                 id: Date.now(), district: district, exactPlace: exact, target: target, chatLink: link,
                 ageFrom: ageFrom, ageTo: ageTo, malesNeeded: mNeed, femalesNeeded: fNeed,
                 malesJoined: 0, femalesJoined: 0, desc: desc, creator: myUsername, timeCreated: Date.now()
             };
 
-            meetings.unshift(newMeeting);
-            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
+            // Превращаем всю карточку в зашифрованную текстовую ссылку
+            const encryptedData = btoa(unescape(encodeURIComponent(JSON.stringify(meetingData))));
+            
+            // ТВОЙ ЮЗЕРНЕЙМ БОТА В ТЕЛЕГРАМЕ (Замени 'your_grodno_bot' на имя своего бота, к которому привязан WebApp)
+            const botUsername = "your_grodno_bot"; 
+            const tmeLink = `https://t.me{botUsername}/app?startapp=${encryptedData}`;
 
-            document.getElementById('create-exact-place').value = '';
-            document.getElementById('create-target').value = '';
-            document.getElementById('create-link').value = '';
-            document.getElementById('create-desc').value = '';
-            document.getElementById('search-males').value = '1';
-            document.getElementById('search-females').value = '1';
+            // Генерируем красивый неоновый текст для публикации в ТГК
+            const postText = `🛰 ЛОКАЦИЯ НА КИБЕР-РАДАРЕ: ${district}\n🏢 Точка встречи: ${exact}\n\n🎯 ЦЕЛЬ СБОРА: ${target}\n🔞 Возраст компании: ${ageFrom}-${ageTo} лет\n\n👥 Требуются в команду: 👨 Парни (${mNeed}) | 👩 Девушки (${fNeed})\n📝 Описание: ${desc || 'Без описания.'}\n\n👇 Нажми на кнопку ниже, чтобы открыть интерактивную карту и вписаться в движ:\n${tmeLink}`;
 
-            renderAll();
-            document.querySelector('[data-sub="sub-radar"]').click();
+            // Копируем пост в буфер обмена телефона, чтобы юзер просто вставил его в свой ТГК
+            navigator.clipboard.writeText(postText).then(() => {
+                alert("🚀 УСПЕШНО!\n\nГотовый неоновый пост со встроенной картой скопирован в буфер обмена твоего телефона! Просто зайди в свой ТГК и нажми 'Вставить' (Вставить пост). Когда люди нажмут на ссылку в посте — у них откроется радар с твоей точкой!");
+                
+                // Сохраняем и себе локально, чтобы видеть на радаре
+                meetings.unshift(meetingData);
+                localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
+                document.querySelector('[data-sub="sub-radar"]').click();
+            }).catch(() => {
+                alert("Ошибка копирования! Текст поста выведен в консоль браузера.");
+                console.log(postText);
+            });
         });
-                        function renderAll() {
+                    function renderAll() {
             renderMeetingsList();
             renderArchiveList();
             renderViolators();
@@ -667,6 +681,7 @@
                 if (el) el.className = "map-point";
             });
 
+            // Навешиваем точки только на актуальные живые сборы
             meetings.forEach(m => {
                 const id = config[m.district];
                 const el = document.getElementById(id);
@@ -697,11 +712,16 @@
             });
         }
 
-        // ОТРИСОВКА ЛЕНТЫ СБОРОВ
+        // ОТРИСОВКА ЛЕНТЫ СБОРОВ С АВТОУДАЛЕНИЕМ СТАРЫХ КАРТОЧЕК
         function renderMeetingsList() {
             const container = document.getElementById('radar-list');
             const emptyMsg = document.getElementById('empty-state-msg');
             container.innerHTML = '';
+
+            // Фоновая проверка времени прямо во время рендеринга ленты
+            const now = Date.now();
+            meetings = meetings.filter(m => (now - m.timeCreated) < 10800000);
+            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
 
             const filtered = meetings.filter(m => {
                 if (currentDistrictFilter !== "all" && m.district !== currentDistrictFilter) return false;
@@ -718,13 +738,19 @@
             emptyMsg.style.display = 'none';
 
             filtered.forEach(m => {
-                const diffTime = Date.now() - m.timeCreated;
+                const diffTime = now - m.timeCreated;
                 let statusClass = "status-planning"; let statusText = "⏳ Планируется";
 
                 if ((m.malesJoined + m.femalesJoined) >= 5) {
                     statusClass = "status-mega"; statusText = "🔥 МЕГА-СБОР";
                 } else if (diffTime > 3600000) {
                     statusClass = "status-active-now"; statusText = "🚀 Движ в разгаре!";
+                }
+
+                // Кнопка удаления сбора: видна только тому, кто его сгенерировал
+                let deleteBtnHtml = "";
+                if (m.creator === myUsername) {
+                    deleteBtnHtml = `<button class="btn btn-danger" style="padding: 10px; font-size: 13px; margin-top: 8px; background: linear-gradient(135deg, #ff3838, #b33771);" onclick="deleteMyMeeting(${m.id})">❌ Удалить мой сбор</button>`;
                 }
 
                 const card = document.createElement('div');
@@ -744,11 +770,22 @@
                         <button class="btn btn-primary" style="padding: 10px; font-size: 13px; flex: 3;" onclick="joinMeeting(${m.id})">⚡ Буду на месте</button>
                         <button class="btn btn-danger" style="padding: 10px; font-size: 13px; flex: 1; background: #261616; color: var(--accent-red);" onclick="reportDescription('${m.creator}', ${m.id})">⚠ ЖБ</button>
                     </div>
+                    ${deleteBtnHtml}
                 `;
                 container.appendChild(card);
             });
         }
-                        // НАЖАТИЕ КНОПКИ СБОРА
+                    // РУЧНОЕ УДАЛЕНИЕ СВОЕГО СБОРА С КАРТЫ И ЛЕНТЫ
+        window.deleteMyMeeting = function(id) {
+            if (confirm("Вы действительно хотите удалить этот сбор и убрать красную точку с кибер-радара Гродно?")) {
+                meetings = meetings.filter(m => m.id !== id);
+                localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
+                renderAll();
+                alert("Сбор успешно удален с карты Гродно!");
+            }
+        };
+
+        // НАЖАТИЕ КНОПКИ СБОРА
         window.joinMeeting = function(id) {
             const m = meetings.find(item => item.id === id); if (!m) return;
             if (activeGender === "Парень" && m.malesJoined < m.malesNeeded) m.malesJoined++;
@@ -759,7 +796,7 @@
             }
             localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
             renderAll();
-            alert("Ты успешно вписался! Переходим в интент-чат сходки.");
+            alert("Ты успешно вписался! Переходим в интент-чат компании.");
             window.location.href = m.chatLink;
         };
 
@@ -849,3 +886,5 @@
     </script>
 </body>
 </html>
+
+          
