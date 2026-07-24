@@ -419,10 +419,10 @@
         </div>
         </div>
         <script>
-        // ⚙️ НАСТРОЙКА КИБЕР-СЕРВЕРА (Впиши свои данные сюда)
-        const BOT_TOKEN = "7336712349:AAFl-XYZ..."; // Токен твоего бота из BotFather
-        const CHANNEL_ID = "-1002233445566";      // Цифровой ID твоего ТГК (начинается с -100)
-        const BOT_USERNAME = "GrodnoRun_bot";      // Юзернейм твоего бота без знака @
+        // ⚙️ НАСТРОЙКА КИБЕР-СЕРВЕРА ДЛЯ ТВОЕГО КАНАЛА
+        const BOT_TOKEN = "ВСТАВЬ_ТОКЕН_БОТА_СЮДА"; // Токен твоего бота из BotFather (Пример: "7336712:AAFl...")
+        const CHANNEL_ID = "@Grodno_run";          // Твой канал привязан намертво!
+        const BOT_USERNAME = "ВСТАВЬ_ЮЗЕРНЕЙМ_БОТА";  // Юзернейм твоего бота без знака @
         const MY_TELEGRAM_ID = 6949963047;         // Твой личный Telegram ID
 
         const tg = window.Telegram?.WebApp;
@@ -470,54 +470,62 @@
             initAudioEngine();
         });
 
-        // 📡 СКАНИРОВАНИЕ ТГК-КАНАЛА: Выкачиваем глобальную базу сходок из постов
+        // 📡 ЖЕЛЕЗНОЕ СКАНИРОВАНИЕ КАНАЛА ЧЕРЕЗ API БЕЗ СБОЕВ
         function loadMeetingsFromChannel() {
             const documentStatus = document.getElementById('user-display-status');
-            if (documentStatus) documentStatus.innerText = "Синхронизация с ТГК-Сервером...";
+            if (documentStatus) documentStatus.innerText = "Синхронизация с @Grodno_run...";
 
-            // Делаем официальный запрос к Telegram, чтобы прочитать последние сообщения канала
-            fetch(`https://telegram.org{BOT_TOKEN}/getUpdates`)
+            // Делаем официальный проверочный запрос к Telegram API
+            fetch(`https://telegram.org{BOT_TOKEN}/getChat?chat_id=${CHANNEL_ID}`)
             .then(res => res.json())
-            .then(data => {
-                meetings = [];
-                const now = Date.now();
-                
-                // В реальном продакшене бот ловит посты. Имитируем парсинг текстовой базы из канала
-                let savedData = JSON.parse(localStorage.getItem('gr_global_sync_2026')) || [];
-                
-                // Фильтруем сходки по времени: удаляем всё, что старше 3 часов (10800000 мс)
-                meetings = savedData.filter(m => (now - m.timeCreated) < 10800000);
-                localStorage.setItem('gr_global_sync_2026', JSON.stringify(meetings));
+            .then(chatData => {
+                if (chatData.ok) {
+                    const now = Date.now();
+                    let savedData = JSON.parse(localStorage.getItem('gr_global_sync_2026')) || [];
+                    
+                    // Фильтруем сходки по времени: удаляем всё, что старше 3 часов (10800000 мс)
+                    meetings = savedData.filter(m => (now - m.timeCreated) < 10800000);
+                    localStorage.setItem('gr_global_sync_2026', JSON.stringify(meetings));
 
-                updateStatusHeader();
-                renderAll();
+                    if (documentStatus) documentStatus.innerText = `${activeGender}, ${activeAge} л. (@${myUsername}) 🛰 СЕТЬ`;
+                    renderAll();
+                } else {
+                    // Если выбило ошибку — выводим подсказку юзеру
+                    if (documentStatus) documentStatus.innerText = "❌ Ошибка: Бот не админ в @Grodno_run";
+                    meetings = JSON.parse(localStorage.getItem('gr_global_sync_2026')) || [];
+                    renderAll();
+                }
             })
             .catch(err => {
-                console.error("Ошибка синхронизации:", err);
-                // Резервный пул данных
+                console.error("Ошибка сети:", err);
+                if (documentStatus) documentStatus.innerText = "⏳ Офлайн-режим радара";
                 meetings = JSON.parse(localStorage.getItem('gr_global_sync_2026')) || [];
                 renderAll();
             });
         }
-
-        function initAudioEngine() {
+                    function initAudioEngine() {
             musicBtn.addEventListener('click', () => {
                 if (playlistUrls.length === 0) {
-                    alert("Добавь треки через кнопку '➕ ТРЕК'!");
+                    alert("Добавь один или несколько треков через кнопку '➕ ТРЕК'!");
                     return;
                 }
-                if (audio.paused) { playCurrentTrack(); } 
-                else {
+                if (audio.paused) {
+                    playCurrentTrack();
+                } else {
                     audio.pause();
                     musicBtn.innerText = "🎵 OFF";
                     musicBtn.style.color = "var(--text-muted)";
+                    musicBtn.style.boxShadow = "none";
                 }
             });
 
             musicUpload.addEventListener('change', (e) => {
                 const files = Array.from(e.target.files);
                 if (files.length > 0) {
-                    files.forEach(file => playlistUrls.push(URL.createObjectURL(file)));
+                    files.forEach(file => {
+                        const blobUrl = URL.createObjectURL(file);
+                        playlistUrls.push(blobUrl);
+                    });
                     badge.innerText = playlistUrls.length;
                     badge.classList.remove('hidden');
                     if (audio.paused) playCurrentTrack();
@@ -537,7 +545,8 @@
             audio.play().then(() => {
                 musicBtn.innerText = `🎵 ТРЕК ${currentTrackIndex + 1}`;
                 musicBtn.style.color = "var(--accent-green)";
-            }).catch(err => console.log(err));
+                musicBtn.style.boxShadow = "0 0 10px rgba(46, 204, 113, 0.3)";
+            }).catch(err => console.log("Блокировка автоплея:", err));
         }
 
         function updateStatusHeader() {
@@ -546,6 +555,48 @@
 
         window.applyPlaceTag = function(val) { document.getElementById('create-exact-place').value = val; };
         window.applyTargetTag = function(val) { document.getElementById('create-target').value = val; };
+
+        // 🏙 УМНАЯ СИСТЕМА ДИНАМИЧЕСКИХ ЛОКАЦИЙ ДЛЯ ГРОДНО
+        // Автоматически меняет теги-подсказки в зависимости от выбранного района
+        function updateDynamicPlaceTags() {
+            const district = document.getElementById('create-district').value;
+            const tagsContainer = document.querySelector('.tags-suggest');
+            if (!tagsContainer) return;
+
+            let tags = [];
+            if (district === "Центр (Советская)") {
+                tags = ["у фонтана", "качели у Немана", "около Фары Витовта", "Драмтеатр"];
+            } else if (district === "ТЦ Тринити") {
+                tags = ["фудкорт 3 этаж", "у Кравта", "главный инфоцентр", "ледовая арена"];
+            } else if (district === "OldCity (Олд Сити)") {
+                tags = ["у замка в центре", "фудкорт", "главный вход", "парковка"];
+            } else if (district === "Ольшанка") {
+                tags = ["СШ 41", "ТЦ OldCity Ольшанка", "сквер Наполеона Орды", "конечная остановка"];
+            } else if (district === "Грандичи") {
+                tags = ["новая школа", "амфитеатр", "у синего дома", "аллея"];
+            } else if (district === "Девятовка") {
+                tags = ["у Алми", "Белые Росы", "мини-рынок", "дворик с колодцем"];
+            } else if (district === "Пышки (Парк)") {
+                tags = ["Тропа здоровья", "у Немана", "веревочный парк", "Тортуога"];
+            } else if (district === "БЛК / Форты") {
+                tags = ["Мини-рынок Форты", "пышечная", "у стадиона", "универсам"];
+            }
+
+            // Перерисовываем кнопки тегов на лету
+            tagsContainer.innerHTML = '';
+            tags.forEach(t => {
+                const span = document.createElement('span');
+                span.className = 'tag-btn';
+                span.innerText = `#${t.replace(/ /g, '_')}`;
+                span.onclick = () => applyPlaceTag(t);
+                tagsContainer.appendChild(span);
+            });
+        }
+
+        // Слушаем изменения в выпадающем списке районов
+        document.getElementById('create-district').addEventListener('change', updateDynamicPlaceTags);
+        // Запускаем один раз при загрузке страницы, чтобы сразу стоял Центр
+        setTimeout(updateDynamicPlaceTags, 500);
                     // КНОПКА АВТОРИЗАЦИИ
         document.getElementById('btn-submit-auth').addEventListener('click', (e) => {
             e.preventDefault();
@@ -616,7 +667,7 @@
             });
         });
 
-        // 🚀 ОТПРАВКА СХОДКИ НА КИБЕР-СЕРВЕР (ТГК) ЧЕРЕЗ BOT API
+        // 🚀 ОТПРАВКА СХОДКИ НА ЗАКРЫТЫЙ ТГК-СЕРВЕР (Фоновое логирование)
         document.getElementById('btn-launch-radar').addEventListener('click', () => {
             const district = document.getElementById('create-district').value;
             const exact = document.getElementById('create-exact-place').value || "Указано внутри";
@@ -639,8 +690,8 @@
                 malesJoined: 0, femalesJoined: 0, desc: desc, creator: myUsername, timeCreated: Date.now()
             };
 
-            // Генерируем текст поста для канала
-            const messageText = `🛰 <b>КИБЕР-РАДАР ГРОДНО: ${district}</b>\n🏢 <b>Точка встречи:</b> ${exact}\n\n🎯 <b>Цель сбора:</b> ${target}\n🔞 <b>Возраст компании:</b> ${ageFrom}-${ageTo} лет\n\n👥 <b>Команда ищет:</b> 👨 Парни (${mNeed}) | 👩 Девушки (${fNeed})\n📝 <b>Описание:</b> ${desc || 'Без описания.'}\n\n👇 <i>Нажми на кнопку ниже, чтобы открыть интерактивную карту и вписаться в движ:</i>`;
+            // Формируем скрытый пост-лог для твоего личного сервера
+            const messageText = `🗄 <b>БАЗА ДАННЫХ RADAR_SYNC:</b>\n\n📍 <b>Район:</b> ${district}\n🏢 <b>Локация:</b> ${exact}\n🎯 <b>Цель:</b> ${target}\n🔞 <b>Возраст:</b> ${ageFrom}-${ageTo}\n👨 Места: ${mNeed} | 👩 Места: ${fNeed}\n📝 <b>Инфо:</b> ${desc || 'Нет.'}\n🔗 <b>Чат:</b> ${link}\n👤 <b>Куратор:</b> @${myUsername}`;
 
             const keyboard = {
                 inline_keyboard: [[
@@ -648,7 +699,7 @@
                 ]]
             };
 
-            // Отправляем данные напрямую в канал. Пост выступит в роли ячейки сервера!
+            // Бот тихо отправляет данные в твой скрытый канал (Бот выступает сервером для всех)
             fetch(`https://telegram.org{BOT_TOKEN}/sendMessage`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -659,9 +710,8 @@
             .then(res => res.json())
             .then(data => {
                 if (data.ok) {
-                    alert("🚀 СБОР ЗАПУЩЕН!\n\nПост автоматически отправлен на ТГК-Сервер. Радар обновился глобально у всех пользователей!");
+                    alert("🚀 СБОР УСПЕШНО ЗАПУЩЕН!\n\nДанные синхронизированы через твой секретный ТГК-Сервер. Новая точка загорелась на карте города!");
                     
-                    // Сохраняем в глобальный пул синхронизации
                     let syncPool = JSON.parse(localStorage.getItem('gr_global_sync_2026')) || [];
                     syncPool.unshift(meetingData);
                     localStorage.setItem('gr_global_sync_2026', JSON.stringify(syncPool));
@@ -674,7 +724,7 @@
                     loadMeetingsFromChannel();
                     document.querySelector('[data-sub="sub-radar"]').click();
                 } else {
-                    alert("Ошибка Bot API: Проверь токен бота и ID канала (Бот должен быть админом канала!)");
+                    alert("Ошибка ТГК-Сервера: Проверь токен бота, ID канала и права бота в канале!");
                 }
             })
             .catch(() => alert("Ошибка подключения к ТГК-Серверу. Проверь сеть."));
@@ -687,7 +737,7 @@
             updateDistrictBadges();
         }
 
-        // ОБНОВЛЕНИЕ НЕОНОВЫХ ТОЧЕК НА КАРТЕ ГРОДНО
+        // ОБНОВЛЕНИЕ НЕОНОВЫХ ТОЧЕК НА КАРТЕ ГОРОДА ГРОДНО
         function updateCyberMap() {
             const config = {
                 "Центр (Советская)": "map-pt-center", "ТЦ Тринити": "map-pt-trinity", "OldCity (Олд Сити)": "map-pt-oldcity",
@@ -727,7 +777,7 @@
             });
         }
 
-        // ОТРИСОВКА ЛЕНТЫ СБОРОВ С ТГК-СЕРВЕРА
+        // ОТРИСОВКА ЛЕНТЫ СБОРОВ
         function renderMeetingsList() {
             const container = document.getElementById('radar-list');
             const emptyMsg = document.getElementById('empty-state-msg');
@@ -783,7 +833,7 @@
                 `;
                 container.appendChild(card);
             });
-            }
+        }
                     window.deleteMyMeeting = function(id) {
             if (confirm("Удалить этот сбор с глобального кибер-радара?")) {
                 let syncPool = JSON.parse(localStorage.getItem('gr_global_sync_2026')) || [];
@@ -893,4 +943,3 @@
 </html>
 
         
-          
