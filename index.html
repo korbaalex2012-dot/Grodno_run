@@ -651,31 +651,22 @@
             // Кодируем данные в компактный и безопасный формат для старт-команды бота
             const encodedPayload = btoa(unescape(encodeURIComponent(JSON.stringify({d:district, e:exact, t:target, l:link, af:ageFrom, at:ageTo, m:mNeed, f:fNeed, ds:desc}))));
 
-            // Перенаправляем пользователя прямиком в диалог с ботом. Это сработает на любом телефоне!
-           // Железобетонная отправка данных напрямую в Telegram WebApp
-try {
-    let district = document.getElementById('district-select')?.value || 'Не указан';
-    let address = document.getElementById('create-exact-place')?.value || 'Не указана';
-    let target = document.getElementById('create-target')?.value || 'Прогулка';
-    let link = document.getElementById('create-link')?.value || 'Нет ссылки';
-    let desc = document.getElementById('create-desc')?.value || '';
+           // Перенаправляем пользователя в диалог с ботом, передавая все данные сходки
+let district = document.getElementById('district-select')?.value || 'Не указан';
+let address = document.getElementById('create-exact-place')?.value || 'Не указана';
+let target = document.getElementById('create-target')?.value || 'Прогулка';
+let link = document.getElementById('create-link')?.value || 'Нет ссылки';
+let desc = document.getElementById('create-desc')?.value || '';
 
-    let messageText = `🚀 **НОВЫЙ СБОР НА РАДАРЕ ГРОДНО!**\n\n` +
-                      `📍 Район: ${district}\n` +
-                      `🏢 Точка: ${address}\n` +
-                      `🎯 Цель: ${target}\n` +
-                      `📝 Описание: ${desc}\n\n` +
-                      `🔗 Чат банды: ${link}`;
+// Собираем текст анкеты
+let messageText = `🚀 Новый сбор на радаре Гродно!\n📍 Район: ${district}\n🏢 Точка: ${address}\n🎯 Цель: ${target}\n📝 Описание: ${desc}\n🔗 Чат банды: ${link}`;
 
-    // Передаем данные встроенному интерфейсу Telegram
-    if (window.Telegram && window.Telegram.WebApp) {
-        window.Telegram.WebApp.sendData(messageText);
-        window.Telegram.WebApp.close();
-    } else {
-        // Защита от вылета: если WebApp не подтянулся, просто закрываем окно
-        console.log("Сбор создан, но WebApp не найден в контексте браузера.");
-    }
-} catch (err) {
+// Кодируем текст, чтобы Telegram его понял в ссылке
+let encodedText = encodeURIComponent(messageText);
+
+// Открываем диалог с твоим ботом и автоматически пишем туда этот текст
+window.location.href = `https://t.me{encodedText}`;
+            
     alert("Произошла ошибка при отправке данных: " + err.message);
 }
             
