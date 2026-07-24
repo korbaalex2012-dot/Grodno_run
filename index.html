@@ -651,21 +651,19 @@
             // Кодируем данные в компактный и безопасный формат для старт-команды бота
             const encodedPayload = btoa(unescape(encodeURIComponent(JSON.stringify({d:district, e:exact, t:target, l:link, af:ageFrom, at:ageTo, m:mNeed, f:fNeed, ds:desc}))));
 
-           // Перенаправляем пользователя в диалог с ботом, передавая все данные сходки
-let district = document.getElementById('district-select')?.value || 'Не указан';
-let address = document.getElementById('create-exact-place')?.value || 'Не указана';
-let target = document.getElementById('create-target')?.value || 'Прогулка';
-let link = document.getElementById('create-link')?.value || 'Нет ссылки';
-let desc = document.getElementById('create-desc')?.value || '';
+           try {
+    // Собираем текст анкеты
+    let messageText = `🚀 Новый сбор на радаре Гродно!\n📍 Район: ${district}\n🏢 Точка: ${address}\n🎯 Цель: ${target}\n📝 Описание: ${desc}\n🔗 Чат банды: ${link}`;
 
-// Собираем текст анкеты
-let messageText = `🚀 Новый сбор на радаре Гродно!\n📍 Район: ${district}\n🏢 Точка: ${address}\n🎯 Цель: ${target}\n📝 Описание: ${desc}\n🔗 Чат банды: ${link}`;
+    // Кодируем текст, чтобы Telegram его понял в ссылке
+    let encodedText = encodeURIComponent(messageText);
 
-// Кодируем текст, чтобы Telegram его понял в ссылке
-let encodedText = encodeURIComponent(messageText);
-
-// Открываем диалог с твоим ботом и автоматически пишем туда этот текст
-window.location.href = `https://t.me{encodedText}`;
+    // Открываем диалог с твоим ботом и автоматически пишем туда этот текст
+    window.location.href = `https://t.me{encodedText}`;
+} catch (e) {
+    console.error("Ошибка при отправке данных: ", e);
+           }
+            
             
     alert("Произошла ошибка при отправке данных: " + err.message);
 }
