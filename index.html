@@ -617,8 +617,12 @@
             });
         });
 
-        // 🚀 БЕЗОПАСНАЯ ОТПРАВКА СХОДКИ ЧЕРЕЗ ВСТРОЕННЫЙ МЕТОД TELEGRAM (БЕЗ FETCH!)
+        // 🚀 НАДЁЖНЫЙ КИБЕР-ГЕНЕРАТОР: Перенаправление в бота через защищённый старт-параметр
         document.getElementById('btn-launch-radar').addEventListener('click', () => {
+            
+            // ⚙️ ВПИШИ СЮДА ЮЗЕРНЕЙМ СВОЕГО БОТА БЕЗ СОБАЧКИ
+            const BOT_USERNAME = "ВСТАВЬ_ЮЗЕРНЕЙМ_БОТА_СЮДА"; 
+
             const district = document.getElementById('create-district').value;
             const exact = document.getElementById('create-exact-place').value || "Указано внутри";
             const target = document.getElementById('create-target').value || "Прогулка / Чилл";
@@ -640,22 +644,24 @@
                 malesJoined: 0, femalesJoined: 0, desc: desc, creator: myUsername, timeCreated: Date.now()
             };
 
-            // Сохраняем себе локально
+            // Сохраняем карточку локально на устройстве
             meetings.unshift(meetingData);
             localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
 
-            // Передаем данные боту железным методом Telegram WebApp. Защита CORS его не заблокирует!
-            if (tg && tg.sendData) {
-                tg.sendData(JSON.stringify({ type: "new_meeting", data: meetingData }));
-            } else {
-                // Если тестируешь с ПК-браузера, просто переключит экран
-                alert("Сбор создан локально! (Для отправки в ТГК запусти через бота на телефоне)");
+            // Кодируем данные в компактный и безопасный формат для старт-команды бота
+            const encodedPayload = btoa(unescape(encodeURIComponent(JSON.stringify({d:district, e:exact, t:target, l:link, af:ageFrom, at:ageTo, m:mNeed, f:fNeed, ds:desc}))));
+
+            // Перенаправляем пользователя прямиком в диалог с ботом. Это сработает на любом телефоне!
+            if (BOT_USERNAME === "ВСТАВЬ_ЮЗЕРНЕЙМ_БОТА_СЮДА") {
+                alert("Сбор создан локально! Чтобы бот слал посты в ТГК, впиши его юзернейм в код на GitHub.");
                 document.getElementById('create-exact-place').value = '';
                 document.getElementById('create-target').value = '';
                 document.getElementById('create-link').value = '';
                 document.getElementById('create-desc').value = '';
                 renderAll();
                 document.querySelector('[data-sub="sub-radar"]').click();
+            } else {
+                window.location.href = `https://t.me{BOT_USERNAME}?start=${encodedPayload}`;
             }
         });
                     function renderAll() {
@@ -762,7 +768,7 @@
                 `;
                 container.appendChild(card);
             });
-        }
+            }
                     window.deleteMyMeeting = function(id) {
             if (confirm("Удалить этот сбор?")) {
                 meetings = meetings.filter(m => m.id !== id);
@@ -870,4 +876,4 @@
 </body>
 </html>
 
-       
+        
