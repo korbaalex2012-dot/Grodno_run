@@ -655,7 +655,8 @@
             if (BOT_USERNAME === "@Grodno_Run_bot") {
         let messageText = `🚀 Новый сбор на радаре Гродно!\n📍 Район: ${district}\n🏢 Точка: ${exact}\n🎯 Цель: ${target}\n📝 Описание: ${desc}\n🔗 Чат банды: ${link}`;
         let encodedText = encodeURIComponent(messageText);
-       window.location.href = `https://t.me/Grodno_Run_bot?text=${encodedText}`;
+     Telegram.WebApp.openTelegramLink(`https://t.me/Grodno_Run_bot?text=${encodedText}`);
+
 
 
             } else {
