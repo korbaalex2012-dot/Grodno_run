@@ -662,11 +662,12 @@
                 chat_id: '@Grodno_run',
                 text: messageText
             }).then(() => {
-                       document.querySelector('[data-sub="sub-radar"]').click();
-        })
+                       document.querySelector('[data-sub="sub-radar"]').click();     
         .catch(err => {
             console.error("Ошибка сервера: ", err);
         });
+    });
+            
             function renderAll() {
             renderMeetingsList();
             renderArchiveList();
