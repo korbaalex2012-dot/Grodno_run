@@ -656,8 +656,7 @@
                let messageText = `🚀 Новый сбор на радаре Гродно!\n📍 Район: ${district}\n🏢 Точка: ${exact}\n🎯 Цель: ${target}\n📝 Описание: ${desc}\n🔗 Чат банды: ${link}`;
         let encodedText = encodeURIComponent(messageText);
         
-       Telegram.WebApp.sendData(messageText);
-        Telegram.WebApp.close();
+      Telegram.WebApp.openTelegramLink(`https://t.me/Grodno_Run_bot?text=${encodedText}`);
 
 
 
