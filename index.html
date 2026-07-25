@@ -652,7 +652,7 @@
             const encodedPayload = btoa(unescape(encodeURIComponent(JSON.stringify({d:district, e:exact, t:target, l:link, af:ageFrom, at:ageTo, m:mNeed, f:fNeed, ds:desc}))));
 
             // Перенаправляем пользователя прямиком в диалог с ботом. Это сработает на любом телефоне!
-            if (BOT_USERNAME === "@Grodno_Run_bot") {
+            if (BOT_USERNAME === "Grodno_Run_bot") {
         let messageText = `🚀 Новый сбор на радаре Гродно!\n📍 Район: ${district}\n🏢 Точка: ${exact}\n🎯 Цель: ${target}\n📝 Описание: ${desc}\n🔗 Чат банды: ${link}`;
         let encodedText = encodeURIComponent(messageText);
      Telegram.WebApp.openTelegramLink(`https://t.me/Grodno_Run_bot?text=${encodedText}`);
