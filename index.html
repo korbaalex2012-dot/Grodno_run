@@ -650,27 +650,17 @@
 
             // Кодируем данные в компактный и безопасный формат для старт-команды бота
             const encodedPayload = btoa(unescape(encodeURIComponent(JSON.stringify({d:district, e:exact, t:target, l:link, af:ageFrom, at:ageTo, m:mNeed, f:fNeed, ds:desc}))));
-
-            // Перенаправляем пользователя прямиком в диалог с ботом. Это сработает на любом телефоне!
-                            try {
-            // Собираем текст анкеты радара
+                try {
             let messageText = `🚀 Новый сбор на радаре Гродно!\n📍 Район: ${district}\n🏢 Точка: ${exact}\n🎯 Цель: ${target}\n📝 Описание: ${desc}\n🔗 Чат банды: ${link}`;
-
-            // Кодируем текст для безопасной отправки в ссылку
             let encodedText = encodeURIComponent(messageText);
-
-            // Перенаправляем пользователя прямиком в диалог с ботом
             window.location.href = `https://t.me/Grodno_Run_bot?text=${encodedText}`;
 
         } catch (e) {
-            console.error("Ошибка отправки данных: ", e);
-        }
+            console.error("Ошибка отправки данных: ", e);    
+    } else {
+        window.location.href = `https://t.me{BOT_USERNAME}?start=${encodedPayload}`;
 
-            else {
-                window.location.href = `https://t.me{BOT_USERNAME}?start=${encodedPayload}`;
-            }
-        });
-                    function renderAll() {
+});    
             renderMeetingsList();
             renderArchiveList();
             renderViolators();
