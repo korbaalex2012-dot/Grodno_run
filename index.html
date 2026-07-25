@@ -652,18 +652,24 @@
             const encodedPayload = btoa(unescape(encodeURIComponent(JSON.stringify({d:district, e:exact, t:target, l:link, af:ageFrom, at:ageTo, m:mNeed, f:fNeed, ds:desc}))));
 
             // Перенаправляем пользователя прямиком в диалог с ботом. Это сработает на любом телефоне!
-            if (BOT_USERNAME === "Grodno_Run_bot") {
-               let messageText = `🚀 Новый сбор на радаре Гродно!\n📍 Район: ${district}\n🏢 Точка: ${exact}\n🎯 Цель: ${target}\n📝 Описание: ${desc}\n🔗 Чат банды: ${link}`;
-        let encodedText = encodeURIComponent(messageText);
+                    const myToken = '8829942321:AAHzai6My057v36JiB35izszp5COPg31FCw';
+        const cleanToken = myToken.replace(/\s+/g, '');
         
-      Telegram.WebApp.openTelegramLink(`https://t.me/Grodno_Run_bot?text=${encodedText}`);
-
-
-
-            } else {
-                window.location.href = `https://t.me{BOT_USERNAME}?start=${encodedPayload}`;
-            }
+        fetch('https://api.telegram.org/bot' + cleanToken + '/sendMessage', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: '@Grodno_run',
+                text: messageText
+            })
+        })
+        .then(() => {
+            document.querySelector('[data-sub="sub-radar"]').click();
+        })
+        .catch(err => {
+            console.error("Ошибка сервера: ", err);
         });
+
                     function renderAll() {
             renderMeetingsList();
             renderArchiveList();
