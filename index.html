@@ -372,7 +372,7 @@
                 </div>
             </div>
 
-           <button type="button" id="btn-launch-radar" class="btn btn-primary" style="margin-bottom: 25px;" onclick="if(localStorage.getItem('my_active_radar')){ Telegram.WebApp.showAlert('❌ Вы уже создали радар! Нельзя создавать более одного радара.'); return; } localStorage.setItem('my_active_radar', 'true'); Telegram.WebApp.showAlert('🚀 Прогулка успешно создана! Радар запущен.'); document.getElementById('create-exact-place').value=''; document.getElementById('create-target').value=''; document.getElementById('create-link').value=''; document.getElementById('create-desc').value=''; setTimeout(function(){ renderAll(); const tab=document.querySelector('[data-sub=\'sub-radar\']'); if(tab) tab.click(); }, 100);">
+          <button type="submit" id="btn-launch-radar" class="btn btn-primary" style="margin-bottom: 25px;">
                 🚀 Запустить радар сбора
             </button>
         </div>
@@ -657,23 +657,35 @@ window.submitForm = function() {
 
             // Перенаправляем пользователя прямиком в диалог с ботом. Это сработает на любом телефоне!
            // Показываем стильное системное окно Telegram
-Telegram.WebApp.showAlert("🚀 Прогулка успешно создана! Радар запущен.");
+    // 1. Проверяем ограничение: 1 человек = 1 активный радар
+    const lastCreated = localStorage.getItem('my_radar_time');
+    const now = Date.now();
+    
+    // Если 3 часа (10800000 мс) еще не прошли — блокируем создание
+    if (lastCreated && (now - parseInt(lastCreated) < 10800000)) {
+        const timeLeft = Math.ceil((10800000 - (now - parseInt(lastCreated))) / 60000);
+        Telegram.WebApp.showAlert(`❌ Вы уже запустили радар! Создать новый можно будет через ${timeLeft} мин.`);
+        return;
+    }
 
-// Очищаем поля формы сбора
-document.getElementById('create-exact-place').value = '';
-document.getElementById('create-target').value = '';
-document.getElementById('create-link').value = '';
-document.getElementById('create-desc').value = '';
+    // 2. Сохраняем время создания локально
+    localStorage.setItem('my_radar_time', now.toString());
 
-// Обновляем карту и списки
-renderAll();
+    // 3. Безопасно перенаправляем в чат бота (токен скрыт)
+    const botUser = 'Grodno_Run_bot';
+    Telegram.WebApp.openTelegramLink('https://t.me' + botUser + '?start=' + encodedPayload);
 
-// Автоматически переключаем интерфейс на главное меню (вкладку Радар)
-const radarTab = document.querySelector('[data-sub="sub-radar"]');
-if (radarTab) {
-    radarTab.click();
-}
-        });
+    // 4. Очищаем поля формы
+    document.getElementById('create-exact-place').value = '';
+    document.getElementById('create-target').value = '';
+    document.getElementById('create-link').value = '';
+    document.getElementById('create-desc').value = '';
+
+    // 5. Обновляем карту и переключаем вкладку на главное меню
+    renderAll();
+    const radarTab = document.querySelector('[data-sub="sub-radar"]');
+    if (radarTab) radarTab.click();
+});
                     function renderAll() {
             renderMeetingsList();
             renderArchiveList();
