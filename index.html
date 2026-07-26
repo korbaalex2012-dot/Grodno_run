@@ -652,20 +652,19 @@ window.submitForm = function() {
             meetings.unshift(meetingData);
             localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
 
-               // 1. Проверяем ограничение: 1 человек = 1 радар на 3 часа
-    const lastCreated = localStorage.getItem('my_radar_time');
-    const now = Date.now();
-    if (lastCreated && (now - parseInt(lastCreated) < 10800000)) {
-        const timeLeft = Math.ceil((10800000 - (now - parseInt(lastCreated))) / 60000);
-        alert(`❌ Вы уже запустили радар! Создать новый можно будет через ${timeLeft} мин.`);
+                  // 1. Проверяем по флагу в localStorage, создал ли человек радар
+    const hasActiveRadar = localStorage.getItem('my_active_radar');
+    
+    if (hasActiveRadar === 'true') {
+        Telegram.WebApp.showAlert('❌ Вы уже запустили радар! Нельзя создавать более одного радара одновременно. Сначала удалите старый на вкладке "Радар".');
         return;
     }
 
-    // 2. Если всё ок, сохраняем время создания локально
-    localStorage.setItem('my_radar_time', now.toString());
+    // 2. Ставим флаг, что радар теперь активен
+    localStorage.setItem('my_active_radar', 'true');
 
-    // 3. Показываем простое окно, как на твоём скриншоте
-    alert("Радар успешно запущен!");
+    // 3. Показываем простое окно, как ты хотел
+    Telegram.WebApp.showAlert("🚀 Радар успешно запущен!");
 
     // 4. Очищаем поля формы сбора
     document.getElementById('create-exact-place').value = '';
@@ -673,7 +672,7 @@ window.submitForm = function() {
     document.getElementById('create-link').value = '';
     document.getElementById('create-desc').value = '';
 
-    // 5. Обновляем карту и принудительно переключаем на главное меню (Радар)
+    // 5. Обновляем карту и переключаем интерфейс на вкладку "Радар"
     renderAll();
     const radarTab = document.querySelector('[data-sub="sub-radar"]');
     if (radarTab) {
