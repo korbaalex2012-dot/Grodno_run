@@ -661,26 +661,24 @@ window.onerror = function(message, source, lineno, colno, error) {
                     const myToken = '8829942321:AAHzai6My057v36JiB35izszp5COPg31FCw';
         const cleanToken = myToken.replace(/\s+/g, '');
         
-        fetch('https://api.telegram.org/bot' + cleanToken + '/sendMessage', {
+                fetch('https://api.telegram.org/bot' + cleanToken + '/sendMessage', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 chat_id: '@Grodno_run',
                 text: messageText
-           })
-    }).then(() => {
-        document.querySelector('[data-sub="sub-radar"]').click();
-    }).catch(err => {
-        console.error("Ошибка сервера: ", err);
-    });
+            })
+        }).then(() => {
+            document.querySelector('[data-sub="sub-radar"]').click();
+      .catch(err => {
+            console.error("Ошибка сервера: ", err);
             function renderAll() {
             renderMeetingsList();
             renderArchiveList();
             renderViolators();
             updateCyberMap();
             updateDistrictBadges();
-        }
-
+        });
         // ОБНОВЛЕНИЕ НЕОНОВЫХ ТОЧЕК НА КАРТЕ ГОРОДА ГРОДНО
         function updateCyberMap() {
             const config = {
@@ -880,8 +878,7 @@ window.onerror = function(message, source, lineno, colno, error) {
             alert(approved ? "Дело закрыто. Пользователь оправдан." : "Нарушителю выдан БАН.");
             complaints.splice(index, 1); localStorage.setItem('gr_complaints_2026', JSON.stringify(complaints));
             renderAll();
-        };
-            } } }                                                                     
+        };                                                                             
     </script>
 </body>
 </html>
