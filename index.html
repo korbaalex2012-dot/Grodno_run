@@ -653,15 +653,25 @@ window.submitForm = function() {
             localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
 
             // Кодируем данные в компактный и безопасный формат для старт-команды бота
-            const encodedPayload = btoa(unescape(encodeURIComponent(JSON.stringify({d:district, e:exact, t:target, l:link, af:ageFrom, at:ageTo, m:mNeed, f:fNeed, ds:desc}))));
+              // Кодируем данные в формат, который на 100% поддерживает русский язык
+    let encodedPayload = "";
+    try {
+        const jsonStr = JSON.stringify({
+            d: district, e: exact, t: target, l: link, 
+            af: ageFrom, at: ageTo, m: maxPeople, 
+            lat: currentLat, lng: currentLng
+        });
+        // Безопасное кодирование кириллицы для Telegram ссылок
+        encodedPayload = btoa(encodeURIComponent(jsonStr).replace(/%([0-8F][0-9A-F])/g, function(match, p1) {
+            return String.fromCharCode(parseInt(p1, 16));
+        }));
+    } catch(e) {
+        console.error("Ошибка кодирования:", e);
+    }
 
-            // Перенаправляем пользователя прямиком в диалог с ботом. Это сработает на любом телефоне!
-           // Показываем стильное системное окно Telegram
-    // 1. Проверяем ограничение: 1 человек = 1 активный радар
+    // 1. Проверяем ограничение: 1 активный радар на 3 часа
     const lastCreated = localStorage.getItem('my_radar_time');
     const now = Date.now();
-    
-    // Если 3 часа (10800000 мс) еще не прошли — блокируем создание
     if (lastCreated && (now - parseInt(lastCreated) < 10800000)) {
         const timeLeft = Math.ceil((10800000 - (now - parseInt(lastCreated))) / 60000);
         Telegram.WebApp.showAlert(`❌ Вы уже запустили радар! Создать новый можно будет через ${timeLeft} мин.`);
@@ -671,17 +681,17 @@ window.submitForm = function() {
     // 2. Сохраняем время создания локально
     localStorage.setItem('my_radar_time', now.toString());
 
-    // 3. Безопасно перенаправляем в чат бота (токен скрыт)
+    // 3. Безопасно перенаправляем в чат бота (без токена в коде)
     const botUser = 'Grodno_Run_bot';
     Telegram.WebApp.openTelegramLink('https://t.me' + botUser + '?start=' + encodedPayload);
 
-    // 4. Очищаем поля формы
+    // 4. Очищаем форму
     document.getElementById('create-exact-place').value = '';
     document.getElementById('create-target').value = '';
     document.getElementById('create-link').value = '';
     document.getElementById('create-desc').value = '';
 
-    // 5. Обновляем карту и переключаем вкладку на главное меню
+    // 5. Обновляем интерфейс
     renderAll();
     const radarTab = document.querySelector('[data-sub="sub-radar"]');
     if (radarTab) radarTab.click();
