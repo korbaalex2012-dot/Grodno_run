@@ -667,13 +667,12 @@ window.onerror = function(message, source, lineno, colno, error) {
             body: JSON.stringify({
                 chat_id: '@Grodno_run',
                 text: messageText
-            }).then(() => {
-                       document.querySelector('[data-sub="sub-radar"]').click();     
-        .catch(err => {
+                    ).then(() => {
+            document.querySelector('[data-sub="sub-radar"]').click();
+        }).catch(err => {
             console.error("Ошибка сервера: ", err);
         });
     });
-            
             function renderAll() {
             renderMeetingsList();
             renderArchiveList();
