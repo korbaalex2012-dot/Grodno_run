@@ -652,49 +652,33 @@ window.submitForm = function() {
             meetings.unshift(meetingData);
             localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
 
-            // Кодируем данные в компактный и безопасный формат для старт-команды бота
-              // Кодируем данные в формат, который на 100% поддерживает русский язык
-    let encodedPayload = "";
-    try {
-        const jsonStr = JSON.stringify({
-            d: district, e: exact, t: target, l: link, 
-            af: ageFrom, at: ageTo, m: maxPeople, 
-            lat: currentLat, lng: currentLng
-        });
-        // Безопасное кодирование кириллицы для Telegram ссылок
-        encodedPayload = btoa(encodeURIComponent(jsonStr).replace(/%([0-8F][0-9A-F])/g, function(match, p1) {
-            return String.fromCharCode(parseInt(p1, 16));
-        }));
-    } catch(e) {
-        console.error("Ошибка кодирования:", e);
-    }
-
-    // 1. Проверяем ограничение: 1 активный радар на 3 часа
+               // 1. Проверяем ограничение: 1 человек = 1 радар на 3 часа
     const lastCreated = localStorage.getItem('my_radar_time');
     const now = Date.now();
     if (lastCreated && (now - parseInt(lastCreated) < 10800000)) {
         const timeLeft = Math.ceil((10800000 - (now - parseInt(lastCreated))) / 60000);
-        Telegram.WebApp.showAlert(`❌ Вы уже запустили радар! Создать новый можно будет через ${timeLeft} мин.`);
+        alert(`❌ Вы уже запустили радар! Создать новый можно будет через ${timeLeft} мин.`);
         return;
     }
 
-    // 2. Сохраняем время создания локально
+    // 2. Если всё ок, сохраняем время создания локально
     localStorage.setItem('my_radar_time', now.toString());
 
-    // 3. Безопасно перенаправляем в чат бота (без токена в коде)
-    const botUser = 'Grodno_Run_bot';
-    Telegram.WebApp.openTelegramLink('https://t.me' + botUser + '?start=' + encodedPayload);
+    // 3. Показываем простое окно, как на твоём скриншоте
+    alert("Радар успешно запущен!");
 
-    // 4. Очищаем форму
+    // 4. Очищаем поля формы сбора
     document.getElementById('create-exact-place').value = '';
     document.getElementById('create-target').value = '';
     document.getElementById('create-link').value = '';
     document.getElementById('create-desc').value = '';
 
-    // 5. Обновляем интерфейс
+    // 5. Обновляем карту и принудительно переключаем на главное меню (Радар)
     renderAll();
     const radarTab = document.querySelector('[data-sub="sub-radar"]');
-    if (radarTab) radarTab.click();
+    if (radarTab) {
+        radarTab.click();
+    }
 });
                     function renderAll() {
             renderMeetingsList();
