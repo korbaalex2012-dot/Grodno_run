@@ -670,7 +670,7 @@ window.onerror = function(message, source, lineno, colno, error) {
             })
         }).then(() => {
             document.querySelector('[data-sub="sub-radar"]').click();
-      .catch(err => {
+                }).catch(err => {
             console.error("Ошибка сервера: ", err);
             function renderAll() {
             renderMeetingsList();
