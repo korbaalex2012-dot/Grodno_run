@@ -656,17 +656,23 @@ window.submitForm = function() {
             const encodedPayload = btoa(unescape(encodeURIComponent(JSON.stringify({d:district, e:exact, t:target, l:link, af:ageFrom, at:ageTo, m:mNeed, f:fNeed, ds:desc}))));
 
             // Перенаправляем пользователя прямиком в диалог с ботом. Это сработает на любом телефоне!
-            if (BOT_USERNAME === "@Grodno_Run_bot") {
-                alert("Сбор создан локально! Чтобы бот слал посты в ТГК, впиши его юзернейм в код на GitHub.");
-                document.getElementById('create-exact-place').value = '';
-                document.getElementById('create-target').value = '';
-                document.getElementById('create-link').value = '';
-                document.getElementById('create-desc').value = '';
-                renderAll();
-                document.querySelector('[data-sub="sub-radar"]').click();
-            } else {
-                Telegram.WebApp.openTelegramLink('https://t.me' + BOT_USERNAME.replace('@', '') + '?start=' + encodedPayload);
-            }
+           // Показываем стильное системное окно Telegram
+Telegram.WebApp.showAlert("🚀 Прогулка успешно создана! Радар запущен.");
+
+// Очищаем поля формы сбора
+document.getElementById('create-exact-place').value = '';
+document.getElementById('create-target').value = '';
+document.getElementById('create-link').value = '';
+document.getElementById('create-desc').value = '';
+
+// Обновляем карту и списки
+renderAll();
+
+// Автоматически переключаем интерфейс на главное меню (вкладку Радар)
+const radarTab = document.querySelector('[data-sub="sub-radar"]');
+if (radarTab) {
+    radarTab.click();
+}
         });
                     function renderAll() {
             renderMeetingsList();
