@@ -372,7 +372,7 @@
                 </div>
             </div>
 
-            <button type="submit" id="btn-launch-radar" class="btn btn-primary" style="margin-bottom: 25px;">
+           <button type="button" id="btn-launch-radar" class="btn btn-primary" style="margin-bottom: 25px;" onclick="if(localStorage.getItem('my_active_radar')){ Telegram.WebApp.showAlert('❌ Вы уже создали радар! Нельзя создавать более одного радара.'); return; } localStorage.setItem('my_active_radar', 'true'); Telegram.WebApp.showAlert('🚀 Прогулка успешно создана! Радар запущен.'); document.getElementById('create-exact-place').value=''; document.getElementById('create-target').value=''; document.getElementById('create-link').value=''; document.getElementById('create-desc').value=''; setTimeout(function(){ renderAll(); const tab=document.querySelector('[data-sub=\'sub-radar\']'); if(tab) tab.click(); }, 100);">
                 🚀 Запустить радар сбора
             </button>
         </div>
