@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, maximum-scale=1.0, user-scalable=no">
+    <title>Grodno Run 2026 — Cyber Radar Premium</title>
+    <script src="https://telegram.org"></script>
+    <style>
+        :root {
+            --bg-main: #0a0a12;
+            --bg-card: rgba(20, 20, 35, 0.65);
+            --bg-input: #121224;
+            --accent: #00a2ff;
+            --accent-glow: rgba(0, 162, 255, 0.4);
+            --accent-green: #2ecc71;
+            --accent-red: #ff3838;
+            --accent-purple: #b33771;
+            --text-main: #f5f6fa;
+            --text-muted: #8e8ea0;
+            --border: rgba(255, 255, 255, 0.08);
+            --glass-blur: blur(12px);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: radial-gradient(circle at top right, #13132b, var(--bg-main) 70%);
+            color: var(--text-main);
+            margin: 0;
+            padding: 15px 15px 100px 15px;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            overflow-x: hidden;
+        }
+
+        h2, h3 {
+            margin: 0 0 10px 0;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, #fff, var(--text-muted));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: -6px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .screen { display: none; }
+        .screen.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            padding: 18px;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+
+        .card.status-planning { border-left: 4px solid var(--accent); }
+        .card.status-active-now { border-left: 4px solid var(--accent-green); box-shadow: 0 0 20px rgba(46, 204, 113, 0.15); }
+        .card.status-mega { border-left: 4px solid var(--accent-purple); box-shadow: 0 0 25px rgba(179, 55, 113, 0.25); }
+
+        .alert {
+            background: rgba(255, 56, 56, 0.07);
+            border: 1px solid rgba(255, 56, 56, 0.3);
+            color: #ff6b6b;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            line-height: 1.4;
+            margin-bottom: 25px;
+        }
+
+        .form-group { margin-bottom: 18px; }
+
+        label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #a4b0be;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        input[type="text"], input[type="number"], select, textarea {
+            width: 100%;
+            padding: 14px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 15px;
+            box-sizing: border-box;
+            outline: none;
+            transition: all 0.25s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 12px var(--accent-glow);
+        }
+
+        .tags-suggest { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+        .tag-btn {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: #cbd5e1;
+            padding: 6px 14px; border-radius: 20px; font-size: 12px; cursor: pointer;
+        }
+        .tag-btn:active { background: var(--accent); color: #fff; }
+    </style>
+</head>
+<body>
+        <style>
+        /* Интерактивная кибер-карта Гродно */
+        .cyber-map {
+            position: relative;
+            width: 100%; height: 190px;
+            background: #06060c; border: 1px solid var(--border);
+            border-radius: 16px; margin-bottom: 20px;
+            overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        .map-bg-grid {
+            position: absolute; width: 100%; height: 100%;
+            background-image: linear-gradient(rgba(0, 162, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 162, 255, 0.05) 1px, transparent 1px);
+            background-size: 16px 16px;
+        }
+
+        .map-point {
+            position: absolute; width: 12px; height: 12px;
+            background: #232335; border-radius: 50%;
+            transform: translate(-50%, -50%); transition: all 0.3s ease;
+        }
+
+        .map-point.active {
+            background: var(--accent-red); box-shadow: 0 0 12px var(--accent-red), 0 0 25px var(--accent-red);
+            animation: pulse-dot 1.4s infinite;
+        }
+
+        .map-point.mega {
+            background: var(--accent-purple); box-shadow: 0 0 18px var(--accent-purple), 0 0 35px var(--accent-purple);
+            animation: pulse-mega 0.7s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(1.7); opacity: 0.4; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        @keyframes pulse-mega {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.9); opacity: 0.5; }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .map-label {
+            position: absolute; font-size: 10px; color: #4b5361;
+            transform: translate(-50%, 9px); white-space: nowrap;
+            font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .map-point.active + .map-label { color: #fff; text-shadow: 0 0 6px rgba(255,255,255,0.5); }
+        .map-point.mega + .map-label { color: #f8a5c2; text-shadow: 0 0 8px var(--accent-purple); }
+
+        .btn {
+            display: block; width: 100%; padding: 15px; border-radius: 12px; border: none;
+            font-size: 15px; font-weight: 700; cursor: pointer; text-align: center; box-sizing: border-box;
+            transition: all 0.2s ease; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .btn-primary { background: linear-gradient(135deg, var(--accent), #0066ff); color: #fff; box-shadow: 0 4px 15px rgba(0, 162, 255, 0.3); }
+        .btn-success { background: linear-gradient(135deg, var(--accent-green), #27ae60); color: #fff; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3); }
+        .btn-danger { background: linear-gradient(135deg, var(--accent-red), #c0392b); color: #fff; box-shadow: 0 4px 15px rgba(255, 56, 56, 0.3); }
+
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10, 10, 18, 0.85);
+            backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+            border-top: 1px solid var(--border); display: flex; padding: 10px 6px; z-index: 999;
+        }
+
+        .nav-btn {
+            flex: 1; background: transparent; border: none; color: var(--text-muted);
+            padding: 8px 4px; font-size: 11px; font-weight: 700; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+            transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
+        .nav-btn.active { color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); }
+        .sub-screen { display: none; }
+        .sub-screen.active { display: block; }
+
+        .filter-bar { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 18px; padding-bottom: 6px; }
+        .filter-bar::-webkit-scrollbar { display: none; }
+        .filter-chip {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: var(--text-muted);
+            padding: 9px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; white-space: nowrap; cursor: pointer;
+        }
+        .filter-chip.active { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
+
+        .counter-row {
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--bg-input); padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border);
+        }
+        .counter { display: flex; align-items: center; gap: 10px; }
+        .counter button {
+            width: 36px; height: 36px; background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+            color: #fff; border-radius: 8px; font-size: 20px; font-weight: bold; cursor: pointer;
+        }
+        .counter input { width: 35px; text-align: center; background: transparent; border: none; color: #fff; font-size: 16px; font-weight: bold; }
+        .empty-state { text-align: center; padding: 45px 20px; color: var(--text-muted); font-size: 14px; }
+        .violator-item { background: rgba(255, 56, 56, 0.04); border: 1px solid rgba(255, 56, 56, 0.15); padding: 16px; border-radius: 14px; margin-bottom: 12px; }
+        .track-counter { font-size: 11px; background: var(--accent); color: #fff; padding: 1px 6px; border-radius: 10px; font-weight: bold; margin-left: 4px; }
+        .hidden { display: none !important; }
+    </style>
+
+    <audio id="bg-audio"></audio>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: rgba(15, 15, 27, 0.7); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); padding: 12px 16px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+        <div>
+            <div style="font-weight: 900; font-size: 15px; letter-spacing: 1px; color: var(--accent); text-shadow: 0 0 10px var(--accent-glow);">GRODNO RUN</div>
+            <p style="font-size: 11px; color: var(--text-muted); margin: 3px 0 0 0; font-weight: 600;" id="user-display-status">Сканирование сети...</p>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <label for="music-upload" style="margin: 0; padding: 7px 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 20px; font-size: 11px; font-weight: bold; cursor: pointer;">
+                ➕ ТРЕК<span id="track-queue-badge" class="track-counter hidden">0</span>
+            </label>
+            <input type="file" id="music-upload" accept="audio/*" multiple class="hidden">
+            <button type="button" id="btn-music-toggle" style="background: var(--bg-input); border: 1px solid var(--border); color: var(--text-muted); padding: 7px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; font-weight: 800;">🎵 OFF</button>
+        </div>
+    </div>
+
+    <div id="screen-auth" class="screen">
+        <div class="alert">
+            ⚠ ВНИМАНИЕ: Все данные проверяются роботом. За ложный пол или возраст — моментальный бан на всех районах Гродно БЕЗ права разблокировки!
+        </div>
+        <div class="card" style="border-top: 4px solid var(--accent-red);">
+            <h3>Входной контроль</h3>
+            <div class="form-group">
+                <label>Ваш пол</label>
+                <select id="auth-gender">
+                    <option value="" disabled selected>Выбрать пол...</option>
+                    <option value="Парень">Парень</option>
+                    <option value="Девушка">Девушка</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Ваш возраст (от 12 до 35 лет)</label>
+                <input type="number" id="auth-age" placeholder="Введите ваш точный возраст" min="12" max="35">
+            </div>
+            <button type="button" id="btn-submit-auth" class="btn btn-success">Пройти авторизацию</button>
+        </div>
+    </div>
+        <div id="screen-main" class="screen">
+        <!-- ПОД-ЭКРАН 1: ЛЕНТА РАДАРА С НЕОНОВОЙ КАРТОЙ -->
+        <div id="sub-radar" class="sub-screen active">
+            <div class="cyber-map">
+                <div class="map-bg-grid"></div>
+                <div class="map-point" id="map-pt-center" style="top: 40%; left: 50%;"></div><div class="map-label" style="top: 40%; left: 50%;">Советская</div>
+                <div class="map-point" id="map-pt-trinity" style="top: 72%; left: 66%;"></div><div class="map-label" style="top: 72%; left: 66%;">Тринити</div>
+                <div class="map-point" id="map-pt-oldcity" style="top: 25%; left: 45%;"></div><div class="map-label" style="top: 25%; left: 45%;">OldCity</div>
+                <div class="map-point" id="map-pt-olshanka" style="top: 86%; left: 33%;"></div><div class="map-label" style="top: 86%; left: 33%;">Ольшанка</div>
+                <div class="map-point" id="map-pt-grandichi" style="top: 14%; left: 58%;"></div><div class="map-label" style="top: 14%; left: 58%;">Грандичи</div>
+                <div class="map-point" id="map-pt-devyatovka" style="top: 32%; left: 64%;"></div><div class="map-label" style="top: 32%; left: 64%;">Девятовка</div>
+                <div class="map-point" id="map-pt-pyshki" style="top: 46%; left: 18%;"></div><div class="map-label" style="top: 46%; left: 18%;">Пышки</div>
+                <div class="map-point" id="map-pt-forty" style="top: 34%; left: 28%;"></div><div class="map-label" style="top: 34%; left: 28%;">Форты</div>
+            </div>
+
+            <div class="filter-bar" id="radar-filter-bar">
+                <div class="filter-chip active" data-filter="all">Все районы</div>
+                <div class="filter-chip" data-filter="Центр (Советская)">Советская <span id="b-center"></span></div>
+                <div class="filter-chip" data-filter="ТЦ Тринити">Тринити <span id="b-trinity"></span></div>
+                <div class="filter-chip" data-filter="OldCity (Олд Сити)">OldCity <span id="b-oldcity"></span></div>
+                <div class="filter-chip" data-filter="Ольшанка">Ольшанка <span id="b-olshanka"></span></div>
+                <div class="filter-chip" data-filter="Грандичи">Грандичи <span id="b-grandichi"></span></div>
+                <div class="filter-chip" data-filter="Девятовка">Девятовка <span id="b-devyatovka"></span></div>
+                <div class="filter-chip" data-filter="Пышки (Парк)">Пышки <span id="b-pyshki"></span></div>
+                <div class="filter-chip" data-filter="БЛК / Форты">Форты <span id="b-forty"></span></div>
+            </div>
+            <div id="empty-state-msg" class="empty-state">На радаре пока пусто... Запусти движ сам!</div>
+            <div id="radar-list"></div>
+        </div>
+
+        <!-- ПОД-ЭКРАН 2: НАЧАЛО ФОРМЫ СОЗДАНИЯ СБОРА -->
+        <div id="sub-create" class="sub-screen">
+            <h2>➕ Запустить сбор</h2>
+            <p class="subtitle">Отметь локацию на общем радаре Гродно</p>
+            <div class="card" style="border-top: 4px solid var(--accent);">
+                <div class="form-group">
+                    <label>📍 Выберите район для карты и фильтра</label>
+                    <select id="create-district">
+                        <option value="Центр (Советская)">Центр (Советская)</option>
+                        <option value="ТЦ Тринити">ТЦ Тринити</option>
+                        <option value="OldCity (Олд Сити)">OldCity (Олд Сити)</option>
+                        <option value="Ольшанка">Ольшанка</option>
+                        <option value="Девятовка">Девятовка</option>
+                        <option value="Грандичи">Грандичи</option>
+                        <option value="Пышки (Парк)">Пышки (Парк)</option>
+                        <option value="БЛК / Форты">БЛК / Форты</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>🏢 Точный адрес / Точка встречи (Пиши сам руками)</label>
+                    <input type="text" id="create-exact-place" placeholder="Например: у фонтана / фудкорт 2 этаж / лавочки">
+                    <div class="tags-suggest">
+                        <span class="tag-btn" onclick="applyPlaceTag('возле фонтана')">#у_фонтана</span>
+                        <span class="tag-btn" onclick="applyPlaceTag('на фудкорте')">#на_фудкорте</span>
+                        <span class="tag-btn" onclick="applyPlaceTag('главный вход')">#главный_вход</span>
+                    </div>
+                </div>
+                                <div class="form-group">
+                    <label>🎯 Цель сбора (Свободный ввод руками)</label>
+                    <input type="text" id="create-target" placeholder="Например: Поиграть в футбол / Катка на самокатах / Чилл">
+                    <div class="tags-suggest">
+                        <span class="tag-btn" onclick="applyTargetTag('Прогулка / Чилл')">#progulka</span>
+                        <span class="tag-btn" onclick="applyTargetTag('Погонять в футбол')">#football</span>
+                        <span class="tag-btn" onclick="applyTargetTag('Катка на самокатах')">#samokaty</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>🔗 Ссылка на чат банды (Telegram ссылка)</label>
+                    <input type="text" id="create-link" placeholder="https://t.me">
+                    <p class="hint">Сюда автоматически перейдут все, кто нажмет кнопку «⚡ Буду на месте»</p>
+                </div>
+
+                <div class="form-group">
+                    <label>🔞 Желаемый возраст компании</label>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        От <input type="number" id="age-from" value="16" style="width: 80px;">
+                        До <input type="number" id="age-to" value="22" style="width: 80px;">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>👥 Сколько человек не хватает в команде?</label>
+                    <div class="counter-row">
+                        <span>Нужно парней</span>
+                        <div class="counter">
+                            <button type="button" class="btn-minus" data-target="search-males">-</button>
+                            <input type="number" id="search-males" value="1" readonly>
+                            <button type="button" class="btn-plus" data-target="search-males">+</button>
+                        </div>
+                    </div>
+                    <div class="counter-row" style="margin-top: 10px;">
+                        <span>Нужно девушек</span>
+                        <div class="counter">
+                            <button type="button" class="btn-minus" data-target="search-females">-</button>
+                            <input type="number" id="search-females" value="1" readonly>
+                            <button type="button" class="btn-plus" data-target="search-females">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>📝 Описание (Макс. 120 символов)</label>
+                    <textarea id="create-desc" maxlength="120" placeholder="Что конкретно будете делать? Сбор строго вовремя!"></textarea>
+                </div>
+            </div>
+
+            <button type="button" id="btn-launch-radar" class="btn btn-primary" style="margin-bottom: 25px;">
+                🚀 Запустить радар сбора
+            </button>
+        </div>
+
+        <!-- ПОД-ЭКРАН 3: АРХИВ «МОИ СХОДКИ» -->
+        <div id="sub-archive" class="sub-screen">
+            <h2>💼 Мои Сходки</h2>
+            <p class="subtitle">Сходки, на которые ты вписался. Жалобы доступны через 1 час.</p>
+            <div id="archive-empty-state" class="empty-state">Ты еще не вписался ни в один движ.</div>
+            <div id="archive-list"></div>
+        </div>
+
+        <!-- ПОД-ЭКРАН 4: ЛИЧНАЯ СКРЫТАЯ АДМИНКА -->
+        <div id="sub-admin" class="sub-screen">
+            <h2>⚡ Админка куратора</h2>
+            <p class="subtitle">Панель тотального контроля проверок и жалоб</p>
+            
+            <div class="card" style="border: 1px solid var(--accent); background: rgba(0, 162, 255, 0.03);">
+                <h3>🕵️ Эмулятор Профиля (Маскировка)</h3>
+                <p class="hint" style="margin-bottom: 12px; color: var(--accent);">Измени свои параметры, чтобы тайно просматривать анкеты любых возрастов и полов:</p>
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <select id="admin-fake-gender" style="flex: 1;">
+                        <option value="Парень">Маскировка: Парень</option>
+                        <option value="Девушка">Маскировка: Девушка</option>
+                    </select>
+                    <input type="number" id="admin-fake-age" value="18" style="width: 90px;" min="12" max="35">
+                </div>
+                <button type="button" class="btn btn-primary" id="btn-apply-fake" style="padding: 10px; font-size: 13px;">💾 Применить маскировку</button>
+            </div>
+
+            <div class="card" style="border-top: 4px solid var(--accent-red);">
+                <h3>📋 Поступившие дела и жалобы</h3>
+                <div id="admin-empty-state" class="empty-state" style="padding: 10px 0;">Нарушителей не обнаружено. Претензий нет.</div>
+                <div id="violators-list"></div>
+            </div>
+        </div>
+
+        <!-- НИЖНЕЕ МЕНЮ НАВИГАЦИИ -->
+        <div class="bottom-nav">
+            <button class="nav-btn active" data-sub="sub-radar"><span>🛰</span>Радар</button>
+            <button class="nav-btn" data-sub="sub-create"><span>➕</span>Создать</button>
+            <button class="nav-btn" data-sub="sub-archive"><span>💼</span>Мои Сходки</button>
+            <button class="nav-btn hidden" id="nav-admin-btn" data-sub="sub-admin"><span>⚡</span>Админка</button>
+        </div>
+        </div>
+        <script>
+        // ТВОЙ НАСТОЯЩИЙ ID ИЗ ТЕЛЕГРАМА ДЛЯ ВХОДА В АДМИНКУ
+        const MY_TELEGRAM_ID = 6949963047;
+
+        const tg = window.Telegram?.WebApp;
+        let myId = 0;
+        let myUsername = "Grodno_User";
+
+        if (tg) {
+            tg.ready();
+            tg.expand();
+            if (tg.initDataUnsafe?.user) {
+                myId = tg.initDataUnsafe.user.id;
+                myUsername = tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name;
+            }
+        }
+
+        // Локальные базы данных
+        let meetings = JSON.parse(localStorage.getItem('gr_meetings_2026')) || [];
+        let archive = JSON.parse(localStorage.getItem('gr_archive_2026')) || [];
+        let complaints = JSON.parse(localStorage.getItem('gr_complaints_2026')) || [];
+
+        // Данные текущей сессии
+        let activeGender = localStorage.getItem('user_gender') || "";
+        let activeAge = parseInt(localStorage.getItem('user_age')) || 0;
+        let currentDistrictFilter = "all";
+
+        // МУЗЫКАЛЬНЫЙ ДВИЖОК СМАРТФОНА
+        const audio = document.getElementById('bg-audio');
+        const musicBtn = document.getElementById('btn-music-toggle');
+        const musicUpload = document.getElementById('music-upload');
+        const badge = document.getElementById('track-queue-badge');
+        let playlistUrls = [];
+        let currentTrackIndex = 0;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('nav-admin-btn').classList.remove('hidden');
+
+            // Автоочистка сходок старше 3 часов (10800000 мс)
+            const now = Date.now();
+            meetings = meetings.filter(m => (now - m.timeCreated) < 10800000);
+            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
+
+            if (localStorage.getItem('user_registered') === 'true') {
+                document.getElementById('screen-auth').classList.remove('active');
+                document.getElementById('screen-main').classList.add('active');
+                updateStatusHeader();
+                renderAll();
+            } else {
+                document.getElementById('screen-auth').classList.add('active');
+            }
+            initAudioEngine();
+        });
+
+        function initAudioEngine() {
+            musicBtn.addEventListener('click', () => {
+                if (playlistUrls.length === 0) {
+                    alert("Добавь треки через кнопку '➕ ТРЕК'!");
+                    return;
+                }
+                if (audio.paused) { playCurrentTrack(); } 
+                else {
+                    audio.pause();
+                    musicBtn.innerText = "🎵 OFF";
+                    musicBtn.style.color = "var(--text-muted)";
+                }
+            });
+
+            musicUpload.addEventListener('change', (e) => {
+                const files = Array.from(e.target.files);
+                if (files.length > 0) {
+                    files.forEach(file => playlistUrls.push(URL.createObjectURL(file)));
+                    badge.innerText = playlistUrls.length;
+                    badge.classList.remove('hidden');
+                    if (audio.paused) playCurrentTrack();
+                }
+            });
+
+            audio.addEventListener('ended', () => {
+                currentTrackIndex++;
+                if (currentTrackIndex >= playlistUrls.length) currentTrackIndex = 0; 
+                playCurrentTrack();
+            });
+        }
+
+        function playCurrentTrack() {
+            if (playlistUrls.length === 0) return;
+            audio.src = playlistUrls[currentTrackIndex];
+            audio.play().then(() => {
+                musicBtn.innerText = `🎵 ТРЕК ${currentTrackIndex + 1}`;
+                musicBtn.style.color = "var(--accent-green)";
+            }).catch(err => console.log(err));
+        }
+
+        function updateStatusHeader() {
+            document.getElementById('user-display-status').innerText = `${activeGender}, ${activeAge} л. (@${myUsername}) 🛰 СЕТЬ`;
+        }
+
+        window.applyPlaceTag = function(val) { document.getElementById('create-exact-place').value = val; };
+        window.applyTargetTag = function(val) { document.getElementById('create-target').value = val; };
+
+        // ДИНАМИЧЕСКИЕ ЛОКАЦИИ ГРОДНО
+        function updateDynamicPlaceTags() {
+            const district = document.getElementById('create-district').value;
+            const tagsContainer = document.querySelector('.tags-suggest');
+            if (!tagsContainer) return;
+
+            let tags = [];
+            if (district === "Центр (Советская)") tags = ["у фонтана", "качели у Немана", "около Фары Витовта", "Драмтеатр"];
+            else if (district === "ТЦ Тринити") tags = ["фудкорт 3 этаж", "у Кравта", "инфоцентр", "ледовая арена"];
+            else if (district === "OldCity (Олд Сити)") tags = ["у замка в центре", "фудкорт", "главный вход"];
+            else if (district === "Ольшанка") tags = ["СШ 41", "ТЦ Ольшанка", "сквер Наполеона Орды"];
+            else if (district === "Грандичи") tags = ["новая школа", "амфитеатр", "аллея"];
+            else if (district === "Девятовка") tags = ["у Алми", "Белые Росы", "дворик с колодцем"];
+            else if (district === "Пышки (Парк)") tags = ["Тропа здоровья", "у Немана", "Тортуога"];
+            else if (district === "БЛК / Форты") tags = ["Мини-рынок Форты", "пышечная", "у стадиона"];
+
+            tagsContainer.innerHTML = '';
+            tags.forEach(t => {
+                const span = document.createElement('span');
+                span.className = 'tag-btn';
+                span.innerText = `#${t.replace(/ /g, '_')}`;
+                span.onclick = () => applyPlaceTag(t);
+                tagsContainer.appendChild(span);
+            });
+        }
+
+        document.getElementById('create-district').addEventListener('change', updateDynamicPlaceTags);
+        setTimeout(updateDynamicPlaceTags, 500);
+                    // КНОПКА АВТОРИЗАЦИИ
+        document.getElementById('btn-submit-auth').addEventListener('click', (e) => {
+            e.preventDefault();
+            const gen = document.getElementById('auth-gender').value;
+            const age = parseInt(document.getElementById('auth-age').value);
+            if (!gen || !age || age < 12 || age > 35) {
+                alert('Укажите корректный пол и возраст от 12 до 35 лет!');
+                return;
+            }
+            localStorage.setItem('user_gender', gen);
+            localStorage.setItem('user_age', age);
+            localStorage.setItem('user_registered', 'true');
+            activeGender = gen; activeAge = age;
+            document.getElementById('screen-auth').classList.remove('active');
+            document.getElementById('screen-main').classList.add('active');
+            updateStatusHeader(); renderAll();
+        });
+
+        // МАСКИРОВКА АДМИНА
+        document.getElementById('btn-apply-fake').addEventListener('click', () => {
+            activeGender = document.getElementById('admin-fake-gender').value;
+            activeAge = parseInt(document.getElementById('admin-fake-age').value);
+            updateStatusHeader(); renderAll();
+            alert("Маскировка куратора применена! Радар перенастроен.");
+        });
+
+        document.querySelectorAll('.btn-minus').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const inp = document.getElementById(btn.getAttribute('data-target'));
+                if (inp.value > 0) inp.value = parseInt(inp.value) - 1;
+            });
+        });
+        document.querySelectorAll('.btn-plus').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const inp = document.getElementById(btn.getAttribute('data-target'));
+                inp.value = parseInt(inp.value) + 1;
+            });
+        });
+
+        // НАВИГАЦИЯ ПО МЕНЮ С КОНТРОЛЕМ ПИН-КОДА АДМИНКИ
+        document.querySelectorAll('.bottom-nav .nav-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const targetSub = btn.getAttribute('data-sub');
+                if (targetSub === "sub-admin" && localStorage.getItem('admin_authorized') !== 'true') {
+                    const pin = prompt("🔐 Доступ ограничен. Введите ПИН-КОД куратора:");
+                    if (pin === "147369") {
+                        localStorage.setItem('admin_authorized', 'true');
+                        alert("⚠️ Доступ подтвержден. Добро пожаловать, Куратор!");
+                    } else {
+                        if (pin !== null) alert("❌ Ошибка: неверный код безопасности.");
+                        return;
+                    }
+                }
+                document.querySelectorAll('.bottom-nav .nav-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.sub-screen').forEach(s => s.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(targetSub).classList.add('active');
+                renderAll();
+            });
+        });
+
+        document.querySelectorAll('#radar-filter-bar .filter-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                document.querySelectorAll('#radar-filter-bar .filter-chip').forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                currentDistrictFilter = chip.getAttribute('data-filter');
+                renderMeetingsList();
+            });
+        });
+
+        // 🚀 НАДЁЖНЫЙ КИБЕР-ГЕНЕРАТОР: Перенаправление в бота через защищённый старт-параметр
+        document.getElementById('btn-launch-radar').addEventListener('click', () => {
+            
+            // ⚙️ ВПИШИ СЮДА ЮЗЕРНЕЙМ СВОЕГО БОТА БЕЗ СОБАЧКИ
+            const BOT_USERNAME = "Grodno_Run_bot"; 
+
+            const district = document.getElementById('create-district').value;
+            const exact = document.getElementById('create-exact-place').value || "Указано внутри";
+            const target = document.getElementById('create-target').value || "Прогулка / Чилл";
+            const link = document.getElementById('create-link').value || "";
+            const ageFrom = parseInt(document.getElementById('age-from').value);
+            const ageTo = parseInt(document.getElementById('age-to').value);
+            const mNeed = parseInt(document.getElementById('search-males').value);
+            const fNeed = parseInt(document.getElementById('search-females').value);
+            const desc = document.getElementById('create-desc').value;
+
+            if(!link.startsWith('http')) {
+                alert("Вставь рабочую Telegram ссылку на чат компании!");
+                return;
+            }
+
+            const meetingData = {
+                id: Date.now(), district: district, exactPlace: exact, target: target, chatLink: link,
+                ageFrom: ageFrom, ageTo: ageTo, malesNeeded: mNeed, femalesNeeded: fNeed,
+                malesJoined: 0, femalesJoined: 0, desc: desc, creator: myUsername, timeCreated: Date.now()
+            };
+
+            // Сохраняем карточку локально на устройстве
+            meetings.unshift(meetingData);
+            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
+
+            // Кодируем данные в компактный и безопасный формат для старт-команды бота
+            const encodedPayload = btoa(unescape(encodeURIComponent(JSON.stringify({d:district, e:exact, t:target, l:link, af:ageFrom, at:ageTo, m:mNeed, f:fNeed, ds:desc}))));
+
+            // Перенаправляем пользователя прямиком в диалог с ботом. Это сработает на любом телефоне!
+            if (BOT_USERNAME === "@Grodno_Run_bot") {
+                alert("Сбор создан локально! Чтобы бот слал посты в ТГК, впиши его юзернейм в код на GitHub.");
+                document.getElementById('create-exact-place').value = '';
+                document.getElementById('create-target').value = '';
+                document.getElementById('create-link').value = '';
+                document.getElementById('create-desc').value = '';
+                renderAll();
+                document.querySelector('[data-sub="sub-radar"]').click();
+            } else {
+                window.location.href = `https://t.me{BOT_USERNAME}?start=${encodedPayload}`;
+            }
+        });
+                    function renderAll() {
+            renderMeetingsList();
+            renderArchiveList();
+            renderViolators();
+            updateCyberMap();
+            updateDistrictBadges();
+        }
+
+        // ОБНОВЛЕНИЕ НЕОНОВЫХ ТОЧЕК НА КАРТЕ ГОРОДА ГРОДНО
+        function updateCyberMap() {
+            const config = {
+                "Центр (Советская)": "map-pt-center", "ТЦ Тринити": "map-pt-trinity", "OldCity (Олд Сити)": "map-pt-oldcity",
+                "Ольшанка": "map-pt-olshanka", "Грандичи": "map-pt-grandichi", "Девятовка": "map-pt-devyatovka",
+                "Пышки (Парк)": "map-pt-pyshki", "БЛК / Форты": "map-pt-forty"
+            };
+
+            Object.values(config).forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.className = "map-point";
+            });
+
+            meetings.forEach(m => {
+                const id = config[m.district];
+                const el = document.getElementById(id);
+                if (el) {
+                    if ((m.malesJoined + m.femalesJoined) >= 5) el.className = "map-point mega";
+                    else el.className = "map-point active";
+                }
+            });
+        }
+
+        // ЦИФРЫ-ОГОНЬКИ НА ФИЛЬТРАХ РАЙОНОВ
+        function updateDistrictBadges() {
+            const counts = {};
+            meetings.forEach(m => counts[m.district] = (counts[m.district] || 0) + 1);
+
+            const badges = {
+                "Центр (Советская)": "b-center", "ТЦ Тринити": "b-trinity", "OldCity (Олд Сити)": "b-oldcity",
+                "Ольшанка": "b-olshanka", "Грандичи": "b-grandichi", "Девятовка": "b-devyatovka",
+                "Пышки (Парк)": "b-pyshki", "БЛК / Форты": "b-forty"
+            };
+
+            Object.keys(badges).forEach(key => {
+                const el = document.getElementById(badges[key]);
+                if (el) el.innerText = counts[key] ? `🔥 ${counts[key]}` : "";
+            });
+        }
+
+        // ОТРИСОВКА ЛЕНТЫ СБОРОВ С АВТОБАЛАНСОМ
+        function renderMeetingsList() {
+            const container = document.getElementById('radar-list');
+            const emptyMsg = document.getElementById('empty-state-msg');
+            container.innerHTML = '';
+
+            const filtered = meetings.filter(m => {
+                if (currentDistrictFilter !== "all" && m.district !== currentDistrictFilter) return false;
+                if (Math.abs(activeAge - m.ageFrom) > 3 && Math.abs(activeAge - m.ageTo) > 3) return false;
+                if (activeGender === "Парень" && m.malesNeeded > 0 && m.malesJoined >= m.malesNeeded) return false;
+                if (activeGender === "Девушка" && m.femalesNeeded > 0 && m.femalesJoined >= m.femalesNeeded) return false;
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                emptyMsg.style.display = 'block';
+                return;
+            }
+            emptyMsg.style.display = 'none';
+
+            filtered.forEach(m => {
+                const diffTime = Date.now() - m.timeCreated;
+                let statusClass = "status-planning"; let statusText = "⏳ Планируется";
+
+                if ((m.malesJoined + m.femalesJoined) >= 5) {
+                    statusClass = "status-mega"; statusText = "🔥 МЕГА-СБОР";
+                } else if (diffTime > 3600000) {
+                    statusClass = "status-active-now"; statusText = "🚀 Движ в разгаре!";
+                }
+
+                let deleteBtnHtml = "";
+                if (m.creator === myUsername) {
+                    deleteBtnHtml = `<button class="btn btn-danger" style="padding: 10px; font-size: 13px; margin-top: 8px; background: linear-gradient(135deg, #ff3838, #b33771);" onclick="deleteMyMeeting(${m.id})">❌ Удалить мой сбор</button>`;
+                }
+
+                const card = document.createElement('div');
+                card.className = `card ${statusClass}`;
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <strong style="color: var(--accent); font-size: 15px;">📍 ${m.district}</strong>
+                        <span style="font-size: 11px; background: #1a1b26; padding: 4px 10px; border-radius: 12px; color: var(--text-muted); font-weight: bold;">${statusText}</span>
+                    </div>
+                    <p style="margin: 0 0 6px 0; font-size: 14px;"><b>Где:</b> ${m.exactPlace}</p>
+                    <p style="margin: 0 0 6px 0; font-size: 14px;"><b>Цель:</b> ${m.target}</p>
+                    <p style="margin: 0 0 10px 0; font-size: 13px; color: #a4b0be;">${m.desc || 'Описания нет.'}</p>
+                    <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+                        Возраст: 🔞 ${m.ageFrom}-${m.ageTo} л. | Места: 👨 ${m.malesJoined}/${m.malesNeeded} | 👩 ${m.femalesJoined}/${m.femalesNeeded}
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-primary" style="padding: 10px; font-size: 13px; flex: 3;" onclick="joinMeeting(${m.id})">⚡ Буду на месте</button>
+                        <button class="btn btn-danger" style="padding: 10px; font-size: 13px; flex: 1; background: #261616; color: var(--accent-red);" onclick="reportDescription('${m.creator}', ${m.id})">⚠ ЖБ</button>
+                    </div>
+                    ${deleteBtnHtml}
+                `;
+                container.appendChild(card);
+            });
+            }
+                    window.deleteMyMeeting = function(id) {
+            if (confirm("Удалить этот сбор?")) {
+                meetings = meetings.filter(m => m.id !== id);
+                localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
+                renderAll();
+                // Сообщаем боту об удалении
+                if (tg && tg.sendData) {
+                    tg.sendData(JSON.stringify({ type: "delete_meeting", id: id }));
+                }
+            }
+        };
+
+        window.joinMeeting = function(id) {
+            const m = meetings.find(item => item.id === id); if (!m) return;
+            if (activeGender === "Парень" && m.malesJoined < m.malesNeeded) m.malesJoined++;
+            if (activeGender === "Девушка" && m.femalesJoined < m.femalesNeeded) m.femalesJoined++;
+
+            if (!archive.some(item => item.id === id)) {
+                archive.unshift(m); localStorage.setItem('gr_archive_2026', JSON.stringify(archive));
+            }
+            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
+            renderAll();
+            alert("Ты вписался в компанию! Открываем чат встречи.");
+            window.location.href = m.chatLink;
+        };
+
+        window.reportDescription = function(username, meetingId) {
+            const reason = prompt("Укажите причину жалобы (Мат, неадекватность):");
+            if (!reason) return;
+            complaints.unshift({ id: Date.now(), violator: username, type: "Жалоба на описание", reason: reason, meetingId: meetingId });
+            localStorage.setItem('gr_complaints_2026', JSON.stringify(complaints));
+            alert("Жалоба доставлена куратору!");
+            renderAll();
+        };
+
+        function renderArchiveList() {
+            const container = document.getElementById('archive-list');
+            const empty = document.getElementById('archive-empty-state');
+            if(!container) return; container.innerHTML = '';
+            if (archive.length === 0) { empty.style.display = 'block'; return; }
+            empty.style.display = 'none';
+
+            archive.forEach(m => {
+                const diff = Date.now() - m.timeCreated;
+                const timeLeft = Math.ceil((3600000 - diff) / 1000 / 60);
+                let btnHtml = (diff >= 3600000) ? 
+                    `<button class="btn btn-danger" style="padding: 8px; font-size: 13px;" onclick="reportRealMeeting('${m.creator}', ${m.id})">⚠ Подать ЖБ по факту встречи</button>` :
+                    `<button class="btn" style="padding: 8px; font-size: 12px; background: #1a1b26; color: #444;" disabled>⏳ ЖБ по факту встречи (Доступно через ${timeLeft} мин)</button>`;
+
+                const card = document.createElement('div'); card.className = 'card';
+                card.innerHTML = `<strong style="color: var(--accent-green);">📍 Район: ${m.district}</strong>
+                    <p style="margin: 5px 0; font-size: 13px;"><b>Цель:</b> ${m.target}</p>
+                    <p style="margin: 5px 0 10px 0; font-size: 12px; color: var(--text-muted);">Организатор: @${m.creator}</p>${btnHtml}`;
+                container.appendChild(card);
+            });
+        }
+
+        window.reportRealMeeting = function(username, meetingId) {
+            const code = prompt("Выберите номер нарушения:\n1 - Не тот возраст\n2 - Слив встречи\n3 - Не тот пол");
+            if (!code) return;
+            let reason = "Нарушение условий";
+            if(code === "1") reason = "Обман с возрастом";
+            if(code === "2") reason = "Слив встречи в последний момент";
+            if(code === "3") reason = "Обман с полом";
+            complaints.unshift({ id: Date.now(), violator: username, type: "Жалоба по факту встречи", reason: reason, meetingId: meetingId });
+            localStorage.setItem('gr_complaints_2026', JSON.stringify(complaints));
+            alert("Жалоба по факту встречи зарегистрирована!");
+            renderAll();
+        };
+
+        function renderViolators() {
+            const list = document.getElementById('violators-list');
+            const empty = document.getElementById('admin-empty-state');
+            if (!list) return; list.innerHTML = '';
+            if (complaints.length === 0) { empty.style.display = 'block'; return; }
+            empty.style.display = 'none';
+
+            complaints.forEach((c, idx) => {
+                const item = document.createElement('div'); item.className = 'violator-item';
+                item.innerHTML = `
+                    <div style="font-size: 11px; color: var(--accent); text-transform: uppercase; font-weight: bold; margin-bottom: 4px;">${c.type}</div>
+                    <p style="margin: 0 0 4px 0;">👤 <b>Нарушитель:</b> @${c.violator}</p>
+                    <p style="margin: 0 0 12px 0; font-size: 13px; color: #ff8a80;">⚠️ <b>Суть:</b> ${c.reason}</p>
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                        <button class="btn btn-primary" style="padding: 7px 10px; font-size: 11px; flex: 2;" onclick="copyUltimatum('${c.violator}')">📋 Копировать ультиматум</button>
+                        <button class="btn btn-success" style="padding: 7px 10px; font-size: 11px; flex: 1;" onclick="adminCloseCase(${idx}, true)">Оправдать</button>
+                        <button class="btn btn-danger" style="padding: 7px 10px; font-size: 11px; flex: 1;" onclick="adminCloseCase(${idx}, false)">БАН</button>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        window.copyUltimatum = function(username) {
+            const text = `ВНИМАНИЕ! На твой профиль поступила официальная жалоба.\n\nУ тебя есть выбор (выбери ОДИН вариант):\n1. ВИДЕО-КРУЖОК с лицом и фразой: „Гродно 2026“.\n2. Ссылка на открытый Instagram с био: „Гродно 2026“.`;
+            navigator.clipboard.writeText(text).then(() => alert(`Ультиматум для @${username} скопирован!`));
+        };
+
+        window.adminCloseCase = function(index, approved) {
+            alert(approved ? "Дело закрыто. Пользователь оправдан." : "Нарушителю выдан БАН.");
+            complaints.splice(index, 1); localStorage.setItem('gr_complaints_2026', JSON.stringify(complaints));
+            renderAll();
+        };
+    </script>
+</body>
+</html>
+
+        
