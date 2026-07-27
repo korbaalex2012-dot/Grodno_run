@@ -629,7 +629,7 @@ window.submitForm = function() {
         return;
     }
 
-        // 2. Собираем данные из полей формы
+            // 2. Собираем данные из полей формы
     const district = document.getElementById('create-district')?.value || '';
     const exact = document.getElementById('create-exact-place')?.value || '';
     const target = document.getElementById('create-target')?.value || '';
@@ -638,31 +638,47 @@ window.submitForm = function() {
     const ageTo = document.getElementById('create-age-to')?.value || '';
     const desc = document.getElementById('create-desc')?.value || '';
 
-    // 3. Формируем безопасный хэш данных для бота (без засветки токена)
-    const jsonStr = JSON.stringify({
-        d: district, e: exact, t: target, l: link, 
-        af: ageFrom, at: ageTo, desc: desc,
-        lat: window.currentLat || 53.6849, lng: window.currentLng || 23.8342
-    });
-    const encodedPayload = btoa(encodeURIComponent(jsonStr).replace(/%([0-8F][0-9A-F])/g, (match, p1) => String.fromCharCode(parseInt(p1, 16))));
+    // 3. Создаем карточку в локальном массиве приложения
+    const newMeeting = {
+        id: 'meeting-' + Date.now(),
+        district: district,
+        exactPlace: exact,
+        target: target,
+        link: link,
+        ageFrom: ageFrom,
+        ageTo: ageTo,
+        desc: desc,
+        lat: window.currentLat || 53.6849, // Координаты Гродно
+        lng: window.currentLng || 23.8342,
+        time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+        playersCount: 1,
+        isMy: true
+    };
 
-    // 4. Включаем блокировку создания на самом телефоне
+    // Добавляем в общий список радаров на карте
+    if (typeof meetings !== 'undefined') {
+        meetings.push(newMeeting);
+    }
+
+    // 4. Жесткая блокировка: ставим флаг, что у пользователя уже есть активный радар
     localStorage.setItem('my_active_radar', 'true');
+    localStorage.setItem('my_radar_id', newMeeting.id);
 
-    // 5. Выводим уведомление от Telegram
-    Telegram.WebApp.showAlert("🚀 Радар успешно запущен! Подтвердите запуск в открывшемся боте.");
+    // 5. Выводим простое системное окно, как ты просил
+    Telegram.WebApp.showAlert("Радар успешно запущен!");
 
-    // 6. Очищаем поля формы сбора
+    // 6. Полностью очищаем все поля формы сбора
     if(document.getElementById('create-exact-place')) document.getElementById('create-exact-place').value = '';
     if(document.getElementById('create-target')) document.getElementById('create-target').value = '';
     if(document.getElementById('create-link')) document.getElementById('create-link').value = '';
     if(document.getElementById('create-desc')) document.getElementById('create-desc').value = '';
 
-    // 7. Безопасно открываем чат бота и переносим Mini App на главное меню (Радар)
-    Telegram.WebApp.openTelegramLink('https://t.me' + encodedPayload);
+    // 7. Обновляем карту и мгновенно перекидываем в главное меню ПРИЛОЖЕНИЯ
     renderAll();
     const radarTab = document.querySelector('[data-sub="sub-radar"]');
-    if (radarTab) radarTab.click();
+    if (radarTab) {
+        radarTab.click();
+    }
 });
             
                     function renderAll() {
