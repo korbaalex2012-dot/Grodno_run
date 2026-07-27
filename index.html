@@ -695,10 +695,142 @@ window.submitForm = function() {
         });
 
         // 🚀 НАДЁЖНЫЙ КИБЕР-ГЕНЕРАТОР: Перенаправление в бота через защищённый старт-параметр
- document.getElementById('btn-launch-radar').addEventListener('click', async function(e) {
+ // ========================================================
+// ПОДГОТОВКА ДАННЫХ И КУЛЬТОВЫХ ТОЧЕК ГРОДНО
+// ========================================================
+const grodnoLocations = {
+    'Центр (Советская)': {
+        'default': ['У Танка', 'Возле Фары', 'Драмтеатр', 'Парк Жилибера'],
+        '⚽ Спорт': ['Стадион «Неман»', 'Коложский парк (площадка)'],
+        '🚴‍♂️ Велик': ['У Танка', 'Набережная (Старый мост)'],
+        '🎮 Гейминг': ['Компьютерный клуб', 'Антикафе в центре']
+    },
+    'ТЦ Тринити': {
+        'default': ['Главный вход', 'Фуд-корт (3 этаж)', 'Возле Кравта', 'Ледовая арена'],
+        '🚴‍♂️ Велик': ['Велодорожка на Лебедева'],
+        '🎮 Гейминг': ['Зона развлечений (Тринити)']
+    },
+    'OldCity (Олд Сити)': {
+        'default': ['У Замка (атриум внутри)', 'Парковка у входа', 'Фуд-корт']
+    },
+    'Ольшанка': {
+        'default': ['ТЦ Стелла', 'Амбулатория', 'Конечная остановка'],
+        '⚽ Спорт': ['Стадион 41-й школы']
+    },
+    'Девятовка': {
+        'default': ['ТЦ Лимож', 'Костёл', 'Чехов (мини-рынок)', 'Польская школа'],
+        '⚽ Спорт': ['Стадион 27-й школы', 'Площадка на Лиможа']
+    },
+    'Грандичи': {
+        'default': ['Евроопт (Грандичи-3)', 'Новая школа №42', 'Конечная автобусов']
+    },
+    'Пышки (Парк)': {
+        'default': ['Тропа здоровья (вход)', 'Джунгли Парк', 'Меловые карьеры', 'Смотровая у Немана'],
+        '🚴‍♂️ Велик': ['Главный прокат', 'Новый мост (Поповича)']
+    },
+    'БЛК / Форты': {
+        'default': ['Мини-рынок Форты', 'ТЦ Корона (БЛК)', 'Вход в Пышки с БЛК'],
+        '⚽ Спорт': ['Стадион «Красное Знамя» (КЗ)', 'Площадка ГрГУ']
+    }
+};
+
+// !!! ВПИШИ СВОЙ АДРЕС ВОРКЕРА МЕЖДУ КАВЫЧКАМИ НИЖЕ !!!
+const workerUrl = "https://workers.dev";
+
+// ========================================================
+// ЛОГИКА ДИНАМИЧЕСКИХ ПОДСКАЗОК И ИНТЕРФЕЙСА
+// ========================================================
+
+// Функция обновления подсказок на экране
+function updatePlaceTags() {
+    const districtSelect = document.getElementById('create-district');
+    const activeTagInput = document.querySelector('input[name="radar-tag"]:checked');
+    
+    if (!districtSelect) return;
+    
+    const currentDistrict = districtSelect.value;
+    const currentTag = activeTagInput ? activeTagInput.value : 'default';
+    
+    // Ищем блок, куда вставлять теги (создаем его под инпутом точного места, если его нет)
+    const exactPlaceInput = document.getElementById('create-exact-place');
+    if (!exactPlaceInput) return;
+    
+    let tagsContainer = document.getElementById('grodno-tags-container');
+    if (!tagsContainer) {
+        tagsContainer = document.createElement('div');
+        tagsContainer.id = 'grodno-tags-container';
+        tagsContainer.style.cssText = 'display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;';
+        exactPlaceInput.parentNode.insertBefore(tagsContainer, exactPlaceInput.nextSibling);
+    }
+    
+    tagsContainer.innerHTML = ''; // Очищаем старые теги
+    
+    // Получаем массив точек для выбранного района и категории
+    const districtData = grodnoLocations[currentDistrict] || {};
+    const tagsToShow = districtData[currentTag] || districtData['default'] || [];
+    
+    // Рендерим новые кликабельные кнопки-теги
+    tagsToShow.forEach(placeName => {
+        const tagBtn = document.createElement('button');
+        tagBtn.type = 'button';
+        tagBtn.innerText = placeName;
+        tagBtn.style.cssText = 'background:#1a2332; color:#5fa3e4; border:1px solid #2c3e55; padding:6px 12px; border-radius:20px; font-size:12px; cursor:pointer;';
+        
+        // Клик по тегу автоматически заполняет поле
+        tagBtn.addEventListener('click', () => {
+            exactPlaceInput.value = placeName;
+        });
+        
+        tagsContainer.appendChild(tagBtn);
+    });
+}
+
+// Навешиваем динамическое изменение плейсхолдера примет в описании
+function updateDescriptionPlaceholder() {
+    const descInput = document.getElementById('create-desc');
+    if (descInput) {
+        descInput.placeholder = "Кто нужен? Что берём? В чём ты будешь одет(а)? (Например: белая худи, синий велик, буду с собакой...)";
+    }
+}
+
+// Инициализация при загрузке страницы
+document.addEventListener('DOMContentLoaded', () => {
+    updateDescriptionPlaceholder();
+    
+    // Слушаем изменения района и категории движа
+    document.getElementById('create-district')?.addEventListener('change', updatePlaceTags);
+    document.querySelectorAll('input[name="radar-tag"]').forEach(radio => {
+        radio.addEventListener('change', updatePlaceTags);
+    });
+    
+    // Первичный вызов, чтобы теги появились сразу
+    setTimeout(updatePlaceTags, 500);
+    
+    // ОТПРАВКА СТАТИСТИКИ АДМИНУ (Скрытый PING при входе в Mini App)
+    if (window.Telegram?.WebApp) {
+        const initData = window.Telegram.WebApp.initDataUnsafe;
+        const user = initData?.user || {};
+        
+        fetch(workerUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'ping',
+                userId: user.id || 'unknown',
+                firstName: user.first_name || 'Anonymous',
+                username: user.username || ''
+            })
+        }).catch(err => console.log('Stat ping error:', err));
+    }
+});
+
+// ========================================================
+// ОБРАБОТКА НАЖАТИЯ НА КНОПКУ «ЗАПУСТИТЬ РАДАР»
+// ========================================================
+document.getElementById('btn-launch-radar').addEventListener('click', async function(e) {
     e.preventDefault();
 
-    // 1. Сбор и валидация данных
+    // 1. Сбор и валидация
     const district = document.getElementById('create-district')?.value || 'Не указан';
     const exactPlace = document.getElementById('create-exact-place')?.value.trim();
     const desc = document.getElementById('create-desc')?.value.trim() || 'Без описания';
@@ -722,30 +854,31 @@ window.submitForm = function() {
     // 3. Сбор тега настроения
     const tag = document.querySelector('input[name="radar-tag"]:checked')?.value || '🏀 Спорт';
 
-    // 4. Формирование текста сообщения
+    // 4. Формирование текста сообщения с переносами и эмодзи
     const messageText = `🏃‍♂️ *Grodno Run — Поиск компании* 🏃‍♀️\n\n` +
                         `📍 *Район:* ${district}\n` +
                         `🏢 *Место:* ${exactPlace}\n` +
                         `⏰ *Время:* ${timeText}\n` +
                         `🏷 *Категория:* ${tag}\n\n` +
-                        `📝 *Описание:* ${desc}`;
+                        `📝 *Описание/Приметы:* ${desc}`;
 
-    // Визуальный отклик на кнопке (Анимация загрузки)
+    // Переключение кнопки в режим загрузки
     const btn = document.getElementById('btn-launch-radar');
     const originalText = btn.innerText;
     btn.innerText = 'Запуск...';
     btn.disabled = true;
 
-    // 5. Отправка фонового запроса на твой Cloudflare Worker
-    const workerUrl = 'noisy-art-8292.korba-alex2012.workers.dev'; 
-
+    // 5. Отправка основного фонового запроса на Cloudflare Worker
     try {
         const response = await fetch(workerUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ text: messageText })
+            body: JSON.stringify({ 
+                action: 'create_radar',
+                text: messageText 
+            })
         });
 
         if (response.ok) {
@@ -755,7 +888,7 @@ window.submitForm = function() {
         }
     } catch (error) {
         console.error('Network error:', error);
-        alert('Ошибка сети! Проверьте CORS-настройки воркера или подключение.');
+        alert('Ошибка сети! Убедись, что обновил код воркера и включил CORS.');
     } finally {
         btn.innerText = originalText;
         btn.disabled = false;
