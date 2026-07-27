@@ -630,6 +630,14 @@ window.submitForm = function() {
     const exact = document.getElementById('create-exact-place')?.value || '';
     const target = document.getElementById('create-target')?.value || '';
     const link = document.getElementById('create-link')?.value || '';
+document.getElementById('btn-launch-radar').addEventListener('click', (e) => {
+    e.preventDefault(); // Защита от перезагрузки страницы
+
+    // 1. Сбор данных только с существующих полей
+    const district = document.getElementById('create-district')?.value || '';
+    const exact = document.getElementById('create-exact-place')?.value || '';
+    const target = document.getElementById('create-target')?.value || '';
+    const link = document.getElementById('create-link')?.value || '';
     const ageFrom = document.getElementById('create-age-from')?.value || '16';
     const ageTo = document.getElementById('create-age-to')?.value || '22';
     const desc = document.getElementById('create-desc')?.value || '';
@@ -651,9 +659,8 @@ window.submitForm = function() {
         isMy: true
     };
 
-    // 3. Записываем в массив карты
+    // 3. Записываем в массив карты с авто-удалением старого радара (Ограничение: Макс 1 радар)
     if (typeof meetings !== 'undefined') {
-        // Если пользователь уже создавал радар, стираем его перед созданием нового (Макс 1 радар)
         const oldId = localStorage.getItem('my_radar_id');
         if (oldId) {
             const idx = meetings.findIndex(m => m.id === oldId);
@@ -666,22 +673,31 @@ window.submitForm = function() {
     localStorage.setItem('my_active_radar', 'true');
     localStorage.setItem('my_radar_id', newMeeting.id);
 
-    // 5. Показываем всплывающее окно
-    Telegram.WebApp.showAlert("Радар успешно запущен!");
-
-    // 6. Очищаем текстовые поля
+    // 5. Очищаем текстовые поля формы сбора
     if(document.getElementById('create-exact-place')) document.getElementById('create-exact-place').value = '';
     if(document.getElementById('create-target')) document.getElementById('create-target').value = '';
     if(document.getElementById('create-link')) document.getElementById('create-link').value = '';
     if(document.getElementById('create-desc')) document.getElementById('create-desc').value = '';
 
-    // 7. Обновляем графику и переключаем Mini App в главное меню
+    // 6. Обновляем графику карты Гродно
     renderAll();
-    const radarTab = document.querySelector('[data-sub="sub-radar"]');
-    if (radarTab) {
-        radarTab.click();
+
+    // 7. НАПРЯМУЮ переключаем экраны приложения на вкладку Радар (Главное меню)
+    const allScreens = document.querySelectorAll('.sub-page, .tab-content, #screen-radar, #screen-create');
+    allScreens.forEach(screen => {
+        if(screen) screen.style.display = 'none';
+    });
+    
+    const mainRadarScreen = document.getElementById('screen-radar') || document.querySelector('[data-page="radar"]');
+    if (mainRadarScreen) {
+        mainRadarScreen.style.display = 'block';
     }
-});         
+
+    // 8. Показываем всплывающее окно Telegram ПОВЕРХ главного меню
+    setTimeout(() => {
+        Telegram.WebApp.showAlert("Радар успешно запущен!");
+    }, 100);
+});      
                     function renderAll() {
             renderMeetingsList();
             renderArchiveList();
