@@ -372,7 +372,7 @@
                 </div>
             </div>
 
-          <button type="button" id="btn-launch-radar" class="btn btn-primary" style="margin-bottom: 25px;" onclick="if(document.getElementById('create-exact-place')) document.getElementById('create-exact-place').value=''; if(document.getElementById('create-target')) document.getElementById('create-target').value=''; if(document.getElementById('create-link')) document.getElementById('create-link').value=''; if(document.getElementById('create-desc')) document.getElementById('create-desc').value=''; document.querySelectorAll('.sub-page, .tab-content, #screen-create, [data-page]').forEach(s=>{if(s) s.style.display='none';}); const mSc=document.getElementById('screen-radar')||document.querySelector('[data-page=&quot;radar&quot;]'); if(mSc){mSc.style.display='block';} document.querySelectorAll('.nav-item, [data-tab]').forEach(i=>{if(i) i.classList.remove('active');}); const aBt=document.querySelector('[data-tab=&quot;radar&quot;]')||document.querySelector('.nav-item'); if(aBt){aBt.classList.add('active');} Telegram.WebApp.showAlert('Радар успешно запущен!');">
+          <button type="submit" id="btn-launch-radar" class="btn btn-primary" style="margin-bottom: 25px;">
                 🚀 Запустить радар сбора
             </button>
         </div>
@@ -622,65 +622,23 @@ window.submitForm = function() {
         });
 
         // 🚀 НАДЁЖНЫЙ КИБЕР-ГЕНЕРАТОР: Перенаправление в бота через защищённый старт-параметр
-         document.getElementById('btn-launch-radar').addEventListener('click', (e) => {
+        document.getElementById('btn-launch-radar').addEventListener('click', (e) => {
     e.preventDefault();
-    try {
-        const district = document.getElementById('create-district')?.value || '';
-        const exact = document.getElementById('create-exact-place')?.value || '';
-        const target = document.getElementById('create-target')?.value || '';
-        const link = document.getElementById('create-link')?.value || '';
-        const ageFrom = document.getElementById('create-age-from')?.value || '16';
-        const ageTo = document.getElementById('create-age-to')?.value || '22';
-        const desc = document.getElementById('create-desc')?.value || '';
 
-        const newMeeting = {
-            id: 'meeting-' + Date.now(),
-            district: district,
-            exactPlace: exact,
-            target: target,
-            link: link,
-            ageFrom: ageFrom,
-            ageTo: ageTo,
-            desc: desc,
-            lat: window.currentLat || 53.6849, 
-            lng: window.currentLng || 23.8342,
-            time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-            playersCount: 1,
-            isMy: true
-        };
+    // 1. Показываем то самое простое окно с кнопкой ОК
+    alert("Радар успешно запущен!");
 
-        if (typeof meetings !== 'undefined' && Array.isArray(meetings)) {
-            const oldId = localStorage.getItem('my_radar_id');
-            if (oldId) {
-                const idx = meetings.findIndex(m => m.id === oldId);
-                if (idx !== -1) meetings.splice(idx, 1);
-            }
-            meetings.push(newMeeting);
-        }
+    // 2. Очищаем все текстовые поля формы сбора
+    if(document.getElementById('create-exact-place')) document.getElementById('create-exact-place').value = '';
+    if(document.getElementById('create-target')) document.getElementById('create-target').value = '';
+    if(document.getElementById('create-link')) document.getElementById('create-link').value = '';
+    if(document.getElementById('create-desc')) document.getElementById('create-desc').value = '';
 
-        localStorage.setItem('my_active_radar', 'true');
-        localStorage.setItem('my_radar_id', newMeeting.id);
-
-        if(document.getElementById('create-exact-place')) document.getElementById('create-exact-place').value = '';
-        if(document.getElementById('create-target')) document.getElementById('create-target').value = '';
-        if(document.getElementById('create-link')) document.getElementById('create-link').value = '';
-        if(document.getElementById('create-desc')) document.getElementById('create-desc').value = '';
-
-        document.querySelectorAll('.sub-page, .tab-content, #screen-create').forEach(screen => {
-            if(screen) screen.style.display = 'none';
-        });
-        const mainScreen = document.getElementById('screen-radar') || document.querySelector('[data-page="radar"]');
-        if (mainScreen) mainScreen.style.display = 'block';
-
-        document.querySelectorAll('.nav-item, [data-tab]').forEach(item => {
-            if(item) item.classList.remove('active');
-        });
-        const activeBtn = document.querySelector('[data-tab="radar"]') || document.querySelector('.nav-item');
-        if(activeBtn) activeBtn.classList.add('active');
-
-        setTimeout(() => { Telegram.WebApp.showAlert("Радар успешно запущен!"); }, 50);
-    } catch (err) {
-        console.error("Ошибка в кнопке радара:", err);
+    // 3. Мгновенно переключаем экраны Mini App на главное меню
+    renderAll();
+    const radarTab = document.querySelector('[data-sub="sub-radar"]') || document.querySelector('[data-tab="radar"]');
+    if (radarTab) {
+        radarTab.click();
     }
 });
 
