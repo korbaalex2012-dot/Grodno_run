@@ -671,13 +671,22 @@ window.submitForm = function() {
     if(document.getElementById('create-link')) document.getElementById('create-link').value = '';
     if(document.getElementById('create-desc')) document.getElementById('create-desc').value = '';
 
-    // 7. Обновляем карту Гродно и переносим Mini App на главное меню
-    renderAll();
-    const radarTab = document.querySelector('[data-tab="radar"]') || document.querySelector('.nav-item');
-    if (radarTab) {
-        radarTab.click();
+      // 7. НАПРЯМУЮ переключаем экраны интерфейса Mini App на главное меню
+    document.querySelectorAll('.sub-page, .tab-content, #screen-create').forEach(screen => {
+        if(screen) screen.style.display = 'none';
+    });
+    const mainScreen = document.getElementById('screen-radar') || document.querySelector('[data-page="radar"]');
+    if (mainScreen) {
+        mainScreen.style.display = 'block';
     }
-});   
+
+    // Обновляем отображение кнопок нижнего меню
+    document.querySelectorAll('.nav-item, [data-tab]').forEach(item => {
+        if(item) item.classList.remove('active');
+    });
+    const activeBtn = document.querySelector('[data-tab="radar"]') || document.querySelector('.nav-item');
+    if(activeBtn) activeBtn.classList.add('active');
+});
                     function renderAll() {
             renderMeetingsList();
             renderArchiveList();
