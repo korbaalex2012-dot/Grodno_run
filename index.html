@@ -623,56 +623,57 @@ window.submitForm = function() {
 
         // 🚀 НАДЁЖНЫЙ КИБЕР-ГЕНЕРАТОР: Перенаправление в бота через защищённый старт-параметр
         document.getElementById('btn-launch-radar').addEventListener('click', () => {
-            
-            // ⚙️ ВПИШИ СЮДА ЮЗЕРНЕЙМ СВОЕГО БОТА БЕЗ СОБАЧКИ
-            const BOT_USERNAME = "Grodno_Run_bot"; 
-
-            const district = document.getElementById('create-district').value;
-            const exact = document.getElementById('create-exact-place').value || "Указано внутри";
-            const target = document.getElementById('create-target').value || "Прогулка / Чилл";
-            const link = document.getElementById('create-link').value || "";
-            const ageFrom = parseInt(document.getElementById('age-from').value);
-            const ageTo = parseInt(document.getElementById('age-to').value);
-            const mNeed = parseInt(document.getElementById('search-males').value);
-            const fNeed = parseInt(document.getElementById('search-females').value);
-            const desc = document.getElementById('create-desc').value;
-
-            if(!link.startsWith('http')) {
-                alert("Вставь рабочую Telegram ссылку на чат компании!");
-                return;
-            }
-
-            const meetingData = {
-                id: Date.now(), district: district, exactPlace: exact, target: target, chatLink: link,
-                ageFrom: ageFrom, ageTo: ageTo, malesNeeded: mNeed, femalesNeeded: fNeed,
-                malesJoined: 0, femalesJoined: 0, desc: desc, creator: myUsername, timeCreated: Date.now()
-            };
-
-            // Сохраняем карточку локально на устройстве
-            meetings.unshift(meetingData);
-            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
-
-                  // 1. Проверяем по флагу в localStorage, создал ли человек радар
-    const hasActiveRadar = localStorage.getItem('my_active_radar');
-    
-    if (hasActiveRadar === 'true') {
+    // 1. Сразу проверяем блокировку в localStorage
+    if (localStorage.getItem('my_active_radar') === 'true') {
         Telegram.WebApp.showAlert('❌ Вы уже запустили радар! Нельзя создавать более одного радара одновременно. Сначала удалите старый на вкладке "Радар".');
         return;
     }
 
-    // 2. Ставим флаг, что радар теперь активен
+    // 2. Собираем данные из полей формы
+    const district = document.getElementById('create-district')?.value || '';
+    const exact = document.getElementById('create-exact-place')?.value || '';
+    const target = document.getElementById('create-target')?.value || '';
+    const link = document.getElementById('create-link')?.value || '';
+    const ageFrom = document.getElementById('create-age-from')?.value || '';
+    const ageTo = document.getElementById('create-age-to')?.value || '';
+    const desc = document.getElementById('create-desc')?.value || '';
+
+    // 3. Создаем карточку в локальном массиве приложения
+    const newMeeting = {
+        id: 'meeting-' + Date.now(),
+        district: district,
+        exactPlace: exact,
+        target: target,
+        link: link,
+        ageFrom: ageFrom,
+        ageTo: ageTo,
+        desc: desc,
+        lat: window.currentLat || 53.6849, // Координаты Гродно по умолчанию
+        lng: window.currentLng || 23.8342,
+        time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+        playersCount: 1,
+        isMy: true
+    };
+
+    // Добавляем в общий список радаров на карте
+    if (typeof meetings !== 'undefined') {
+        meetings.push(newMeeting);
+    }
+
+    // 4. Включаем блокировку в памяти телефона
     localStorage.setItem('my_active_radar', 'true');
+    localStorage.setItem('my_radar_id', newMeeting.id);
 
-    // 3. Показываем простое окно, как ты хотел
-    Telegram.WebApp.showAlert("🚀 Радар успешно запущен!");
+    // 5. Показываем всплывающее окно Telegram
+    Telegram.WebApp.showAlert("Радар успешно запущен!");
 
-    // 4. Очищаем поля формы сбора
-    document.getElementById('create-exact-place').value = '';
-    document.getElementById('create-target').value = '';
-    document.getElementById('create-link').value = '';
-    document.getElementById('create-desc').value = '';
+    // 6. Очищаем форму
+    if(document.getElementById('create-exact-place')) document.getElementById('create-exact-place').value = '';
+    if(document.getElementById('create-target')) document.getElementById('create-target').value = '';
+    if(document.getElementById('create-link')) document.getElementById('create-link').value = '';
+    if(document.getElementById('create-desc')) document.getElementById('create-desc').value = '';
 
-    // 5. Обновляем карту и переключаем интерфейс на вкладку "Радар"
+    // 7. Обновляем карту и переключаем на вкладку "Радар"
     renderAll();
     const radarTab = document.querySelector('[data-sub="sub-radar"]');
     if (radarTab) {
