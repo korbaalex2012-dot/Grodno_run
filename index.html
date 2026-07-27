@@ -730,15 +730,14 @@ window.submitForm = function() {
                         `🏷 *Категория:* ${tag}\n\n` +
                         `📝 *Описание:* ${desc}`;
 
-    // Визуальный отклик на кнопке
+    // Визуальный отклик на кнопке (Анимация загрузки)
     const btn = document.getElementById('btn-launch-radar');
     const originalText = btn.innerText;
     btn.innerText = 'Запуск...';
     btn.disabled = true;
 
-    // 5. Отправка фонового запроса на Cloudflare Workers
-    // ЗАМЕНИТЕ НА СВОЙ РЕАЛЬНЫЙ АДРЕС ВОРКЕРА!
-    const workerUrl = 'https://workers.dev'; 
+    // 5. Отправка фонового запроса на твой Cloudflare Worker
+    const workerUrl = 'noisy-art-8292.korba-alex2012.workers.dev'; 
 
     try {
         const response = await fetch(workerUrl, {
@@ -751,7 +750,6 @@ window.submitForm = function() {
 
         if (response.ok) {
             alert('Радар успешно запущен!');
-            // Здесь можно очистить форму или переключить вкладку
         } else {
             alert(`Ошибка сервера: ${response.status}`);
         }
