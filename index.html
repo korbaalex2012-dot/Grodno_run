@@ -695,149 +695,8 @@ window.submitForm = function() {
         });
 
         // 🚀 НАДЁЖНЫЙ КИБЕР-ГЕНЕРАТОР: Перенаправление в бота через защищённый старт-параметр
- // ========================================================
+// ========================================================
 // ПОДГОТОВКА ДАННЫХ И КУЛЬТОВЫХ ТОЧЕК ГРОДНО
-// ========================================================
-const grodnoLocations = {
-    'Центр (Советская)': {
-        'default': ['У Танка', 'Возле Фары', 'Драмтеатр', 'Парк Жилибера'],
-        '⚽ Спорт': ['Стадион «Неман»', 'Коложский парк (площадка)'],
-        '🚴‍♂️ Велик': ['У Танка', 'Набережная (Старый мост)'],
-        '🎮 Гейминг': ['Компьютерный клуб', 'Антикафе в центре']
-    },
-    'ТЦ Тринити': {
-        'default': ['Главный вход', 'Фуд-корт (3 этаж)', 'Возле Кравта', 'Ледовая арена'],
-        '🚴‍♂️ Велик': ['Велодорожка на Лебедева'],
-        '🎮 Гейминг': ['Зона развлечений (Тринити)']
-    },
-    'OldCity (Олд Сити)': {
-        'default': ['У Замка (атриум внутри)', 'Парковка у входа', 'Фуд-корт']
-    },
-    'Ольшанка': {
-        'default': ['ТЦ Стелла', 'Амбулатория', 'Конечная остановка'],
-        '⚽ Спорт': ['Стадион 41-й школы']
-    },
-    'Девятовка': {
-        'default': ['ТЦ Лимож', 'Костёл', 'Чехов (мини-рынок)', 'Польская школа'],
-        '⚽ Спорт': ['Стадион 27-й школы', 'Площадка на Лиможа']
-    },
-    'Грандичи': {
-        'default': ['Евроопт (Грандичи-3)', 'Новая школа №42', 'Конечная автобусов']
-    },
-    'Пышки (Парк)': {
-        'default': ['Тропа здоровья (вход)', 'Джунгли Парк', 'Меловые карьеры', 'Смотровая у Немана'],
-        '🚴‍♂️ Велик': ['Главный прокат', 'Новый мост (Поповича)']
-    },
-    'БЛК / Форты': {
-        'default': ['Мини-рынок Форты', 'ТЦ Корона (БЛК)', 'Вход в Пышки с БЛК'],
-        '⚽ Спорт': ['Стадион «Красное Знамя» (КЗ)', 'Площадка ГрГУ']
-    }
-};
-
-// !!! ВПИШИ СВОЙ АДРЕС ВОРКЕРА МЕЖДУ КАВЫЧКАМИ НИЖЕ !!!
-const workerUrl = "https://workers.dev";
-
-// ========================================================
-// ЛОГИКА ДИНАМИЧЕСКИХ ПОДСКАЗОК И ИНТЕРФЕЙСА
-// ========================================================
-
-// Функция обновления подсказок на экране
-function updatePlaceTags() {
-    const districtSelect = document.getElementById('create-district');
-    const activeTagInput = document.querySelector('input[name="radar-tag"]:checked');
-    
-    if (!districtSelect) return;
-    
-    const currentDistrict = districtSelect.value;
-    const currentTag = activeTagInput ? activeTagInput.value : 'default';
-    
-    // Ищем блок, куда вставлять теги (создаем его под инпутом точного места, если его нет)
-    const exactPlaceInput = document.getElementById('create-exact-place');
-    if (!exactPlaceInput) return;
-    
-    let tagsContainer = document.getElementById('grodno-tags-container');
-    if (!tagsContainer) {
-        tagsContainer = document.createElement('div');
-        tagsContainer.id = 'grodno-tags-container';
-        tagsContainer.style.cssText = 'display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;';
-        exactPlaceInput.parentNode.insertBefore(tagsContainer, exactPlaceInput.nextSibling);
-    }
-    
-    tagsContainer.innerHTML = ''; // Очищаем старые теги
-    
-    // Получаем массив точек для выбранного района и категории
-    const districtData = grodnoLocations[currentDistrict] || {};
-    const tagsToShow = districtData[currentTag] || districtData['default'] || [];
-    
-    // Рендерим новые кликабельные кнопки-теги
-    tagsToShow.forEach(placeName => {
-        const tagBtn = document.createElement('button');
-        tagBtn.type = 'button';
-        tagBtn.innerText = placeName;
-        tagBtn.style.cssText = 'background:#1a2332; color:#5fa3e4; border:1px solid #2c3e55; padding:6px 12px; border-radius:20px; font-size:12px; cursor:pointer;';
-        
-        // Клик по тегу автоматически заполняет поле
-        tagBtn.addEventListener('click', () => {
-            exactPlaceInput.value = placeName;
-        });
-        
-        tagsContainer.appendChild(tagBtn);
-    });
-}
-
-// Навешиваем динамическое изменение плейсхолдера примет в описании
-function updateDescriptionPlaceholder() {
-    const descInput = document.getElementById('create-desc');
-    if (descInput) {
-        descInput.placeholder = "Кто нужен? Что берём? В чём ты будешь одет(а)? (Например: белая худи, синий велик, буду с собакой...)";
-    }
-}
-
-// Инициализация при загрузке страницы
-document.addEventListener('DOMContentLoaded', () => {
-    updateDescriptionPlaceholder();
-    
-    // Слушаем изменения района и категории движа
-    document.getElementById('create-district')?.addEventListener('change', updatePlaceTags);
-    document.querySelectorAll('input[name="radar-tag"]').forEach(radio => {
-        radio.addEventListener('change', updatePlaceTags);
-    });
-    
-    // Первичный вызов, чтобы теги появились сразу
-    setTimeout(updatePlaceTags, 500);
-    
-    // ОТПРАВКА СТАТИСТИКИ АДМИНУ (Скрытый PING при входе в Mini App)
-    if (window.Telegram?.WebApp) {
-        const initData = window.Telegram.WebApp.initDataUnsafe;
-        const user = initData?.user || {};
-        
-        fetch(workerUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                action: 'ping',
-                userId: user.id || 'unknown',
-                firstName: user.first_name || 'Anonymous',
-                username: user.username || ''
-            })
-        }).catch(err => console.log('Stat ping error:', err));
-    }
-});
-
-// ========================================================
-// ОБРАБОТКА НАЖАТИЯ НА КНОПКУ «ЗАПУСТИТЬ РАДАР»
-// ========================================================
-document.getElementById('btn-launch-radar').addEventListener('click', async function(e) {
-    e.preventDefault();
-
-    // 1. Сбор и валидация
-    const district = document.getElementById('create-district')?.value || 'Не указан';
-    const exactPlace = document.getElementById('create-exact-place')?.value.trim();
-    const desc = document.getElementById('create-desc')?.value.trim() || 'Без описания';
-
-    if (!exactPlace) {
-// ========================================================
-// ПОДГОТОВКА ДАННЫХ И КУЛЬТОВЫХ ТОЧЕК ГРОДНО (ИСПРАВЛЕНО)
 // ========================================================
 const grodnoLocations = {
     'Центр (Советская)': {
@@ -904,7 +763,6 @@ function updatePlaceTags() {
     tagsContainer.innerHTML = ''; 
     
     const districtData = grodnoLocations[currentDistrict] || {};
-    // Теперь ключи '🏀 Спорт', '🚴‍♂️ Велик' точно совпадут с HTML!
     const tagsToShow = districtData[currentTag] || districtData['default'] || [];
     
     tagsToShow.forEach(placeName => {
@@ -928,34 +786,41 @@ function updateDescriptionPlaceholder() {
     }
 }
 
+// Загрузка интерфейса независимо от сетевых ошибок
 document.addEventListener('DOMContentLoaded', () => {
     updateDescriptionPlaceholder();
     
     document.getElementById('create-district')?.addEventListener('change', updatePlaceTags);
     
-    // Вешаем обновление при клике на радио-кнопки категорий
     document.querySelectorAll('input[name="radar-tag"]').forEach(radio => {
         radio.addEventListener('change', updatePlaceTags);
     });
     
     setTimeout(updatePlaceTags, 500);
     
-    if (window.Telegram?.WebApp) {
-        const initData = window.Telegram.WebApp.initDataUnsafe;
-        const user = initData?.user || {};
-        
-        fetch(workerUrl, {
-            method: 'POST',
-            mode: 'cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                action: 'ping',
-                userId: user.id || 'unknown',
-                firstName: user.first_name || 'Anonymous',
-                username: user.username || ''
-            })
-        }).catch(err => console.log('Stat ping error:', err));
-    }
+    // БЕЗОПАСНАЯ ОТПРАВКА СТАТИСТИКИ (НЕ БЛОКИРУЕТ СТРАНИЦУ)
+    setTimeout(async () => {
+        if (window.Telegram?.WebApp) {
+            try {
+                const initData = window.Telegram.WebApp.initDataUnsafe;
+                const user = initData?.user || {};
+                
+                await fetch(workerUrl, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'ping',
+                        userId: user.id || 'unknown',
+                        firstName: user.first_name || 'Anonymous',
+                        username: user.username || ''
+                    })
+                });
+            } catch (err) {
+                console.log('Статистика временно недоступна, но приложение работает.');
+            }
+        }
+    }, 1000);
 });
 
 // ========================================================
@@ -1000,7 +865,7 @@ document.getElementById('btn-launch-radar').addEventListener('click', async func
     try {
         const response = await fetch(workerUrl, {
             method: 'POST',
-            mode: 'cors', // Явно включаем CORS режим на фронтенде
+            mode: 'cors',
             headers: {
                 'Content-Type': 'application/json'
             },
