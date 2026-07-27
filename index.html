@@ -622,14 +622,17 @@ window.submitForm = function() {
         });
 
         // 🚀 НАДЁЖНЫЙ КИБЕР-ГЕНЕРАТОР: Перенаправление в бота через защищённый старт-параметр
-        document.getElementById('btn-launch-radar').addEventListener('click', () => {
-    // 1. Сразу проверяем блокировку в localStorage
-    if (localStorage.getItem('my_active_radar') === 'true') {
-        Telegram.WebApp.showAlert('❌ Вы уже запустили радар! Нельзя создавать более одного радара одновременно. Сначала удалите старый на вкладке "Радар".');
-        return;
+    document.getElementById('btn-launch-radar').addEventListener('click', () => {
+    // 1. Защита: Если радар уже создан, удаляем старый перед созданием нового
+    const oldRadarId = localStorage.getItem('my_radar_id');
+    if (oldRadarId && typeof meetings !== 'undefined') {
+        const index = meetings.findIndex(m => m.id === oldRadarId);
+        if (index !== -1) {
+            meetings.splice(index, 1); // Удаляем старую точку с карты
+        }
     }
 
-            // 2. Собираем данные из полей формы
+    // 2. Собираем данные из полей формы
     const district = document.getElementById('create-district')?.value || '';
     const exact = document.getElementById('create-exact-place')?.value || '';
     const target = document.getElementById('create-target')?.value || '';
@@ -638,7 +641,7 @@ window.submitForm = function() {
     const ageTo = document.getElementById('create-age-to')?.value || '';
     const desc = document.getElementById('create-desc')?.value || '';
 
-    // 3. Создаем карточку в локальном массиве приложения
+    // 3. Создаем ОДИН новый радар
     const newMeeting = {
         id: 'meeting-' + Date.now(),
         district: district,
@@ -655,32 +658,31 @@ window.submitForm = function() {
         isMy: true
     };
 
-    // Добавляем в общий список радаров на карте
+    // Добавляем радар в общий массив для отрисовки
     if (typeof meetings !== 'undefined') {
         meetings.push(newMeeting);
     }
 
-    // 4. Жесткая блокировка: ставим флаг, что у пользователя уже есть активный радар
+    // 4. Записываем ID нового радара в память устройства
     localStorage.setItem('my_active_radar', 'true');
     localStorage.setItem('my_radar_id', newMeeting.id);
 
-    // 5. Выводим простое системное окно, как ты просил
+    // 5. Показываем простое текстовое уведомление Telegram
     Telegram.WebApp.showAlert("Радар успешно запущен!");
 
-    // 6. Полностью очищаем все поля формы сбора
+    // 6. Очищаем форму сбора
     if(document.getElementById('create-exact-place')) document.getElementById('create-exact-place').value = '';
     if(document.getElementById('create-target')) document.getElementById('create-target').value = '';
     if(document.getElementById('create-link')) document.getElementById('create-link').value = '';
     if(document.getElementById('create-desc')) document.getElementById('create-desc').value = '';
 
-    // 7. Обновляем карту и мгновенно перекидываем в главное меню ПРИЛОЖЕНИЯ
+    // 7. Переключаем Mini App в главное меню приложения (вкладка Радар)
     renderAll();
     const radarTab = document.querySelector('[data-sub="sub-radar"]');
     if (radarTab) {
         radarTab.click();
     }
-});
-            
+});            
                     function renderAll() {
             renderMeetingsList();
             renderArchiveList();
