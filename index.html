@@ -689,7 +689,7 @@ window.submitForm = function() {
         });
 
         // 🚀 НАДЁЖНЫЙ КИБЕР-ГЕНЕРАТОР: Перенаправление в бота через защищённый старт-параметр
-      dodocument.getElementById('btn-launch-radar').addEventListener('click', async (e) => {
+      document.getElementById('btn-launch-radar').addEventListener('click', async (e) => {
     e.preventDefault();
 
     // 1. Сбор данных из полей формы
@@ -705,33 +705,31 @@ window.submitForm = function() {
     const rawData = JSON.stringify({ d: district, e: exact, t: target, l: link, af: ageFrom, at: ageTo, desc: desc, lat: window.currentLat || 53.6849, lng: window.currentLng || 23.8342 });
     const encodedPayload = btoa(encodeURIComponent(rawData).replace(/%([0-8F][0-9A-F])/g, (match, p1) => String.fromCharCode(parseInt(p1, 16))));
 
-    // Показываем стандартное окно успешного запуска
+    // 3. Мгновенно выводим текстовое окно
     alert("Радар успешно запущен!");
 
-    // 3. Отправляем данные на твой вечный бесплатный Cloudflare Worker
+    // 4. Отправляем данные на твой рабочий Cloudflare Worker
     try {
         const WORKER_URL = "https://workers.dev"; 
-
         fetch(WORKER_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ payload: encodedPayload })
-        });
+        }).catch(err => console.error("Ошибка запроса fetch:", err));
     } catch(err) {
         console.error("Ошибка сети сервера:", err);
     }
 
-    // 4. Очищаем форму
+    // 5. Очищаем форму
     if(document.getElementById('create-exact-place')) document.getElementById('create-exact-place').value = '';
     if(document.getElementById('create-target')) document.getElementById('create-target').value = '';
     if(document.getElementById('create-link')) document.getElementById('create-link').value = '';
     if(document.getElementById('create-desc')) document.getElementById('create-desc').value = '';
 
-    // 5. Мгновенно переносим Mini App на главное меню (Радар)
+    // 6. Переносим Mini App на главное меню (Радар)
+    renderAll();
     if (typeof loadRadarsFromChannel === 'function') {
-        setTimeout(loadRadarsFromChannel, 1000); // Подгружаем новые точки через секунду
-    } else {
-        renderAll();
+        setTimeout(loadRadarsFromChannel, 800);
     }
     
     const radarTab = document.querySelector('[data-tab="radar"]') || document.querySelector('[data-sub="sub-radar"]');
