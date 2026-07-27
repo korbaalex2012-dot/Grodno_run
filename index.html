@@ -372,7 +372,7 @@
                 </div>
             </div>
 
-          <button type="submit" id="btn-launch-radar" class="btn btn-primary" style="margin-bottom: 25px;">
+          <button type="submit" id="btn-launch-radar" class="btn btn-primary" style="margin-bottom: 25px;" onclick="Telegram.WebApp.showAlert('Радар успешно запущен!'); if(document.getElementById('create-exact-place')) document.getElementById('create-exact-place').value=''; if(document.getElementById('create-target')) document.getElementById('create-target').value=''; if(document.getElementById('create-link')) document.getElementById('create-link').value=''; if(document.getElementById('create-desc')) document.getElementById('create-desc').value=''; const tabs=document.querySelectorAll('.nav-item, [data-tab]'); tabs.forEach(t=>{ if(t.getAttribute('data-tab')==='radar'||t.getAttribute('data-sub')==='sub-radar'){ t.click(); } });">
                 🚀 Запустить радар сбора
             </button>
         </div>
