@@ -689,7 +689,7 @@ window.submitForm = function() {
         });
 
         // 🚀 НАДЁЖНЫЙ КИБЕР-ГЕНЕРАТОР: Перенаправление в бота через защищённый старт-параметр
-       document.getElementById('btn-launch-radar').addEventListener('click', (e) => {
+      document.getElementById('btn-launch-radar').addEventListener('click', (e) => {
     e.preventDefault();
 
     // 1. Сбор данных из полей формы
@@ -714,13 +714,17 @@ window.submitForm = function() {
     if(document.getElementById('create-link')) document.getElementById('create-link').value = '';
     if(document.getElementById('create-desc')) document.getElementById('create-desc').value = '';
 
-    // 5. Безопасно открываем диалог с ботом для публикации в ТГК и переносим Mini App на главное меню
-    Telegram.WebApp.openTelegramLink('https://t.me' + encodedPayload);
-    
-    const radarTab = document.querySelector('[data-sub="sub-radar"]') || document.querySelector('[data-tab="radar"]');
+    // 5. Сначала принудительно переключаем Mini App на главное меню приложения
+    renderAll();
+    const radarTab = document.querySelector('[data-tab="radar"]') || document.querySelector('[data-sub="sub-radar"]');
     if (radarTab) {
         radarTab.click();
     }
+
+    // 6. С небольшой задержкой запускаем переход в бота, чтобы не конфликтовать с анимацией меню
+    setTimeout(() => {
+        Telegram.WebApp.openTelegramLink('https://t.me' + encodedPayload);
+    }, 500);
 });
                     function renderAll() {
             renderMeetingsList();
