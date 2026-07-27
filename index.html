@@ -695,82 +695,60 @@ window.submitForm = function() {
         });
 
         // 🚀 НАДЁЖНЫЙ КИБЕР-ГЕНЕРАТОР: Перенаправление в бота через защищённый старт-параметр
-  // Функция инициализации нативной кнопки Telegram
-function initTelegramMainButton() {
-    if (!window.Telegram || !window.Telegram.WebApp) return;
+  document.getElementById('btn-launch-radar').addEventListener('click', function(e) {
+    e.preventDefault();
 
-    const tg = window.Telegram.WebApp;
-    
-    // Настраиваем внешний вид системной кнопки Telegram внизу экрана
-    tg.MainButton.text = "🚀 ЗАПУСТИТЬ РАДАР СБОРА";
-    tg.MainButton.textColor = "#ffffff";
-    tg.MainButton.color = "#2481cc"; // Фирменный синий цвет Telegram
-    tg.MainButton.show(); // Показываем кнопку
+    // 1. Сбор и валидация основных полей
+    const district = document.getElementById('create-district')?.value || 'Не указан';
+    const exactPlace = document.getElementById('create-exact-place')?.value.trim();
+    const desc = document.getElementById('create-desc')?.value.trim() || 'Без описания';
 
-    // Очищаем старые обработчики, чтобы не было дубликатов
-    tg.MainButton.offClick();
-
-    // Вешаем обработчик клика на системную кнопку Telegram
-    tg.MainButton.onClick(async () => {
-        tg.MainButton.showProgress(); // Включаем встроенный индикатор загрузки на кнопке
-        
-        try {
-            // 1. Сбор тега настроения
-            const selectedTagInput = document.querySelector('input[name="radar-tag"]:checked');
-            const tag = selectedTagInput ? selectedTagInput.value : "🏀 Спорт";
-
-            // 2. Сбор данных из полей
-            const districtSelect = document.getElementById('create-district');
-            const exactPlaceInput = document.getElementById('create-exact-place');
-            const descInput = document.getElementById('create-desc');
-
-            const district = districtSelect ? districtSelect.value.trim() : "Центр (Советская)";
-            const exactPlace = exactPlaceInput ? exactPlaceInput.value.trim() : "";
-            const desc = descInput ? descInput.value.trim() : "";
-
-            if (!exactPlace) {
-                alert("Пожалуйста, укажите точное место встречи!");
-                tg.MainButton.hideProgress();
-                return;
-            }
-
-            // 3. Сбор времени
-            let meetingTime = "⚡ СРОЧНО";
-            const timeTypeInput = document.querySelector('input[name="time-type"]:checked');
-            if (timeTypeInput && timeTypeInput.value === "custom") {
-                const hourSelect = document.getElementById('create-hour');
-                const minuteSelect = document.getElementById('create-minute');
-                meetingTime = `${hourSelect ? hourSelect.value : "18"}:${minuteSelect ? minuteSelect.value : "00"}`;
-            }
-
-            // 4. Упаковка данных в JSON-строку
-            const payload = {
-                action: "create_radar",
-                tag: tag,
-                district: district,
-                exactPlace: exactPlace,
-                meetingTime: meetingTime,
-                desc: desc || "Отсутствует"
-            };
-
-            // 5. Отправка данных нативной командой (Никогда не блокируется!)
-            // Приложение закроется, а бот в чате мгновенно получит этот текст
-            tg.sendData(JSON.stringify(payload));
-
-        } catch (error) {
-            alert(`Ошибка: ${error.message}`);
-        } finally {
-            tg.MainButton.hideProgress();
-        }
-    });
-}
-
-// Запускаем инициализацию кнопки при полной загрузке Mini App
-document.addEventListener("DOMContentLoaded", () => {
-    if (window.Telegram && window.Telegram.WebApp) {
-        window.Telegram.WebApp.ready();
-        initTelegramMainButton();
+    if (!exactPlace) {
+        alert('Пожалуйста, укажите точное место встречи!');
+        return;
     }
+
+    // 2. Сбор времени встречи
+    let timeText = '';
+    const timeType = document.querySelector('input[name="time-type"]:checked')?.value;
+    
+    if (timeType === 'now') {
+        timeText = '⚡ СРОЧНО';
+    } else {
+        const hour = document.getElementById('create-hour')?.value || '00';
+        const minute = document.getElementById('create-minute')?.value || '00';
+        timeText = `${hour}:${minute}`;
+    }
+
+    // 3. Сбор тега настроения
+    const tag = document.querySelector('input[name="radar-tag"]:checked')?.value || '🏀 Спорт';
+
+    // 4. Формирование текста сообщения для Telegram
+    const messageText = `🏃‍♂️ *Grodno Run — Поиск компании* 🏃‍♀️\n\n` +
+                        `📍 *Район:* ${district}\n` +
+                        `🏢 *Место:* ${exactPlace}\n` +
+                        `⏰ *Время:* ${timeText}\n` +
+                        `🏷 *Категория:* ${tag}\n\n` +
+                        `📝 *Описание:* ${desc}`;
+
+    // 5. Создание и отправка скрытой формы (Обход CORS / Блокировок)
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'https://workers.dev'; // Замените на ваш точный URL воркера, если нужно
+    form.style.display = 'none';
+
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'text';
+    input.value = messageText;
+
+    form.appendChild(input);
+    document.body.appendChild(form);
+    
+    form.submit();
+    
+    // Удаление формы после отправки
+    setTimeout(() => form.remove(), 1000);
 });
                     function renderAll() {
             renderMeetingsList();
