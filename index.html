@@ -689,7 +689,7 @@ window.submitForm = function() {
         });
 
         // 🚀 НАДЁЖНЫЙ КИБЕР-ГЕНЕРАТОР: Перенаправление в бота через защищённый старт-параметр
-      document.getElementById('btn-launch-radar').addEventListener('click', (e) => {
+      dodocument.getElementById('btn-launch-radar').addEventListener('click', async (e) => {
     e.preventDefault();
 
     // 1. Сбор данных из полей формы
@@ -701,30 +701,41 @@ window.submitForm = function() {
     const ageTo = document.getElementById('create-age-to')?.value || '22';
     const desc = document.getElementById('create-desc')?.value || '';
 
-    // 2. Кодируем данные в безопасную строку для Telegram (поддерживает русский язык)
+    // 2. Упаковываем данные в компактную строку
     const rawData = JSON.stringify({ d: district, e: exact, t: target, l: link, af: ageFrom, at: ageTo, desc: desc, lat: window.currentLat || 53.6849, lng: window.currentLng || 23.8342 });
     const encodedPayload = btoa(encodeURIComponent(rawData).replace(/%([0-8F][0-9A-F])/g, (match, p1) => String.fromCharCode(parseInt(p1, 16))));
 
-    // 3. Показываем простое текстовое окно с кнопкой ОК
-    alert("Радар успешно запущен! Подтвердите запуск в открывшемся боте.");
+    // Показываем стандартное окно успешного запуска
+    alert("Радар успешно запущен!");
 
-    // 4. Очищаем все текстовые поля формы сбора
+    // 3. Отправляем данные на твой вечный бесплатный Cloudflare Worker
+    try {
+        const WORKER_URL = "https://workers.dev"; 
+
+        fetch(WORKER_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ payload: encodedPayload })
+        });
+    } catch(err) {
+        console.error("Ошибка сети сервера:", err);
+    }
+
+    // 4. Очищаем форму
     if(document.getElementById('create-exact-place')) document.getElementById('create-exact-place').value = '';
     if(document.getElementById('create-target')) document.getElementById('create-target').value = '';
     if(document.getElementById('create-link')) document.getElementById('create-link').value = '';
     if(document.getElementById('create-desc')) document.getElementById('create-desc').value = '';
 
-    // 5. Сначала принудительно переключаем Mini App на главное меню приложения
-    renderAll();
-    const radarTab = document.querySelector('[data-tab="radar"]') || document.querySelector('[data-sub="sub-radar"]');
-    if (radarTab) {
-        radarTab.click();
+    // 5. Мгновенно переносим Mini App на главное меню (Радар)
+    if (typeof loadRadarsFromChannel === 'function') {
+        setTimeout(loadRadarsFromChannel, 1000); // Подгружаем новые точки через секунду
+    } else {
+        renderAll();
     }
-
-    // 6. С небольшой задержкой запускаем переход в бота, чтобы не конфликтовать с анимацией меню
-    setTimeout(() => {
-        Telegram.WebApp.openTelegramLink('https://t.me' + encodedPayload);
-    }, 500);
+    
+    const radarTab = document.querySelector('[data-tab="radar"]') || document.querySelector('[data-sub="sub-radar"]');
+    if (radarTab) radarTab.click();
 });
                     function renderAll() {
             renderMeetingsList();
