@@ -695,10 +695,10 @@ window.submitForm = function() {
         });
 
         // 🚀 НАДЁЖНЫЙ КИБЕР-ГЕНЕРАТОР: Перенаправление в бота через защищённый старт-параметр
-  document.getElementById('btn-launch-radar').addEventListener('click', function(e) {
+ document.getElementById('btn-launch-radar').addEventListener('click', async function(e) {
     e.preventDefault();
 
-    // 1. Сбор и валидация основных полей
+    // 1. Сбор и валидация данных
     const district = document.getElementById('create-district')?.value || 'Не указан';
     const exactPlace = document.getElementById('create-exact-place')?.value.trim();
     const desc = document.getElementById('create-desc')?.value.trim() || 'Без описания';
@@ -708,10 +708,9 @@ window.submitForm = function() {
         return;
     }
 
-    // 2. Сбор времени встречи
+    // 2. Расчет времени встречи
     let timeText = '';
     const timeType = document.querySelector('input[name="time-type"]:checked')?.value;
-    
     if (timeType === 'now') {
         timeText = '⚡ СРОЧНО';
     } else {
@@ -723,7 +722,7 @@ window.submitForm = function() {
     // 3. Сбор тега настроения
     const tag = document.querySelector('input[name="radar-tag"]:checked')?.value || '🏀 Спорт';
 
-    // 4. Формирование текста сообщения для Telegram
+    // 4. Формирование текста сообщения
     const messageText = `🏃‍♂️ *Grodno Run — Поиск компании* 🏃‍♀️\n\n` +
                         `📍 *Район:* ${district}\n` +
                         `🏢 *Место:* ${exactPlace}\n` +
@@ -731,24 +730,38 @@ window.submitForm = function() {
                         `🏷 *Категория:* ${tag}\n\n` +
                         `📝 *Описание:* ${desc}`;
 
-    // 5. Создание и отправка скрытой формы (Обход CORS / Блокировок)
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = 'https://workers.dev'; // Замените на ваш точный URL воркера, если нужно
-    form.style.display = 'none';
+    // Визуальный отклик на кнопке
+    const btn = document.getElementById('btn-launch-radar');
+    const originalText = btn.innerText;
+    btn.innerText = 'Запуск...';
+    btn.disabled = true;
 
-    const input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = 'text';
-    input.value = messageText;
+    // 5. Отправка фонового запроса на Cloudflare Workers
+    // ЗАМЕНИТЕ НА СВОЙ РЕАЛЬНЫЙ АДРЕС ВОРКЕРА!
+    const workerUrl = 'https://workers.dev'; 
 
-    form.appendChild(input);
-    document.body.appendChild(form);
-    
-    form.submit();
-    
-    // Удаление формы после отправки
-    setTimeout(() => form.remove(), 1000);
+    try {
+        const response = await fetch(workerUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ text: messageText })
+        });
+
+        if (response.ok) {
+            alert('Радар успешно запущен!');
+            // Здесь можно очистить форму или переключить вкладку
+        } else {
+            alert(`Ошибка сервера: ${response.status}`);
+        }
+    } catch (error) {
+        console.error('Network error:', error);
+        alert('Ошибка сети! Проверьте CORS-настройки воркера или подключение.');
+    } finally {
+        btn.innerText = originalText;
+        btn.disabled = false;
+    }
 });
                     function renderAll() {
             renderMeetingsList();
