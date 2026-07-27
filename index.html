@@ -419,6 +419,73 @@
         </div>
         </div>
         <script>
+            // Функция автоматической загрузки активных радаров из Telegram-канала (БЕЗ токена!)
+async function loadRadarsFromChannel() {
+    try {
+        // Запрашиваем публичный веб-виджет истории твоего ТГК
+        const response = await fetch('https://allorigins.win' + encodeURIComponent('https://t.me'));
+        const data = await response.json();
+        const html = data.contents;
+        
+        // Массив для очистки старых и записи новых радаров
+        if (typeof meetings === 'undefined') window.meetings = [];
+        meetings.length = 0; 
+
+        // Ищем посты с зашифрованными хэшами во фрейме канала
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const messages = doc.querySelectorAll('.tgme_widget_message_text');
+        const times = doc.querySelectorAll('.time');
+
+        messages.forEach((msg, index) => {
+            const text = msg.innerText;
+            // Ищем ключевое слово, по которому Mini App поймет, что это карточка радара
+            if (text.includes('RADAR_DATA:')) {
+                const base64Data = text.split('RADAR_DATA:')[1].trim();
+                
+                // Расшифровываем хэш с полной поддержкой кириллицы
+                const rawJson = decodeURIComponent(atob(base64Data).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                
+                const parsed = JSON.parse(rawJson);
+                
+                // Проверка таймера жизни сходки: игнорируем посты старше 3 часов (10800000 мс)
+                const postTimeAttr = times[index]?.getAttribute('datetime');
+                const postTimestamp = postTimeAttr ? new Date(postTimeAttr).getTime() : Date.now();
+                if (Date.now() - postTimestamp > 10800000) return; 
+
+                // Собираем валидную карточку для карты Гродно
+                meetings.push({
+                    id: 'meeting-' + postTimestamp,
+                    district: parsed.d,
+                    exactPlace: parsed.e,
+                    target: parsed.t,
+                    link: parsed.l,
+                    ageFrom: parsed.af,
+                    ageTo: parsed.at,
+                    desc: parsed.desc,
+                    lat: parsed.lat,
+                    lng: parsed.lng,
+                    time: new Date(postTimestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                    playersCount: 1
+                });
+            }
+        });
+        
+        // Перерисовываем карту и списки с новыми точками
+        if (typeof renderAll === 'function') renderAll();
+    } catch (e) {
+        console.error("Ошибка загрузки базы из ТГК:", e);
+    }
+}
+
+// Запускаем сканирование канала сразу при входе в игру
+document.addEventListener('DOMContentLoaded', () => {
+    loadRadarsFromChannel();
+    // Обновляем карту каждые 30 секунд в фоне
+    setInterval(loadRadarsFromChannel, 30000);
+});      
             // Перехватываем управление кнопкой, чтобы убрать ошибку
 window.submitForm = function() {
     alert("Шаг 1 пройден! Кнопка больше не ломает игру.");
