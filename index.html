@@ -313,66 +313,70 @@
                     </select>
                 </div>
 
-                <div class="form-group">
-                    <label>🏢 Точный адрес / Точка встречи (Пиши сам руками)</label>
-                    <input type="text" id="create-exact-place" placeholder="Например: у фонтана / фудкорт 2 этаж / лавочки">
-                    <div class="tags-suggest">
-                        <span class="tag-btn" onclick="applyPlaceTag('возле фонтана')">#у_фонтана</span>
-                        <span class="tag-btn" onclick="applyPlaceTag('на фудкорте')">#на_фудкорте</span>
-                        <span class="tag-btn" onclick="applyPlaceTag('главный вход')">#главный_вход</span>
-                    </div>
-                </div>
-                                <div class="form-group">
-                    <label>🎯 Цель сбора (Свободный ввод руками)</label>
-                    <input type="text" id="create-target" placeholder="Например: Поиграть в футбол / Катка на самокатах / Чилл">
-                    <div class="tags-suggest">
-                        <span class="tag-btn" onclick="applyTargetTag('Прогулка / Чилл')">#progulka</span>
-                        <span class="tag-btn" onclick="applyTargetTag('Погонять в футбол')">#football</span>
-                        <span class="tag-btn" onclick="applyTargetTag('Катка на самокатах')">#samokaty</span>
-                    </div>
-                </div>
+                <div class="form-group" style="margin-top: 15px;">
+    <label class="cyber-label">🎯 Точное место встречи:</label>
+    <input type="text" id="create-exact-place" class="cyber-input" placeholder="Например: Коробка на Ожешко, Скейт-парк">
+</div>
 
-                <div class="form-group">
-                    <label>🔗 Ссылка на чат банды (Telegram ссылка)</label>
-                    <input type="text" id="create-link" placeholder="https://t.me">
-                    <p class="hint">Сюда автоматически перейдут все, кто нажмет кнопку «⚡ Буду на месте»</p>
-                </div>
+<div class="form-group">
+    <label class="cyber-label">🔥 Категория (Тег настроения):</label>
+    <div class="cyber-tags-container" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 5px;">
+        <input type="radio" id="tag-sport" name="radar-tag" value="🏀 Спорт" checked style="display:none;">
+        <label for="tag-sport" class="cyber-tag-btn" style="padding: 8px 12px; border: 1px solid #00f0ff; color: #00f0ff; border-radius: 4px; cursor: pointer; display: inline-block;">🏀 Спорт</label>
 
-                <div class="form-group">
-                    <label>🔞 Желаемый возраст компании</label>
-                    <div style="display: flex; gap: 10px; align-items: center;">
-                        От <input type="number" id="age-from" value="16" style="width: 80px;">
-                        До <input type="number" id="age-to" value="22" style="width: 80px;">
-                    </div>
-                </div>
+        <input type="radio" id="tag-bike" name="radar-tag" value="🚲 Велик" style="display:none;">
+        <label for="tag-bike" class="cyber-tag-btn" style="padding: 8px 12px; border: 1px solid #00f0ff; color: #00f0ff; border-radius: 4px; cursor: pointer; display: inline-block;">🚲 Велик</label>
 
-                <div class="form-group">
-                    <label>👥 Сколько человек не хватает в команде?</label>
-                    <div class="counter-row">
-                        <span>Нужно парней</span>
-                        <div class="counter">
-                            <button type="button" class="btn-minus" data-target="search-males">-</button>
-                            <input type="number" id="search-males" value="1" readonly>
-                            <button type="button" class="btn-plus" data-target="search-males">+</button>
-                        </div>
-                    </div>
-                    <div class="counter-row" style="margin-top: 10px;">
-                        <span>Нужно девушек</span>
-                        <div class="counter">
-                            <button type="button" class="btn-minus" data-target="search-females">-</button>
-                            <input type="number" id="search-females" value="1" readonly>
-                            <button type="button" class="btn-plus" data-target="search-females">+</button>
-                        </div>
-                    </div>
-                </div>
+        <input type="radio" id="tag-game" name="radar-tag" value="🎮 Гейминг" style="display:none;">
+        <label for="tag-game" class="cyber-tag-btn" style="padding: 8px 12px; border: 1px solid #00f0ff; color: #00f0ff; border-radius: 4px; cursor: pointer; display: inline-block;">🎮 Гейминг</label>
 
-                <div class="form-group">
-                    <label>📝 Описание (Макс. 120 символов)</label>
-                    <textarea id="create-desc" maxlength="120" placeholder="Что конкретно будете делать? Сбор строго вовремя!"></textarea>
-                </div>
-            </div>
+        <input type="radio" id="tag-chill" name="radar-tag" value="💨 Чилл" style="display:none;">
+        <label for="tag-chill" class="cyber-tag-btn" style="padding: 8px 12px; border: 1px solid #00f0ff; color: #00f0ff; border-radius: 4px; cursor: pointer; display: inline-block;">💨 Чилл</label>
+    </div>
+</div>
 
-          <button type="submit" id="btn-launch-radar" class="btn btn-primary" style="margin-bottom: 25px;">
+<div class="form-group">
+    <label class="cyber-label">⏱️ Когда собираемся?</label>
+    <div style="display: flex; gap: 15px; margin-top: 5px; margin-bottom: 10px;">
+        <label style="color: #ff007f; cursor: pointer;">
+            <input type="radio" name="time-type" value="now" checked onclick="document.getElementById('custom-time-block').style.display='none';"> ⚡ СРОЧНО
+        </label>
+        <label style="color: #00f0ff; cursor: pointer;">
+            <input type="radio" name="time-type" value="custom" onclick="document.getElementById('custom-time-block').style.display='flex';"> 📅 Выбрать время
+        </label>
+    </div>
+    
+    <div id="custom-time-block" style="display: none; gap: 10px; align-items: center;">
+        <select id="create-hour" class="cyber-input" style="width: 70px; text-align: center;">
+            <option value="12">12</option><option value="13">13</option><option value="14">14</option>
+            <option value="15">15</option><option value="16">16</option><option value="17">17</option>
+            <option value="18">18</option><option value="19">19</option><option value="20">20</option>
+            <option value="21">21</option><option value="22">22</option>
+        </select>
+        <span style="color:#00f0ff;">:</span>
+        <select id="create-minute" class="cyber-input" style="width: 70px; text-align: center;">
+            <option value="00">00</option><option value="15">15</option>
+            <option value="30">30</option><option value="45">45</option>
+        </select>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="cyber-label">📝 Короткое описание:</label>
+    <textarea id="create-desc" class="cyber-input" placeholder="Кто нужен? Что берём с собой? Сколько сидим?" style="height: 80px; resize: none;"></textarea>
+</div>
+
+<button type="submit" id="btn-launch-radar" class="btn btn-primary" style="margin-bottom: 25px; width: 100%;">
+    🚀 ЗАПУСТИТЬ РАДАР СБОРА
+</button>
+
+<style>
+input[type="radio"]:checked + .cyber-tag-btn {
+    background: rgba(0, 240, 255, 0.2) !important;
+    box-shadow: 0 0 10px #00f0ff;
+    font-weight: bold;
+}
+</style>
                 🚀 Запустить радар сбора
             </button>
         </div>
