@@ -622,7 +622,7 @@ window.submitForm = function() {
         });
 
         // 🚀 НАДЁЖНЫЙ КИБЕР-ГЕНЕРАТОР: Перенаправление в бота через защищённый старт-параметр
-      // 1. Сбор данных с полей формы
+         // 1. Сбор данных из полей формы
     const district = document.getElementById('create-district')?.value || '';
     const exact = document.getElementById('create-exact-place')?.value || '';
     const target = document.getElementById('create-target')?.value || '';
@@ -648,36 +648,36 @@ window.submitForm = function() {
         isMy: true
     };
 
-    // 3. Записываем в массив карты с авто-удалением старого (Макс 1 радар)
+    // 3. Записываем в массив с авто-удалением твоего предыдущего радара (Макс 1 радар)
     if (typeof meetings !== 'undefined') {
         const oldId = localStorage.getItem('my_radar_id');
         if (oldId) {
             const idx = meetings.findIndex(m => m.id === oldId);
-            if (idx !== -1) meetings.splice(idx, 1);
+            if (idx !== -1) meetings.splice(idx, 1); // Стираем старый радар
         }
         meetings.push(newMeeting);
     }
 
-    // 4. Фиксируем флаги в памяти устройства
+    // 4. Фиксируем метки в памяти планшета
     localStorage.setItem('my_active_radar', 'true');
     localStorage.setItem('my_radar_id', newMeeting.id);
 
-    // 5. Показываем всплывающее окно Telegram
+    // 5. Показываем всплывающее окно Telegram поверх экрана
     Telegram.WebApp.showAlert("Радар успешно запущен!");
 
-    // 6. Очищаем текстовые поля
+    // 6. Очищаем форму сбора
     if(document.getElementById('create-exact-place')) document.getElementById('create-exact-place').value = '';
     if(document.getElementById('create-target')) document.getElementById('create-target').value = '';
     if(document.getElementById('create-link')) document.getElementById('create-link').value = '';
     if(document.getElementById('create-desc')) document.getElementById('create-desc').value = '';
 
-    // 7. Обновляем карту и переключаем вкладку нижнего меню на Радар (Главное меню)
+    // 7. Обновляем карту Гродно и переносим Mini App на главное меню
     renderAll();
     const radarTab = document.querySelector('[data-tab="radar"]') || document.querySelector('.nav-item');
     if (radarTab) {
         radarTab.click();
     }
-});    
+});   
                     function renderAll() {
             renderMeetingsList();
             renderArchiveList();
@@ -884,9 +884,8 @@ window.submitForm = function() {
         window.adminCloseCase = function(index, approved) {
             alert(approved ? "Дело закрыто. Пользователь оправдан." : "Нарушителю выдан БАН.");
             complaints.splice(index, 1); localStorage.setItem('gr_complaints_2026', JSON.stringify(complaints));
-            renderAll();       
-    </script>
+                    renderAll();
+    };
+</script>
 </body>
 </html>
-
-        
