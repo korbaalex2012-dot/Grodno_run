@@ -622,71 +622,68 @@ window.submitForm = function() {
         });
 
         // 🚀 НАДЁЖНЫЙ КИБЕР-ГЕНЕРАТОР: Перенаправление в бота через защищённый старт-параметр
-         // 1. Сбор данных из полей формы
-    const district = document.getElementById('create-district')?.value || '';
-    const exact = document.getElementById('create-exact-place')?.value || '';
-    const target = document.getElementById('create-target')?.value || '';
-    const link = document.getElementById('create-link')?.value || '';
-    const ageFrom = document.getElementById('create-age-from')?.value || '16';
-    const ageTo = document.getElementById('create-age-to')?.value || '22';
-    const desc = document.getElementById('create-desc')?.value || '';
+         document.getElementById('btn-launch-radar').addEventListener('click', (e) => {
+    e.preventDefault();
+    try {
+        const district = document.getElementById('create-district')?.value || '';
+        const exact = document.getElementById('create-exact-place')?.value || '';
+        const target = document.getElementById('create-target')?.value || '';
+        const link = document.getElementById('create-link')?.value || '';
+        const ageFrom = document.getElementById('create-age-from')?.value || '16';
+        const ageTo = document.getElementById('create-age-to')?.value || '22';
+        const desc = document.getElementById('create-desc')?.value || '';
 
-    // 2. Создаем карточку радара
-    const newMeeting = {
-        id: 'meeting-' + Date.now(),
-        district: district,
-        exactPlace: exact,
-        target: target,
-        link: link,
-        ageFrom: ageFrom,
-        ageTo: ageTo,
-        desc: desc,
-        lat: window.currentLat || 53.6849, 
-        lng: window.currentLng || 23.8342,
-        time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-        playersCount: 1,
-        isMy: true
-    };
+        const newMeeting = {
+            id: 'meeting-' + Date.now(),
+            district: district,
+            exactPlace: exact,
+            target: target,
+            link: link,
+            ageFrom: ageFrom,
+            ageTo: ageTo,
+            desc: desc,
+            lat: window.currentLat || 53.6849, 
+            lng: window.currentLng || 23.8342,
+            time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+            playersCount: 1,
+            isMy: true
+        };
 
-    // 3. Записываем в массив с авто-удалением твоего предыдущего радара (Макс 1 радар)
-    if (typeof meetings !== 'undefined') {
-        const oldId = localStorage.getItem('my_radar_id');
-        if (oldId) {
-            const idx = meetings.findIndex(m => m.id === oldId);
-            if (idx !== -1) meetings.splice(idx, 1); // Стираем старый радар
+        if (typeof meetings !== 'undefined' && Array.isArray(meetings)) {
+            const oldId = localStorage.getItem('my_radar_id');
+            if (oldId) {
+                const idx = meetings.findIndex(m => m.id === oldId);
+                if (idx !== -1) meetings.splice(idx, 1);
+            }
+            meetings.push(newMeeting);
         }
-        meetings.push(newMeeting);
+
+        localStorage.setItem('my_active_radar', 'true');
+        localStorage.setItem('my_radar_id', newMeeting.id);
+
+        if(document.getElementById('create-exact-place')) document.getElementById('create-exact-place').value = '';
+        if(document.getElementById('create-target')) document.getElementById('create-target').value = '';
+        if(document.getElementById('create-link')) document.getElementById('create-link').value = '';
+        if(document.getElementById('create-desc')) document.getElementById('create-desc').value = '';
+
+        document.querySelectorAll('.sub-page, .tab-content, #screen-create').forEach(screen => {
+            if(screen) screen.style.display = 'none';
+        });
+        const mainScreen = document.getElementById('screen-radar') || document.querySelector('[data-page="radar"]');
+        if (mainScreen) mainScreen.style.style.display = 'block';
+
+        document.querySelectorAll('.nav-item, [data-tab]').forEach(item => {
+            if(item) item.classList.remove('active');
+        });
+        const activeBtn = document.querySelector('[data-tab="radar"]') || document.querySelector('.nav-item');
+        if(activeBtn) activeBtn.classList.add('active');
+
+        setTimeout(() => { Telegram.WebApp.showAlert("Радар успешно запущен!"); }, 50);
+    } catch (err) {
+        console.error("Ошибка в кнопке радара:", err);
     }
-
-    // 4. Фиксируем метки в памяти планшета
-    localStorage.setItem('my_active_radar', 'true');
-    localStorage.setItem('my_radar_id', newMeeting.id);
-
-    // 5. Показываем всплывающее окно Telegram поверх экрана
-    Telegram.WebApp.showAlert("Радар успешно запущен!");
-
-    // 6. Очищаем форму сбора
-    if(document.getElementById('create-exact-place')) document.getElementById('create-exact-place').value = '';
-    if(document.getElementById('create-target')) document.getElementById('create-target').value = '';
-    if(document.getElementById('create-link')) document.getElementById('create-link').value = '';
-    if(document.getElementById('create-desc')) document.getElementById('create-desc').value = '';
-
-      // 7. НАПРЯМУЮ переключаем экраны интерфейса Mini App на главное меню
-    document.querySelectorAll('.sub-page, .tab-content, #screen-create').forEach(screen => {
-        if(screen) screen.style.display = 'none';
-    });
-    const mainScreen = document.getElementById('screen-radar') || document.querySelector('[data-page="radar"]');
-    if (mainScreen) {
-        mainScreen.style.display = 'block';
-    }
-
-    // Обновляем отображение кнопок нижнего меню
-    document.querySelectorAll('.nav-item, [data-tab]').forEach(item => {
-        if(item) item.classList.remove('active');
-    });
-    const activeBtn = document.querySelector('[data-tab="radar"]') || document.querySelector('.nav-item');
-    if(activeBtn) activeBtn.classList.add('active');
 });
+
                     function renderAll() {
             renderMeetingsList();
             renderArchiveList();
