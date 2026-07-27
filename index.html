@@ -622,18 +622,7 @@ window.submitForm = function() {
         });
 
         // 🚀 НАДЁЖНЫЙ КИБЕР-ГЕНЕРАТОР: Перенаправление в бота через защищённый старт-параметр
-   document.getElementById('btn-launch-radar').addEventListener('click', (e) => {
-    e.preventDefault(); // Защита от перезагрузки страницы
-
-    // 1. Сбор данных только с существующих полей
-    const district = document.getElementById('create-district')?.value || '';
-    const exact = document.getElementById('create-exact-place')?.value || '';
-    const target = document.getElementById('create-target')?.value || '';
-    const link = document.getElementById('create-link')?.value || '';
-document.getElementById('btn-launch-radar').addEventListener('click', (e) => {
-    e.preventDefault(); // Защита от перезагрузки страницы
-
-    // 1. Сбор данных только с существующих полей
+      // 1. Сбор данных с полей формы
     const district = document.getElementById('create-district')?.value || '';
     const exact = document.getElementById('create-exact-place')?.value || '';
     const target = document.getElementById('create-target')?.value || '';
@@ -659,7 +648,7 @@ document.getElementById('btn-launch-radar').addEventListener('click', (e) => {
         isMy: true
     };
 
-    // 3. Записываем в массив карты с авто-удалением старого радара (Ограничение: Макс 1 радар)
+    // 3. Записываем в массив карты с авто-удалением старого (Макс 1 радар)
     if (typeof meetings !== 'undefined') {
         const oldId = localStorage.getItem('my_radar_id');
         if (oldId) {
@@ -673,31 +662,22 @@ document.getElementById('btn-launch-radar').addEventListener('click', (e) => {
     localStorage.setItem('my_active_radar', 'true');
     localStorage.setItem('my_radar_id', newMeeting.id);
 
-    // 5. Очищаем текстовые поля формы сбора
+    // 5. Показываем всплывающее окно Telegram
+    Telegram.WebApp.showAlert("Радар успешно запущен!");
+
+    // 6. Очищаем текстовые поля
     if(document.getElementById('create-exact-place')) document.getElementById('create-exact-place').value = '';
     if(document.getElementById('create-target')) document.getElementById('create-target').value = '';
     if(document.getElementById('create-link')) document.getElementById('create-link').value = '';
     if(document.getElementById('create-desc')) document.getElementById('create-desc').value = '';
 
-    // 6. Обновляем графику карты Гродно
+    // 7. Обновляем карту и переключаем вкладку нижнего меню на Радар (Главное меню)
     renderAll();
-
-    // 7. НАПРЯМУЮ переключаем экраны приложения на вкладку Радар (Главное меню)
-    const allScreens = document.querySelectorAll('.sub-page, .tab-content, #screen-radar, #screen-create');
-    allScreens.forEach(screen => {
-        if(screen) screen.style.display = 'none';
-    });
-    
-    const mainRadarScreen = document.getElementById('screen-radar') || document.querySelector('[data-page="radar"]');
-    if (mainRadarScreen) {
-        mainRadarScreen.style.display = 'block';
+    const radarTab = document.querySelector('[data-tab="radar"]') || document.querySelector('.nav-item');
+    if (radarTab) {
+        radarTab.click();
     }
-
-    // 8. Показываем всплывающее окно Telegram ПОВЕРХ главного меню
-    setTimeout(() => {
-        Telegram.WebApp.showAlert("Радар успешно запущен!");
-    }, 100);
-});      
+});    
                     function renderAll() {
             renderMeetingsList();
             renderArchiveList();
@@ -904,8 +884,7 @@ document.getElementById('btn-launch-radar').addEventListener('click', (e) => {
         window.adminCloseCase = function(index, approved) {
             alert(approved ? "Дело закрыто. Пользователь оправдан." : "Нарушителю выдан БАН.");
             complaints.splice(index, 1); localStorage.setItem('gr_complaints_2026', JSON.stringify(complaints));
-            renderAll();
-        };
+            renderAll();       
     </script>
 </body>
 </html>
