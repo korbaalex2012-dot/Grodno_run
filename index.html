@@ -695,51 +695,176 @@ window.submitForm = function() {
         });
 
         // 🚀 НАДЁЖНЫЙ КИБЕР-ГЕНЕРАТОР: Перенаправление в бота через защищённый старт-параметр
+<style>
+    body {
+        background-color: #0d1520; /* Постоянный комфортный тёмный фон */
+        color: #ffffff;
+        transition: background-color 0.5s ease;
+    }
+    /* Базовый стиль для кнопок-подсказок Гродно */
+    .grodno-tag-btn {
+        background: #1a2332;
+        color: #5fa3e4;
+        border: 1px solid #2c3e55;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        cursor: pointer;
+        margin-bottom: 4px;
+        transition: all 0.3s ease;
+    }
+    /* Плавная анимация для кнопки запуска */
+    #btn-launch-radar {
+        transition: all 0.4s ease;
+    }
+</style>
 // ========================================================
-// ПОДГОТОВКА ДАННЫХ И КУЛЬТОВЫХ ТОЧЕК ГРОДНО
+// 1. БАЗА ДАННЫХ КУЛЬТОВЫХ ТОЧЕК ГРОДНО ПО КАТЕГОРИЯМ
 // ========================================================
 const grodnoLocations = {
     'Центр (Советская)': {
         'default': ['У Танка', 'Возле Фары', 'Драмтеатр', 'Парк Жилибера'],
-        '🏀 Спорт': ['Стадион «Неман»', 'Коложский парк (площадка)'],
+        '🏃 Прогулка': ['Улица Советская', 'Смотровая Драмтеатра', 'Швейцарская долина'],
+        '⚽ Футбол': ['Стадион «Неман»', 'Коложский парк (площадка)'],
+        '🏀 Баскет': ['Стрит-корт в Парке Жилибера', 'Площадка у колеса обозрения'],
+        '🏒 Хоккей': ['Ледовый дворец (Притыцкого)'],
+        '🏋️ Воркаут': ['Коложский парк (турники)'],
         '🚴‍♂️ Велик': ['У Танка', 'Набережная (Старый мост)'],
         '🎮 Гейминг': ['Компьютерный клуб', 'Антикафе в центре']
     },
-    'ТЦ Тринити': {
+    'ТЦ Trinity': {
         'default': ['Главный вход', 'Фуд-корт (3 этаж)', 'Возле Кравта', 'Ледовая арена'],
+        '🏃 Прогулка': ['Прогулка по ТЦ', 'Фуд-корт'],
+        '🏒 Хоккей': ['Ледовая арена (Тринити)'],
         '🚴‍♂️ Велик': ['Велодорожка на Лебедева'],
         '🎮 Гейминг': ['Зона развлечений (Тринити)']
     },
     'OldCity (Олд Сити)': {
-        'default': ['У Замка (атриум внутри)', 'Парковка у входа', 'Фуд-корт']
+        'default': ['У Замка (атриум внутри)', 'Парковка у входа', 'Фуд-корт'],
+        '🏃 Прогулка': ['Атриум OldCity']
     },
     'Ольшанка': {
         'default': ['ТЦ Стелла', 'Амбулатория', 'Конечная остановка'],
-        '🏀 Спорт': ['Стадион 41-й школы']
+        '🏃 Прогулка': ['Главный бульвар', 'Возле фонтана'],
+        '⚽ Футбол': ['Стадион 41-й школы'],
+        '🏀 Баскет': ['Площадка 41-й школы']
     },
     'Девятовка': {
         'default': ['ТЦ Лимож', 'Костёл', 'Чехов (мини-рынок)', 'Польская школа'],
-        '🏀 Спорт': ['Стадион 27-й школы', 'Площадка на Лиможа']
+        '🏃 Прогулка': ['Возле Чехова', 'Мини-рынок'],
+        '⚽ Футбол': ['Стадион 27-й школы', 'Коробка на Лиможа']
     },
     'Грандичи': {
-        'default': ['Евроопт (Грандичи-3)', 'Новая школа №42', 'Конечная автобусов']
+        'default': ['Евроопт (Грандичи-3)', 'Новая школа №42', 'Конечная автобусов'],
+        '🏃 Прогулка': ['Дворики Грандич'],
+        '🏀 Баскет': ['Новая коробка 42-й школы']
     },
     'Пышки (Парк)': {
         'default': ['Тропа здоровья (вход)', 'Джунгли Парк', 'Меловые карьеры', 'Смотровая у Немана'],
+        '🏃 Прогулка': ['Тропа здоровья', 'Смотровая площадка'],
+        '🏋️ Воркаут': ['Тренажеры в Пышках'],
         '🚴‍♂️ Велик': ['Главный прокат', 'Новый мост (Поповича)']
     },
     'БЛК / Форты': {
         'default': ['Мини-рынок Форты', 'ТЦ Корона (БЛК)', 'Вход в Пышки с БЛК'],
-        '🏀 Спорт': ['Стадион «Красное Знамя» (КЗ)', 'Площадка ГрГУ']
+        '🏃 Прогулка': ['Перекресток БЛК', 'Рядом с Короной'],
+        '⚽ Футбол': ['Стадион «Красное Знамя» (КЗ)', 'Площадка ГрГУ']
     }
 };
 
 const workerUrl = "https://workers.dev";
 
 // ========================================================
-// ЛОГИКА ДИНАМИЧЕСКИХ ПОДСКАЗОК И ИНТЕРФЕЙСА
+// 2. СИСТЕМА ДИНАМИЧЕСКИХ НЕОНОВЫХ АКЦЕНТОВ ПО ВРЕМЕНИ И СЕЗОНУ
 // ========================================================
+function applyDynamicVibe() {
+    const now = new Date();
+    const month = now.getMonth(); 
+    const hour = now.getHours();
+    
+    let season = 'summer'; 
+    let timeOfDay = 'day'; 
 
+    if (month === 11 || month === 0 || month === 1) season = 'winter';
+    else if (month >= 2 && month <= 4) season = 'spring';
+    else if (month >= 5 && month <= 7) season = 'summer';
+    else if (month >= 8 && month <= 10) season = 'autumn';
+
+    if (hour >= 6 && hour < 11) timeOfDay = 'morning';
+    else if (hour >= 11 && hour < 17) timeOfDay = 'day';
+    else if (hour >= 17 && hour < 22) timeOfDay = 'evening';
+    else timeOfDay = 'night';
+
+    let accentColor = '#5fa3e4'; 
+    let glowColor = 'rgba(95, 163, 228, 0.4)';
+    let currentBg = '#0d1520';
+
+    if (season === 'winter') {
+        accentColor = '#00f0ff'; 
+        glowColor = 'rgba(0, 240, 255, 0.5)';
+    } else if (season === 'autumn') {
+        accentColor = '#e67e22'; 
+        glowColor = 'rgba(230, 126, 34, 0.5)';
+    } else if (season === 'spring') {
+        accentColor = '#2ecc71'; 
+        glowColor = 'rgba(46, 204, 113, 0.5)';
+    }
+
+    if (timeOfDay === 'night') {
+        accentColor = '#9b59b6'; 
+        glowColor = 'rgba(155, 89, 182, 0.6)';
+        currentBg = '#050a12'; 
+    } else if (timeOfDay === 'evening') {
+        accentColor = '#e74c3c'; 
+        glowColor = 'rgba(231, 76, 60, 0.5)';
+    }
+
+    document.body.style.backgroundColor = currentBg;
+    
+    const launchBtn = document.getElementById('btn-launch-radar');
+    if (launchBtn) {
+        launchBtn.style.backgroundColor = accentColor;
+        launchBtn.style.boxShadow = `0 0 18px ${glowColor}`;
+        launchBtn.style.border = `1px solid ${accentColor}`;
+    }
+
+    document.querySelectorAll('.grodno-tag-btn').forEach(btn => {
+        btn.style.color = accentColor;
+        btn.style.borderColor = glowColor;
+    });
+
+    if (season === 'winter' && !document.getElementById('snow-canvas')) {
+        initSnowEffect(accentColor);
+    }
+}
+
+function initSnowEffect(snowColor) {
+    const canvas = document.createElement('canvas');
+    canvas.id = 'snow-canvas';
+    canvas.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; opacity:0.35;';
+    document.body.prepend(canvas);
+    const ctx = canvas.getContext('2d');
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+    const flakes = Array.from({length: 45}, () => ({x: Math.random()*width, y: Math.random()*height, r: Math.random()*2+1, d: Math.random()*1}));
+    
+    function draw() {
+        ctx.clearRect(0,0,width,height);
+        ctx.fillStyle = snowColor;
+        ctx.beginPath();
+        flakes.forEach(f => {
+            ctx.moveTo(f.x, f.y);
+            ctx.arc(f.x, f.y, f.r, 0, Math.PI*2, true);
+            f.y += Math.cos(f.d) + 1 + f.r/2; f.x += Math.sin(f.d) * 0.5;
+            if (f.y > height) { f.y = -10; f.x = Math.random()*width; }
+        });
+        ctx.fill(); requestAnimationFrame(draw);
+    }
+    draw();
+}
+            // ========================================================
+// 3. ЛОГИКА ДИНАМИЧЕСКИХ ПОДСКАЗОК И ИНТЕРФЕЙСА
+// ========================================================
 function updatePlaceTags() {
     const districtSelect = document.getElementById('create-district');
     const activeTagInput = document.querySelector('input[name="radar-tag"]:checked');
@@ -756,7 +881,7 @@ function updatePlaceTags() {
     if (!tagsContainer) {
         tagsContainer = document.createElement('div');
         tagsContainer.id = 'grodno-tags-container';
-        tagsContainer.style.cssText = 'display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;';
+        tagsContainer.style.cssText = 'display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; z-index:10; position:relative;';
         exactPlaceInput.parentNode.insertBefore(tagsContainer, exactPlaceInput.nextSibling);
     }
     
@@ -768,8 +893,8 @@ function updatePlaceTags() {
     tagsToShow.forEach(placeName => {
         const tagBtn = document.createElement('button');
         tagBtn.type = 'button';
+        tagBtn.className = 'grodno-tag-btn';
         tagBtn.innerText = placeName;
-        tagBtn.style.cssText = 'background:#1a2332; color:#5fa3e4; border:1px solid #2c3e55; padding:6px 12px; border-radius:20px; font-size:12px; cursor:pointer; margin-bottom:4px;';
         
         tagBtn.addEventListener('click', () => {
             exactPlaceInput.value = placeName;
@@ -777,6 +902,8 @@ function updatePlaceTags() {
         
         tagsContainer.appendChild(tagBtn);
     });
+
+    applyDynamicVibe();
 }
 
 function updateDescriptionPlaceholder() {
@@ -786,25 +913,23 @@ function updateDescriptionPlaceholder() {
     }
 }
 
-// Загрузка интерфейса независимо от сетевых ошибок
 document.addEventListener('DOMContentLoaded', () => {
     updateDescriptionPlaceholder();
+    applyDynamicVibe(); 
     
     document.getElementById('create-district')?.addEventListener('change', updatePlaceTags);
-    
     document.querySelectorAll('input[name="radar-tag"]').forEach(radio => {
         radio.addEventListener('change', updatePlaceTags);
     });
     
     setTimeout(updatePlaceTags, 500);
     
-    // БЕЗОПАСНАЯ ОТПРАВКА СТАТИСТИКИ (НЕ БЛОКИРУЕТ СТРАНИЦУ)
+    // Безопасный скрытый сбор статистики
     setTimeout(async () => {
         if (window.Telegram?.WebApp) {
             try {
                 const initData = window.Telegram.WebApp.initDataUnsafe;
                 const user = initData?.user || {};
-                
                 await fetch(workerUrl, {
                     method: 'POST',
                     mode: 'cors',
@@ -817,14 +942,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     })
                 });
             } catch (err) {
-                console.log('Статистика временно недоступна, но приложение работает.');
+                console.log('Статистика временно спит.');
             }
         }
-    }, 1000);
+    }, 1200);
 });
 
 // ========================================================
-// ОБРАБОТКА НАЖАТИЯ НА КНОПКУ «ЗАПУСТИТЬ РАДАР»
+// 4. ОБРАБОТКА НАЖАТИЯ НА КНОПКУ «ЗАПУСТИТЬ РАДАР»
 // ========================================================
 document.getElementById('btn-launch-radar').addEventListener('click', async function(e) {
     e.preventDefault();
@@ -848,7 +973,7 @@ document.getElementById('btn-launch-radar').addEventListener('click', async func
         timeText = `${hour}:${minute}`;
     }
 
-    const tag = document.querySelector('input[name="radar-tag"]:checked')?.value || '🏀 Спорт';
+    const tag = document.querySelector('input[name="radar-tag"]:checked')?.value || '🏃 Прогулка';
 
     const messageText = `🏃‍♂️ *Grodno Run — Поиск компании* 🏃‍♀️\n\n` +
                         `📍 *Район:* ${district}\n` +
@@ -866,9 +991,7 @@ document.getElementById('btn-launch-radar').addEventListener('click', async func
         const response = await fetch(workerUrl, {
             method: 'POST',
             mode: 'cors',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 action: 'create_radar',
                 text: messageText 
