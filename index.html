@@ -145,7 +145,7 @@
 
     <div id="screen-auth" class="screen active">
         <div class="alert">
-            ⚠ ВНИМАНИЕ: Все данные проверяются роботом. За ложный пол или возраст — моментальный бан на всех районах Гродно БЕЗ права разблокировки!
+            ⚠ ВНИМАНИЕ: Доступ разрешен только для участников от 12 до 14 лет! Младше 12 и старше 14 лет вход заблокирован.
         </div>
         <div class="card" style="border-top: 4px solid var(--accent-red);">
             <h3>Входной контроль</h3>
@@ -158,14 +158,13 @@
                 </select>
             </div>
             <div class="form-group">
-                <label>Ваш возраст (от 12 до 35 лет)</label>
-                <input type="number" id="auth-age" placeholder="Введите ваш точный возраст" min="12" max="35">
+                <label>Ваш возраст (строго от 12 до 14 лет)</label>
+                <input type="number" id="auth-age" placeholder="Введите возраст (12, 13 или 14)" min="12" max="14">
             </div>
             <button type="button" id="btn-submit-auth" class="btn btn-success">Пройти авторизацию</button>
         </div>
     </div>
-
-    <div id="screen-main" class="screen">
+        <div id="screen-main" class="screen">
         <div id="sub-radar" class="sub-screen active">
             <div class="card" style="padding: 10px; margin-bottom: 16px;">
                 <div style="font-size: 11px; font-weight: 700; color: var(--accent); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">
@@ -200,7 +199,7 @@
             <div id="empty-state-msg" class="empty-state">На радаре пока пусто... Запусти движ сам!</div>
             <div id="radar-list"></div>
         </div>
-                <div id="sub-create" class="sub-screen">
+                    <div id="sub-create" class="sub-screen">
             <h2>➕ Запустить сбор</h2>
             <p class="subtitle">Отметь локацию на общем радаре Гродно</p>
             <div class="card" style="border-top: 4px solid var(--accent);">
@@ -305,7 +304,7 @@
                 </div>
 
                 <div class="form-group" style="margin-top: 15px;">
-                    <label>👥 Кого ждём по составу?</label>
+                    <label>👥 Состав участников:</label>
                     <style>
                         .tag-chip-comp {
                             background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: var(--text-muted);
@@ -314,12 +313,12 @@
                         .tag-chip-comp.active { background: rgba(0, 162, 255, 0.2); color: var(--accent); border-color: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
                     </style>
                     <div id="target-gender-selector" style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;">
-                        <button type="button" class="tag-chip-comp active" data-mode="limit" onclick="setCompositionMode('limit')">🔢 По лимиту людей</button>
-                        <button type="button" class="tag-chip-comp" data-mode="gender" onclick="setCompositionMode('gender')">👥 Точный состав (М/Ж)</button>
+                        <button type="button" class="tag-chip-comp active" data-mode="limit" onclick="setCompositionMode('limit')">👥 Максимум человек</button>
+                        <button type="button" class="tag-chip-comp" data-mode="gender" onclick="setCompositionMode('gender')">⚙️ Точный состав (М/Ж)</button>
                     </div>
 
                     <div id="mode-limit-block" style="margin-top: 12px;">
-                        <label style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Максимум человек:</label>
+                        <label style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Сколько максимум человек:</label>
                         <input type="text" id="create-max-people" placeholder="Например: 5 или Без лимита" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px; padding: 10px; color: #fff; font-size: 14px; box-sizing: border-box;">
                     </div>
 
@@ -350,7 +349,7 @@
 
         <div id="sub-admin" class="sub-screen">
             <h2>🚨 Админка</h2>
-            <p class="subtitle">Управление профилем и жалобами в районе</p>
+            <p class="subtitle">Управление профилем и жалобами</p>
             
             <div class="card" style="border-top: 4px solid var(--accent); margin-bottom: 20px;">
                 <h3 style="font-size: 14px; margin-bottom: 12px;">🛠️ Настройки профиля</h3>
@@ -365,7 +364,8 @@
             <div id="violators-list"></div>
         </div>
     </div>
-        <style>
+
+    <style>
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10, 10, 18, 0.85);
             backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
@@ -460,12 +460,12 @@
         let archive = JSON.parse(localStorage.getItem('gr_archive_2026')) || [];
         let complaints = JSON.parse(localStorage.getItem('gr_complaints_2026')) || [];
 
-        let activeGender = localStorage.getItem('user_gender'] || "";
+        let activeGender = localStorage.getItem('user_gender') || "";
         let activeAge = parseInt(localStorage.getItem('user_age')) || 0;
         let currentDistrictFilter = "all";
         let mapInstance = null;
         let mapMarkers = [];
-        let currentCompositionMode = 'limit'; // 'limit' или 'gender'
+        let currentCompositionMode = 'limit';
 
         async function loadMeetingsFromServer() {
             try {
@@ -580,9 +580,7 @@
 
             Object.keys(grodnoLocationsData).forEach(districtName => {
                 const points = grodnoLocationsData[districtName];
-
                 points.forEach(pt => {
-                    // Фильтруем точки по выбранной категории в форме создания / фильтра
                     if (pt.category !== activeCategory) return;
 
                     const circleMarker = L.circleMarker(pt.coords, {
@@ -636,12 +634,10 @@
             
             tagsContainer.innerHTML = ''; 
             const districtPoints = grodnoLocationsData[currentDistrict] || [];
-            
-            // Фильтруем подсказки мест строго под выбранную категорию (например, Футбол, Наст. теннис и т.д.)
             const filteredPoints = districtPoints.filter(pt => pt.category === currentTag);
             
             if (filteredPoints.length === 0) {
-                tagsContainer.innerHTML = '<span style="font-size: 11px; color: var(--text-muted);">Для этой категории в районе нет готовых точек. Введите место вручную.</span>';
+                tagsContainer.innerHTML = '<span style="font-size: 11px; color: var(--text-muted);">Для этой категории в районе нет точек. Введите вручную.</span>';
                 return;
             }
 
@@ -657,12 +653,10 @@
             });
         }
 
-        // Переключение отображения выбора времени
         window.toggleTimeInputs = function() {
             const timeType = document.querySelector('input[name="time-type"]:checked')?.value;
             const timePickerBlock = document.getElementById('time-picker-block');
             if (!timePickerBlock) return;
-            
             if (timeType === 'later') {
                 timePickerBlock.classList.remove('hidden');
             } else {
@@ -670,7 +664,6 @@
             }
         };
 
-        // Переключение режимов состава участников
         window.setCompositionMode = function(mode) {
             currentCompositionMode = mode;
             const limitBlock = document.getElementById('mode-limit-block');
@@ -690,33 +683,49 @@
             }
         };
 
-        // Админ-панель: смена пола
         window.toggleUserGender = function() {
             activeGender = activeGender === 'Парень' ? 'Девушка' : 'Парень';
             localStorage.setItem('user_gender', activeGender);
             updateStatusHeader();
-            alert(`Ваш пол успешно изменен на: ${activeGender}`);
+            alert(`Ваш пол изменен на: ${activeGender}`);
         };
 
-        // Админ-панель: смена возраста
         window.changeUserAgePrompt = function() {
-            const newAge = prompt("Введите ваш новый возраст (от 12 до 35):", activeAge);
+            const newAge = prompt("Введите ваш новый возраст (строго от 12 до 14 лет):", activeAge);
             if (!newAge) return;
             const parsedAge = parseInt(newAge);
-            if (isNaN(parsedAge) || parsedAge < 12 || parsedAge > 35) {
-                alert("Укажите корректный возраст от 12 до 35 лет!");
+            if (isNaN(parsedAge) || parsedAge < 12 || parsedAge > 14) {
+                alert("Возраст должен быть от 12 до 14 лет!");
                 return;
             }
             activeAge = parsedAge;
             localStorage.setItem('user_age', activeAge);
             updateStatusHeader();
-            alert(`Возраст успешно обновлен: ${activeAge} лет`);
+            alert(`Возраст обновлен: ${activeAge} лет`);
         };
 
         document.addEventListener('DOMContentLoaded', async () => {
+            if (localStorage.getItem('user_registered') === 'true') {
+                document.getElementById('screen-auth')?.classList.remove('active');
+                const authScr = document.getElementById('screen-auth');
+                if (authScr) authScr.style.display = 'none';
+
+                const mainScr = document.getElementById('screen-main');
+                if (mainScr) {
+                    mainScr.classList.add('active');
+                    mainScr.style.display = 'block';
+                }
+                updateStatusHeader();
+                await loadMeetingsFromServer();
+                renderAll();
+                setTimeout(initLeafletMap, 200);
+            } else {
+                document.getElementById('screen-auth')?.classList.add('active');
+            }
+
             if (myId === 6949963047) {
                 const bottomNav = document.querySelector('.bottom-nav');
-                if (bottomNav) {
+                if (bottomNav && !bottomNav.querySelector('[data-sub="sub-admin"]')) {
                     const adminNavBtn = document.createElement('button');
                     adminNavBtn.className = 'nav-btn';
                     adminNavBtn.setAttribute('data-sub', 'sub-admin');
@@ -729,20 +738,8 @@
                         document.getElementById('sub-admin')?.classList.add('active');
                         renderAll();
                     });
-                    
                     bottomNav.appendChild(adminNavBtn);
                 }
-            }
-
-            if (localStorage.getItem('user_registered') === 'true') {
-                document.getElementById('screen-auth')?.classList.remove('active');
-                document.getElementById('screen-main')?.classList.add('active');
-                updateStatusHeader();
-                await loadMeetingsFromServer();
-                renderAll();
-                setTimeout(initLeafletMap, 200);
-            } else {
-                document.getElementById('screen-auth')?.classList.add('active');
             }
             
             initAudioEngine();
@@ -756,51 +753,39 @@
                 });
             });
         });
+
+        // Кнопка авторизации с жесткой проверкой возраста (12, 13, 14 лет)
         document.getElementById('btn-submit-auth')?.addEventListener('click', (e) => {
             e.preventDefault();
-            
-            const genderSelect = document.getElementById('auth-gender');
-            const ageInput = document.getElementById('auth-age');
-            
-            if (!genderSelect || !ageInput) return;
+            const gen = document.getElementById('auth-gender').value;
+            const age = parseInt(document.getElementById('auth-age').value);
 
-            const gen = genderSelect.value;
-            const age = parseInt(ageInput.value);
-
-            if (!gen || isNaN(age) || age < 12 || age > 35) {
-                alert('Укажите корректный пол и возраст от 12 до 35 лет!');
+            if (!gen || isNaN(age) || age < 12 || age > 14) {
+                alert('Доступ строго от 12 до 14 лет! Укажите корректный возраст.');
                 return;
             }
 
-            // Сохраняем данные
             localStorage.setItem('user_gender', gen);
             localStorage.setItem('user_age', age);
             localStorage.setItem('user_registered', 'true');
-            
             activeGender = gen; 
             activeAge = age;
 
-            // Жестко переключаем видимость через style.display (чтобы точно сработало независимо от CSS)
             const authScreen = document.getElementById('screen-auth');
             const mainScreen = document.getElementById('screen-main');
 
             if (authScreen) {
                 authScreen.classList.remove('active');
-                authScreen.style.display = 'none'; // Принудительно скрываем
+                authScreen.style.display = 'none';
             }
             if (mainScreen) {
                 mainScreen.classList.add('active');
-                mainScreen.style.display = 'block'; // Принудительно показываем
+                mainScreen.style.display = 'block';
             }
-            
+
             updateStatusHeader(); 
             renderAll();
-            
-            setTimeout(() => {
-                if (typeof initLeafletMap === 'function') {
-                    initLeafletMap();
-                }
-            }, 200);
+            setTimeout(() => { if (typeof initLeafletMap === 'function') initLeafletMap(); }, 200);
         });
 
         document.querySelectorAll('.bottom-nav .nav-btn').forEach(btn => {
@@ -838,7 +823,7 @@
             const maxPeopleInput = currentCompositionMode === 'limit' ? (document.getElementById('create-max-people')?.value || 'Без лимита') : 'По составу (М/Ж)';
 
             if (!exactPlace) {
-                alert('Пожалуйста, укажите точное место встречи!');
+                alert('Укажите точное место встречи!');
                 return;
             }
 
@@ -928,7 +913,6 @@
             filtered.forEach(m => {
                 const card = document.createElement('div');
                 card.className = `card status-planning`;
-                
                 const isCreator = m.creator === myUsername || myUsername === "Grodno_User";
                 
                 card.innerHTML = `
@@ -938,7 +922,7 @@
                     </div>
                     <p style="margin: 0 0 6px 0; font-size: 14px;"><b>Где:</b> ${m.exactPlace}</p>
                     <p style="margin: 0 0 6px 0; font-size: 14px;"><b>Категория:</b> ${m.category || 'Прогулка'}</p>
-                    <p style="margin: 0 0 6px 0; font-size: 12px; color: #a4b0be;">👥 Состав: Девушек: <b>${m.girlsCount || 0}</b> | Пацанов: <b>${m.guysCount || 0}</b> | Лимит: <b>${m.maxPeople || 'Без лимита'}</b></p>
+                    <p style="margin: 0 0 6px 0; font-size: 12px; color: #a4b0be;">👥 Девушек: <b>${m.girlsCount || 0}</b> | Пацанов: <b>${m.guysCount || 0}</b> | Лимит: <b>${m.maxPeople || 'Без лимита'}</b></p>
                     <p style="margin: 0 0 10px 0; font-size: 13px; color: #a4b0be;">${m.description || 'Описания нет.'}</p>
                     <p style="margin: 0 0 10px 0; font-size: 12px; color: var(--accent);">👤 Организатор: @${m.creator || 'Аноним'}</p>
                     <div style="display: flex; gap: 8px; flex-wrap: wrap;">
@@ -952,11 +936,11 @@
         }
 
         window.cancelMeeting = async function(id) {
-            if (!confirm("Ты уверен, что хочешь отменить и удалить этот сбор?")) return;
+            if (!confirm("Отменить и удалить этот сбор?")) return;
             meetings = meetings.filter(item => item.id !== id);
             localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
             await saveMeetingsToServer();
-            alert("Сход успешно отменен и удален с радара!");
+            alert("Сход успешно отменен!");
             renderAll();
         };
 
@@ -975,11 +959,11 @@
         };
 
         window.reportDescription = function(username, meetingId) {
-            const reason = prompt("Укажите причину жалобы (Мат, неадекватность):");
+            const reason = prompt("Причина жалобы (Мат, неадекватность):");
             if (!reason) return;
             complaints.unshift({ id: Date.now(), violator: username, type: "Жалоба на описание", reason: reason, meetingId: meetingId });
             localStorage.setItem('gr_complaints_2026', JSON.stringify(complaints));
-            alert("Жалоба доставлена куратору!");
+            alert("Жалоба отправлена!");
             renderAll();
         };
 
@@ -1037,3 +1021,4 @@
 </body>
 </html>
 
+    
