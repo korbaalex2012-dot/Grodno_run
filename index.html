@@ -116,7 +116,6 @@
             box-shadow: 0 0 12px var(--accent-glow);
         }
 
-        /* Интерактивная кибер-карта Гродно */
         .cyber-map {
             position: relative;
             width: 100%; height: 190px;
@@ -236,8 +235,7 @@
             <button type="button" id="btn-music-toggle" style="background: var(--bg-input); border: 1px solid var(--border); color: var(--text-muted); padding: 7px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; font-weight: 800;">🎵 OFF</button>
         </div>
     </div>
-
-    <div id="screen-auth" class="screen">
+        <div id="screen-auth" class="screen">
         <div class="alert">
             ⚠ ВНИМАНИЕ: Все данные проверяются роботом. За ложный пол или возраст — моментальный бан на всех районах Гродно БЕЗ права разблокировки!
         </div>
@@ -259,7 +257,7 @@
         </div>
     </div>
 
-    <div id="screen-main" class="screen active">
+    <div id="screen-main" class="screen">
         
         <div id="sub-radar" class="sub-screen active">
             <div class="cyber-map">
@@ -288,7 +286,8 @@
             <div id="empty-state-msg" class="empty-state">На радаре пока пусто... Запусти движ сам!</div>
             <div id="radar-list"></div>
         </div>
-                <div id="sub-create" class="sub-screen">
+
+        <div id="sub-create" class="sub-screen">
             <h2>➕ Запустить сбор</h2>
             <p class="subtitle">Отметь локацию на общем радаре Гродно</p>
             <div class="card" style="border-top: 4px solid var(--accent);">
@@ -376,52 +375,42 @@
                 </button>
             </div>
         </div>
-
-        <div id="sub-archive" class="sub-screen">
-            <h2>💼 Мои Сходки</h2>
-            <p class="subtitle">Сходки, на которые ты вписался. Жалобы доступны через 1 час.</p>
-            <div id="archive-empty-state" class="empty-state">Ты еще не вписался ни в один движ.</div>
+                <div id="sub-archive" class="sub-screen">
+            <h2>📜 Архив сборов</h2>
+            <p class="subtitle">История завершенных встреч</p>
+            <div id="archive-empty-state" class="empty-state">Архив пуст.</div>
             <div id="archive-list"></div>
         </div>
 
         <div id="sub-admin" class="sub-screen">
-            <h2>⚡ Админка куратора</h2>
-            <p class="subtitle">Панель тотального контроля проверок и жалоб</p>
-            
-            <div class="card" style="border: 1px solid var(--accent); background: rgba(0, 162, 255, 0.03);">
-                <h3>🕵️ Эмулятор Профиля (Маскировка)</h3>
-                <p class="subtitle" style="margin-bottom: 12px; color: var(--accent);">Измени свои параметры, чтобы тайно просматривать анкеты любых возрастов и полов:</p>
-                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                    <select id="admin-fake-gender" style="flex: 1;">
-                        <option value="Парень">Маскировка: Парень</option>
-                        <option value="Девушка">Маскировка: Девушка</option>
-                    </select>
-                    <input type="number" id="admin-fake-age" value="18" style="width: 90px;" min="12" max="35">
-                </div>
-                <button type="button" class="btn btn-primary" id="btn-apply-fake" style="padding: 10px; font-size: 13px;">💾 Применить маскировку</button>
-            </div>
-
-            <div class="card" style="border-top: 4px solid var(--accent-red);">
-                <h3>📋 Поступившие дела и жалобы</h3>
-                <div id="admin-empty-state" class="empty-state" style="padding: 10px 0;">Нарушителей не обнаружено. Претензий нет.</div>
-                <div id="violators-list"></div>
-            </div>
+            <h2>🚨 Панель куратора</h2>
+            <p class="subtitle">Жалобы и нарушения в районе</p>
+            <div id="admin-empty-state" class="empty-state">Нарушений нет. Все чисто!</div>
+            <div id="violators-list"></div>
         </div>
 
     </div>
 
     <div class="bottom-nav">
-        <button class="nav-btn active" data-sub="sub-radar"><span>🛰</span>Радар</button>
-        <button class="nav-btn" data-sub="sub-create"><span>➕</span>Создать</button>
-        <button class="nav-btn" data-sub="sub-archive"><span>💼</span>Мои Сходки</button>
-        <button class="nav-btn hidden" id="nav-admin-btn" data-sub="sub-admin"><span>⚡</span>Админка</button>
+        <button class="nav-btn active" data-sub="sub-radar">
+            <span style="font-size: 16px;">📡</span>Радар
+        </button>
+        <button class="nav-btn" data-sub="sub-create">
+            <span style="font-size: 16px;">⚡</span>Собрать
+        </button>
+        <button class="nav-btn" data-sub="sub-archive">
+            <span style="font-size: 16px;">📜</span>Архив
+        </button>
+        <button class="nav-btn" data-sub="sub-admin">
+            <span style="font-size: 16px;">🚨</span>Куратор
+        </button>
     </div>
         <script>
-        // Твой рабочий Worker URL
+        const BIN_ID = '6a68a3d7da38895dfe9b46cf';
+        const API_KEY = '$2a$10$fCuDEyphx80p7hlYAPd8C.W8S8fZv53sNq6UhpL8m/Oot7eVvdScu';
         const workerUrl = "https://noisy-art-8292.korba-alex2012.workers.dev";
         const MY_TELEGRAM_ID = 6949963047;
 
-        // База локаций Гродно по видам спорта и интересам
         const grodnoLocations = {
             'Центр (Советская)': {
                 'default': ['У Танка', 'Возле Фары', 'Драмтеатр', 'Парк Жилибера'],
@@ -484,7 +473,6 @@
             }
         }
 
-        // Локальные базы данных
         let meetings = JSON.parse(localStorage.getItem('gr_meetings_2026')) || [];
         let archive = JSON.parse(localStorage.getItem('gr_archive_2026')) || [];
         let complaints = JSON.parse(localStorage.getItem('gr_complaints_2026')) || [];
@@ -493,25 +481,14 @@
         let activeAge = parseInt(localStorage.getItem('user_age')) || 0;
         let currentDistrictFilter = "all";
 
-        // Музыкальный плеер
-        const audio = document.getElementById('bg-audio');
-        const musicBtn = document.getElementById('btn-music-toggle');
-        const musicUpload = document.getElementById('music-upload');
-        const badge = document.getElementById('track-queue-badge');
-        let playlistUrls = [];
-        let currentTrackIndex = 0;
-
-               // Функция загрузки карточек с сервера Cloudflare
         async function loadMeetingsFromServer() {
             try {
-                const res = await fetch(workerUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'get_radars' })
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+                    headers: { 'X-Master-Key': API_KEY }
                 });
                 const data = await res.json();
-                if (data.success && Array.isArray(data.meetings)) {
-                    meetings = data.meetings;
+                if (data && data.record && Array.isArray(data.record.meetings)) {
+                    meetings = data.record.meetings;
                     localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
                 }
             } catch (e) {
@@ -519,15 +496,33 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            document.getElementById('nav-admin-btn')?.classList.remove('hidden');
+        async function saveMeetingsToServer() {
+            try {
+                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': API_KEY
+                    },
+                    body: JSON.stringify({ meetings: meetings })
+                });
+            } catch (e) {
+                console.error("Ошибка сохранения на сервер:", e);
+            }
+        }
 
+        const audio = document.getElementById('bg-audio');
+        const musicBtn = document.getElementById('btn-music-toggle');
+        const musicUpload = document.getElementById('music-upload');
+        const badge = document.getElementById('track-queue-badge');
+        let playlistUrls = [];
+        let currentTrackIndex = 0;
+
+        document.addEventListener('DOMContentLoaded', async () => {
             if (localStorage.getItem('user_registered') === 'true') {
                 document.getElementById('screen-auth')?.classList.remove('active');
                 document.getElementById('screen-main')?.classList.add('active');
                 updateStatusHeader();
-                
-                // Сначала подтягиваем свежие сходки всех юзеров, потом отрисовываем
                 await loadMeetingsFromServer();
                 renderAll();
             } else {
@@ -542,6 +537,7 @@
                 radio.addEventListener('change', updatePlaceTags);
             });
         });
+
         function initAudioEngine() {
             musicBtn?.addEventListener('click', () => {
                 if (playlistUrls.length === 0) {
@@ -592,7 +588,6 @@
         function updatePlaceTags() {
             const districtSelect = document.getElementById('create-district');
             const activeTagInput = document.querySelector('input[name="radar-tag"]:checked');
-            
             if (!districtSelect) return;
             
             const currentDistrict = districtSelect.value;
@@ -617,14 +612,13 @@
                 tagBtn.type = 'button';
                 tagBtn.innerText = placeName;
                 tagBtn.style.cssText = 'background:rgba(255,255,255,0.05); color:#00a2ff; border:1px solid rgba(0,162,255,0.3); padding:5px 10px; border-radius:15px; font-size:11px; cursor:pointer; font-weight:600;';
-                
                 tagBtn.addEventListener('click', () => {
                     exactPlaceInput.value = placeName;
                 });
                 tagsContainer.appendChild(tagBtn);
             });
         }
-                    // Авторизация
+
         document.getElementById('btn-submit-auth')?.addEventListener('click', (e) => {
             e.preventDefault();
             const gen = document.getElementById('auth-gender').value;
@@ -642,28 +636,9 @@
             updateStatusHeader(); renderAll();
         });
 
-        // Маскировка Админа
-        document.getElementById('btn-apply-fake')?.addEventListener('click', () => {
-            activeGender = document.getElementById('admin-fake-gender').value;
-            activeAge = parseInt(document.getElementById('admin-fake-age').value);
-            updateStatusHeader(); renderAll();
-            alert("Маскировка куратора применена! Радар перенастроен.");
-        });
-
-        // Навигация по кнопкам меню
         document.querySelectorAll('.bottom-nav .nav-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const targetSub = btn.getAttribute('data-sub');
-                if (targetSub === "sub-admin" && localStorage.getItem('admin_authorized') !== 'true') {
-                    const pin = prompt("🔐 Доступ ограничен. Введите ПИН-КОД куратора:");
-                    if (pin === "147369") {
-                        localStorage.setItem('admin_authorized', 'true');
-                        alert("⚠️ Доступ подтвержден. Добро пожаловать, Куратор!");
-                    } else {
-                        if (pin !== null) alert("❌ Ошибка: неверный код безопасности.");
-                        return;
-                    }
-                }
                 document.querySelectorAll('.bottom-nav .nav-btn').forEach(b => b.classList.remove('active'));
                 document.querySelectorAll('.sub-screen').forEach(s => s.classList.remove('active'));
                 btn.classList.add('active');
@@ -681,10 +656,8 @@
             });
         });
 
-        // Запуск Радара и отправка данных в Worker
         document.getElementById('btn-launch-radar')?.addEventListener('click', async function(e) {
             e.preventDefault();
-
             const district = document.getElementById('create-district')?.value || 'Не указан';
             const exactPlace = document.getElementById('create-exact-place')?.value.trim();
             const desc = document.getElementById('create-desc')?.value.trim() || 'Без описания';
@@ -706,55 +679,29 @@
 
             const tag = document.querySelector('input[name="radar-tag"]:checked')?.value || '🚶‍♂️ Прогулка';
 
-            const payload = {
-                action: 'create_radar',
+            const newMeeting = {
+                id: 'm_' + Date.now() + "_" + Math.random().toString(36).substr(2, 5),
                 district: district,
                 exactPlace: exactPlace,
                 time: timeText,
                 category: tag,
                 description: desc,
-                creator: myUsername
+                creator: myUsername,
+                members: [myUsername]
             };
 
-            const btn = document.getElementById('btn-launch-radar');
-            const origText = btn.innerText;
-            btn.innerText = 'Запуск...';
-            btn.disabled = true;
-
-                       const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 8000);
-
-            try {
-                const response = await fetch(workerUrl, {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                    signal: controller.signal
-                });
-                clearTimeout(timeoutId);
-
-                              if (response.ok) {
-                    alert('Радар успешно запущен!');
-                    await loadMeetingsFromServer();
-                    renderAll();
-                    document.querySelector('.nav-btn[data-sub="sub-radar"]')?.click();
-                }
- else {
-                    alert(`Ошибка сервера: ${response.status}`);
-                }
-            } catch (error) {
-                clearTimeout(timeoutId);
-                if (error.name === 'AbortError') {
-                    alert('Превышено время ожидания! Проверь VPN или интернет.');
-                } else {
-                    console.error('Network error:', error);
-                    alert('Ошибка сети! Проверь подключение.');
-                }
-            } finally {
-                btn.innerText = origText;
-                btn.disabled = false;
+            meetings.unshift(newMeeting);
+            if (!archive.some(item => item.id === newMeeting.id)) {
+                archive.unshift(newMeeting);
             }
+            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
+            localStorage.setItem('gr_archive_2026', JSON.stringify(archive));
+
+            await saveMeetingsToServer();
+
+            alert('Радар успешно запущен!');
+            renderAll();
+            document.querySelector('.nav-btn[data-sub="sub-radar"]')?.click();
         });
 
         function renderAll() {
@@ -781,8 +728,7 @@
                 const id = config[m.district];
                 const el = document.getElementById(id);
                 if (el) {
-                    if ((m.malesJoined + m.femalesJoined) >= 5) el.className = "map-point mega";
-                    else el.className = "map-point active";
+                    el.className = "map-point active";
                 }
             });
         }
@@ -830,7 +776,7 @@
                     </div>
                     <p style="margin: 0 0 6px 0; font-size: 14px;"><b>Где:</b> ${m.exactPlace}</p>
                     <p style="margin: 0 0 6px 0; font-size: 14px;"><b>Категория:</b> ${m.category || 'Прогулка'}</p>
-                    <p style="margin: 0 0 10px 0; font-size: 13px; color: #a4b0be;">${m.desc || 'Описания нет.'}</p>
+                    <p style="margin: 0 0 10px 0; font-size: 13px; color: #a4b0be;">${m.description || 'Описания нет.'}</p>
                     <div style="display: flex; gap: 8px;">
                         <button class="btn btn-primary" style="padding: 10px; font-size: 13px; flex: 3;" onclick="joinMeeting('${m.id}')">⚡ Буду на месте</button>
                         <button class="btn btn-danger" style="padding: 10px; font-size: 13px; flex: 1; background: #261616; color: var(--accent-red);" onclick="reportDescription('${m.creator}', '${m.id}')">⚠ ЖБ</button>
@@ -840,22 +786,15 @@
             });
         }
 
-        window.deleteMyMeeting = function(id) {
-            if (confirm("Удалить этот сбор?")) {
-                meetings = meetings.filter(m => m.id !== id);
-                localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
-                if (tg && tg.sendData) {
-                    tg.sendData(JSON.stringify({ type: "delete_meeting", id: id }));
-                }
-                renderAll();
-            }
-        };
-
-        window.joinMeeting = function(id) {
+        window.joinMeeting = async function(id) {
             const m = meetings.find(item => item.id === id); 
-            if (!archive.some(item => item.id === id)) {
-                if (m) archive.unshift(m);
+            if (m && !archive.some(item => item.id === id)) {
+                archive.unshift(m);
                 localStorage.setItem('gr_archive_2026', JSON.stringify(archive));
+            }
+            if (m && !m.members.includes(myUsername)) {
+                m.members.push(myUsername);
+                await saveMeetingsToServer();
             }
             alert("Ты вписался в компанию!");
             renderAll();
@@ -886,7 +825,7 @@
             });
         }
 
-        function renderViolators() {
+               function renderViolators() {
             const list = document.getElementById('violators-list');
             const empty = document.getElementById('admin-empty-state');
             if (!list) return; list.innerHTML = '';
@@ -923,3 +862,5 @@
     </script>
 </body>
 </html>
+
+    
