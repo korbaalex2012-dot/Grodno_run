@@ -2,211 +2,152 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, maximum-scale=1.0, user-scalable=no">
-    <title>Grodno Run 2026 — Cyber Radar Premium</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Grodno Run 2026</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <style>
         :root {
-            --bg-main: #0a0a12;
-            --bg-card: rgba(20, 20, 35, 0.65);
-            --bg-input: #121224;
+            --bg-main: #0d0e15;
+            --bg-card: #161821;
+            --bg-input: #1e202c;
             --accent: #00a2ff;
             --accent-glow: rgba(0, 162, 255, 0.4);
-            --accent-green: #2ecc71;
+            --accent-green: #00ff88;
             --accent-red: #ff3838;
-            --accent-purple: #b33771;
             --text-main: #f5f6fa;
-            --text-muted: #8e8ea0;
+            --text-muted: #8c92ac;
             --border: rgba(255, 255, 255, 0.08);
-            --glass-blur: blur(12px);
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: radial-gradient(circle at top right, #13132b, var(--bg-main) 70%);
+            margin: 0; padding: 0;
+            background-color: var(--bg-main);
             color: var(--text-main);
-            margin: 0;
-            padding: 15px 15px 100px 15px;
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-user-select: none;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             overflow-x: hidden;
         }
 
-        h2, h3 {
-            margin: 0 0 10px 0;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            text-transform: uppercase;
-            background: linear-gradient(90deg, #fff, var(--text-muted));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        .screen { display: none; padding: 15px; padding-bottom: 85px; box-sizing: border-box; min-height: 100vh; }
+        .screen.active { display: block; }
 
-        .subtitle {
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-top: -6px;
-            margin-bottom: 20px;
-            font-weight: 500;
-        }
+        .sub-screen { display: none; }
+        .sub-screen.active { display: block; }
 
-        .screen { display: none; }
-        .screen.active { display: block; animation: fadeIn 0.3s ease-in-out; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        h2 { font-size: 20px; margin-bottom: 5px; color: #fff; font-weight: 800; letter-spacing: 0.5px; }
+        .subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 15px; }
 
         .card {
             background: var(--bg-card);
-            backdrop-filter: var(--glass-blur);
-            -webkit-backdrop-filter: var(--glass-blur);
-            padding: 18px;
+            border: 1px solid var(--border);
             border-radius: 16px;
-            margin-bottom: 16px;
-            border: 1px solid var(--border);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-            position: relative;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
         }
 
-        .card.status-planning { border-left: 4px solid var(--accent); }
-        .card.status-active-now { border-left: 4px solid var(--accent-green); box-shadow: 0 0 20px rgba(46, 204, 113, 0.15); }
-        .card.status-mega { border-left: 4px solid var(--accent-purple); box-shadow: 0 0 25px rgba(179, 55, 113, 0.25); }
-
-        .alert {
-            background: rgba(255, 56, 56, 0.07);
-            border: 1px solid rgba(255, 56, 56, 0.3);
-            color: #ff6b6b;
-            padding: 14px;
-            border-radius: 12px;
-            font-size: 13px;
-            line-height: 1.4;
-            margin-bottom: 25px;
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; font-weight: 700; text-transform: uppercase; }
+        
+        input[type="text"], input[type="number"], select {
+            width: 100%; background: var(--bg-input); border: 1px solid var(--border);
+            border-radius: 10px; padding: 12px; color: #fff; font-size: 14px; box-sizing: border-box;
+            outline: none; transition: border-color 0.2s;
         }
-
-        .form-group { margin-bottom: 18px; }
-
-        label {
-            display: block;
-            font-size: 11px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: #a4b0be;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        input[type="text"], input[type="number"], select, textarea {
-            width: 100%;
-            padding: 14px;
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            color: #fff;
-            font-size: 15px;
-            box-sizing: border-box;
-            outline: none;
-            transition: all 0.25s ease;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 12px var(--accent-glow);
-        }
+        input:focus, select:focus { border-color: var(--accent); }
 
         .btn {
-            display: block; width: 100%; padding: 15px; border-radius: 12px; border: none;
-            font-size: 15px; font-weight: 700; cursor: pointer; text-align: center; box-sizing: border-box;
-            transition: all 0.2s ease; text-transform: uppercase; letter-spacing: 0.5px;
+            border: none; border-radius: 12px; font-weight: 700; cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
         }
-        .btn-primary { background: linear-gradient(135deg, var(--accent), #0066ff); color: #fff; box-shadow: 0 4px 15px rgba(0, 162, 255, 0.3); }
-        .btn-success { background: linear-gradient(135deg, var(--accent-green), #27ae60); color: #fff; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3); }
-        .btn-danger { background: linear-gradient(135deg, var(--accent-red), #c0392b); color: #fff; box-shadow: 0 4px 15px rgba(255, 56, 56, 0.3); }
+        .btn:active { transform: scale(0.97); }
+        .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 4px 15px var(--accent-glow); }
+        .btn-success { background: var(--accent-green); color: #0d0e15; }
+        .btn-danger { background: var(--accent-red); color: #fff; }
 
-        .hidden { display: none !important; }
+        /* Навигация снизу */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: rgba(13, 14, 21, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--border);
+            display: flex; justify-content: space-around;
+            padding: 10px 0; z-index: 1000;
+        }
+        .nav-btn {
+            background: none; border: none; color: var(--text-muted);
+            font-size: 10px; font-weight: 700; display: flex; flex-direction: column;
+            align-items: center; gap: 4px; cursor: pointer; flex: 1; transition: color 0.2s;
+        }
+        .nav-btn span { font-size: 18px; }
+        .nav-btn.active { color: var(--accent); }
     </style>
 </head>
 <body>
 
-    <audio id="bg-audio"></audio>
-
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: rgba(15, 15, 27, 0.7); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); padding: 12px 16px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
-        <div>
-            <div style="font-weight: 900; font-size: 15px; letter-spacing: 1px; color: var(--accent); text-shadow: 0 0 10px var(--accent-glow);">GRODNO RUN</div>
-            <p style="font-size: 11px; color: var(--text-muted); margin: 3px 0 0 0; font-weight: 600;" id="user-display-status">Сканирование сети...</p>
-        </div>
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <label for="music-upload" style="margin: 0; padding: 7px 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 20px; font-size: 11px; font-weight: bold; cursor: pointer;">
-                ➕ ТРЕК<span id="track-queue-badge" style="font-size: 11px; background: var(--accent); color: #fff; padding: 1px 6px; border-radius: 10px; font-weight: bold; margin-left: 4px;" class="hidden">0</span>
-            </label>
-            <input type="file" id="music-upload" accept="audio/*" multiple class="hidden">
-            <button type="button" id="btn-music-toggle" style="background: var(--bg-input); border: 1px solid var(--border); color: var(--text-muted); padding: 7px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; font-weight: 800;">🎵 OFF</button>
-        </div>
-    </div>
-        <div id="screen-auth" class="screen active">
-        <div class="alert">
-            ⚠ ВНИМАНИЕ: Все данные проверяются роботом. За ложный пол или возраст — моментальный бан на всех районах Гродно БЕЗ права разблокировки!
-        </div>
-        <div class="card" style="border-top: 4px solid var(--accent-red);">
-            <h3>Входной контроль</h3>
-            <div class="form-group">
-                <label>Ваш пол</label>
-                <select id="auth-gender">
-                    <option value="" disabled selected>Выбрать пол...</option>
-                    <option value="Парень">Парень</option>
-                    <option value="Девушка">Девушка</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Ваш возраст (от 12 до 35 лет)</label>
-                <input type="number" id="auth-age" placeholder="Введите ваш точный возраст" min="12" max="35">
-            </div>
-            <button type="button" id="btn-submit-auth" class="btn btn-success">Пройти авторизацию</button>
-        </div>
-    </div>
-
-    <div id="screen-main" class="screen">
-        
-        <div id="sub-radar" class="sub-screen active">
+    <div id="screen-auth" class="screen">
+        <div style="max-width: 380px; margin: 40px auto; text-align: center;">
+            <div style="font-size: 45px; margin-bottom: 10px;">⚡</div>
+            <h2>Grodno Run 2026</h2>
+            <p class="subtitle">Укажи свои данные для доступа к локальному радару города</p>
             
-            <div class="card" style="padding: 10px; margin-bottom: 16px;">
-                <div style="font-size: 11px; font-weight: 700; color: var(--accent); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">
-                    🗺️ Интерактивная карта Гродно (Зум / Перетаскивание)
+            <div class="card" style="text-align: left; margin-top: 20px;">
+                <div class="form-group">
+                    <label>Твой пол:</label>
+                    <select id="auth-gender">
+                        <option value="guy">🚹 Парень</option>
+                        <option value="girl">🚺 Девушка</option>
+                    </select>
                 </div>
-                <div id="grodno-leaflet-map" style="width: 100%; height: 240px; border-radius: 12px; border: 1px solid var(--border); background: #06060c; z-index: 1;"></div>
-            </div>
+                
+                <div class="form-group" style="margin-top: 15px;">
+                    <label>Твой возраст:</label>
+                    <input type="number" id="auth-age" min="12" max="35" placeholder="Например: 18">
+                </div>
 
-            <style>
-                .filter-bar { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 18px; padding-bottom: 6px; }
-                .filter-bar::-webkit-scrollbar { display: none; }
-                .filter-chip {
-                    background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: var(--text-muted);
-                    padding: 9px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; white-space: nowrap; cursor: pointer;
-                }
-                .filter-chip.active { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
-                .empty-state { text-align: center; padding: 45px 20px; color: var(--text-muted); font-size: 14px; }
-            </style>
-
-            <div class="filter-bar" id="radar-filter-bar">
-                <div class="filter-chip active" data-filter="all">Все районы</div>
-                <div class="filter-chip" data-filter="Центр (Советская)">Советская <span id="b-center"></span></div>
-                <div class="filter-chip" data-filter="ТЦ Тринити">Тринити <span id="b-trinity"></span></div>
-                <div class="filter-chip" data-filter="OldCity (Олд Сити)">OldCity <span id="b-oldcity"></span></div>
-                <div class="filter-chip" data-filter="Ольшанка">Ольшанка <span id="b-olshanka"></span></div>
-                <div class="filter-chip" data-filter="Грандичи">Грандичи <span id="b-grandichi"></span></div>
-                <div class="filter-chip" data-filter="Девятовка">Девятовка <span id="b-devyatovka"></span></div>
-                <div class="filter-chip" data-filter="Пышки (Парк)">Пышки <span id="b-pyshki"></span></div>
-                <div class="filter-chip" data-filter="БЛК / Форты">Форты <span id="b-forty"></span></div>
+                <button class="btn btn-primary" id="btn-submit-auth" style="width: 100%; margin-top: 15px; padding: 14px; font-size: 15px;">
+                    Войти в систему
+                </button>
             </div>
-            
-            <div id="empty-state-msg" class="empty-state">На радаре пока пусто... Запусти движ сам!</div>
-            <div id="radar-list"></div>
         </div>
-                       <div id="sub-create" class="sub-screen">
+    </div>
+        <div id="screen-main" class="screen">
+        <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; margin-bottom: 12px; background: rgba(22,24,33,0.8);">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 16px;">📍</span>
+                <span id="header-location" style="font-size: 13px; font-weight: bold; color: var(--accent);">Гродно</span>
+            </div>
+            <div style="font-size: 12px; color: var(--text-muted);" id="header-user-info">
+                Загрузка...
+            </div>
+        </div>
+
+        <div id="sub-radar" class="sub-screen active">
+            <h2>radar.grodno</h2>
+            <p class="subtitle">Интерактивный радар сборов и активностей в городе</p>
+
+            <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 15px;">
+                <div id="grodno-leaflet-map" style="width: 100%; height: 220px; background: #0d0e15;"></div>
+            </div>
+
+            <div style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px;" id="radar-filter-bar">
+                <button class="btn filter-chip active" data-filter="all" style="background: var(--bg-card); color: #fff; padding: 6px 12px; font-size: 12px; border: 1px solid var(--border); white-space: nowrap;">Все районы</button>
+                <button class="btn filter-chip" data-filter="Центр (Советская)" style="background: var(--bg-card); color: var(--text-muted); padding: 6px 12px; font-size: 12px; border: 1px solid var(--border); white-space: nowrap;">Центр <span id="b-center" style="color:var(--accent); margin-left:4px;"></span></button>
+                <button class="btn filter-chip" data-filter="ТЦ Тринити" style="background: var(--bg-card); color: var(--text-muted); padding: 6px 12px; font-size: 12px; border: 1px solid var(--border); white-space: nowrap;">Тринити <span id="b-trinity" style="color:var(--accent); margin-left:4px;"></span></button>
+                <button class="btn filter-chip" data-filter="OldCity (Олд Сити)" style="background: var(--bg-card); color: var(--text-muted); padding: 6px 12px; font-size: 12px; border: 1px solid var(--border); white-space: nowrap;">OldCity <span id="b-oldcity" style="color:var(--accent); margin-left:4px;"></span></button>
+                <button class="btn filter-chip" data-filter="Ольшанка" style="background: var(--bg-card); color: var(--text-muted); padding: 6px 12px; font-size: 12px; border: 1px solid var(--border); white-space: nowrap;">Ольшанка <span id="b-olshanka" style="color:var(--accent); margin-left:4px;"></span></button>
+                <button class="btn filter-chip" data-filter="Девятовка" style="background: var(--bg-card); color: var(--text-muted); padding: 6px 12px; font-size: 12px; border: 1px solid var(--border); white-space: nowrap;">Девятовка <span id="b-devyatovka" style="color:var(--accent); margin-left:4px;"></span></button>
+                <button class="btn filter-chip" data-filter="Грандичи" style="background: var(--bg-card); color: var(--text-muted); padding: 6px 12px; font-size: 12px; border: 1px solid var(--border); white-space: nowrap;">Грандичи <span id="b-grandichi" style="color:var(--accent); margin-left:4px;"></span></button>
+                <button class="btn filter-chip" data-filter="Пышки (Парк)" style="background: var(--bg-card); color: var(--text-muted); padding: 6px 12px; font-size: 12px; border: 1px solid var(--border); white-space: nowrap;">Пышки <span id="b-pyshki" style="color:var(--accent); margin-left:4px;"></span></button>
+                <button class="btn filter-chip" data-filter="БЛК / Форты" style="background: var(--bg-card); color: var(--text-muted); padding: 6px 12px; font-size: 12px; border: 1px solid var(--border); white-space: nowrap;">БЛК <span id="b-forty" style="color:var(--accent); margin-left:4px;"></span></button>
+            </div>
+
+            <div id="radar-list"></div>
+            <div id="empty-state-msg" style="text-align: center; color: var(--text-muted); padding: 30px 0; display: none;">
+                <div style="font-size: 32px; margin-bottom: 8px;">📡</div>
+                В этом районе пока нет активных сборов. Создай свой первым!
+            </div>
+        </div>
+                <div id="sub-create" class="sub-screen">
             <h2>➕ Запустить сбор</h2>
             <p class="subtitle">Отметь локацию на общем радаре Гродно</p>
             <div class="card" style="border-top: 4px solid var(--accent);">
@@ -239,29 +180,25 @@
                             box-shadow: 0 0 10px var(--accent-glow);
                             font-weight: bold;
                         }
+                        .comp-mode-btn {
+                            flex: 1; padding: 10px; font-size: 12px; font-weight: 700; background: var(--bg-input);
+                            border: 1px solid var(--border); color: var(--text-muted); border-radius: 10px; cursor: pointer; text-align: center;
+                        }
+                        .comp-mode-btn.active { background: rgba(0,162,255,0.2); color: var(--accent); border-color: var(--accent); }
                     </style>
                     <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 5px;">
                         <input type="radio" id="tag-walk" name="radar-tag" value="🚶‍♂️ Прогулка" checked style="display:none;">
                         <label for="tag-walk" class="cyber-tag-btn">🚶‍♂️ Прогулка</label>
-
                         <input type="radio" id="tag-football" name="radar-tag" value="⚽ Футбол" style="display:none;">
                         <label for="tag-football" class="cyber-tag-btn">⚽ Футбол</label>
-
                         <input type="radio" id="tag-basketball" name="radar-tag" value="🏀 Баскетбол" style="display:none;">
                         <label for="tag-basketball" class="cyber-tag-btn">🏀 Баскетбол</label>
-
                         <input type="radio" id="tag-volleyball" name="radar-tag" value="🏐 Волейбол" style="display:none;">
                         <label for="tag-volleyball" class="cyber-tag-btn">🏐 Волейбол</label>
-
-                        <input type="radio" id="tag-pingpong" name="radar-tag" value="🏓 Наст. теннис" style="display:none;">
-                        <label for="tag-pingpong" class="cyber-tag-btn">🏓 Наст. теннис</label>
-
                         <input type="radio" id="tag-workout" name="radar-tag" value="🏋️‍♂️ Турники / Бег" style="display:none;">
                         <label for="tag-workout" class="cyber-tag-btn">🏋️‍♂️ Турники / Бег</label>
-
                         <input type="radio" id="tag-bike" name="radar-tag" value="🚲 Велик" style="display:none;">
                         <label for="tag-bike" class="cyber-tag-btn">🚲 Велик</label>
-
                         <input type="radio" id="tag-game" name="radar-tag" value="🎮 Гейминг" style="display:none;">
                         <label for="tag-game" class="cyber-tag-btn">🎮 Гейминг</label>
                     </div>
@@ -269,270 +206,179 @@
 
                 <div class="form-group" style="margin-top: 15px;">
                     <label>🎯 Точное место встречи:</label>
-                    <input type="text" id="create-exact-place" placeholder="Например: Коробка на Ожешко, Скейт-парк">
+                    <input type="text" id="create-exact-place" placeholder="Например: Коробка на Ожешко">
                 </div>
 
                 <div class="form-group" style="margin-top: 15px;">
                     <label>⏱️ Когда собираемся?</label>
                     <div style="display: flex; gap: 15px; margin-top: 5px; align-items: center;">
-                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 13px; color: #ff3838; font-weight: bold;">
+                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 13px; color: var(--accent-red); font-weight: bold;">
                             <input type="radio" name="time-type" value="now" checked> ⚡ Срочно
                         </label>
-                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 13px; color: #00a2ff; font-weight: bold;">
+                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 13px; color: var(--accent); font-weight: bold;">
                             <input type="radio" name="time-type" value="later"> 📅 Выбрать время
                         </label>
                     </div>
                 </div>
 
                 <div class="form-group" style="margin-top: 15px;">
-                    <label>📝 Короткое описание / приметы:</label>
-                    <textarea id="create-desc" placeholder="Кто нужен? Что берём с собой? Сколько сидим?" style="width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; color: #fff; font-size: 13px; resize: none; height: 70px; box-sizing: border-box;"></textarea>
+                    <label>👥 Кто нужен по составу?</label>
+                    <div style="display: flex; gap: 8px; margin-top: 6px;">
+                        <button type="button" class="comp-mode-btn active" id="btn-mode-free" onclick="switchCompositionMode('free')">🌐 Свободный состав</button>
+                        <button type="button" class="comp-mode-btn" id="btn-mode-exact" onclick="switchCompositionMode('exact')">🔢 Точные цифры</button>
+                    </div>
+
+                    <div id="composition-free-box" style="display: flex; gap: 6px; margin-top: 10px;">
+                        <button type="button" class="cyber-tag-btn tag-chip-comp active" data-gender="any" onclick="setTargetGender(this)">🌍 Все равно</button>
+                        <button type="button" class="cyber-tag-btn tag-chip-comp" data-gender="only_guys" onclick="setTargetGender(this)">🚹 Только пацаны</button>
+                        <button type="button" class="cyber-tag-btn tag-chip-comp" data-gender="only_girls" onclick="setTargetGender(this)">🚺 Только девушки</button>
+                    </div>
+
+                    <div id="composition-exact-box" style="display: none; display: flex; gap: 10px; margin-top: 10px;">
+                        <div style="flex: 1;">
+                            <label style="font-size: 11px; color: var(--text-muted);">Девушек (чел):</label>
+                            <input type="number" id="count-girls" min="0" value="0" style="margin-top: 4px;">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="font-size: 11px; color: var(--text-muted);">Пацанов (чел):</label>
+                            <input type="number" id="count-guys" min="0" value="0" style="margin-top: 4px;">
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-group" style="margin-top: 15px;">
-                    <label>👥 Кого ждём по составу?</label>
-                    <style>
-                        .tag-chip-comp {
-                            background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: var(--text-muted);
-                            padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;
-                        }
-                        .tag-chip-comp.active { background: rgba(0, 162, 255, 0.2); color: var(--accent); border-color: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
-                    </style>
-                    <div id="target-gender-selector" style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;">
-                        <button type="button" class="tag-chip-comp active" data-gender="any" onclick="setTargetGender(this)">🌍 Все равно</button>
-                        <button type="button" class="tag-chip-comp" data-gender="only_guys" onclick="setTargetGender(this)">🚹 Только пацаны</button>
-                        <button type="button" class="tag-chip-comp" data-gender="only_girls" onclick="setTargetGender(this)">🚺 Только девушки</button>
-                    </div>
-
-                    <div style="display: flex; gap: 10px; margin-top: 12px;">
-                        <div style="flex: 1;">
-                            <label style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Девушек:</label>
-                            <input type="number" id="count-girls" min="0" value="0" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px; padding: 10px; color: #fff; font-size: 14px; box-sizing: border-box;">
-                        </div>
-                        <div style="flex: 1;">
-                            <label style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Пацанов:</label>
-                            <input type="number" id="count-guys" min="0" value="0" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px; padding: 10px; color: #fff; font-size: 14px; box-sizing: border-box;">
-                        </div>
+                    <label>🔞 Ограничение по возрасту (от и до):</label>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
+                        <input type="number" id="age-min" min="12" max="35" value="14" placeholder="От" style="text-align: center;">
+                        <span style="color: var(--text-muted);">—</span>
+                        <input type="number" id="age-max" min="12" max="35" value="25" placeholder="До" style="text-align: center;">
                     </div>
                 </div>
 
                 <div class="form-group" id="max-people-block" style="margin-top: 15px;">
-                    <label>🔢 Максимум человек</label>
-                    <input type="text" id="create-max-people" placeholder="Например: 5 или Без лимита" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: #fff; font-size: 14px; box-sizing: border-box;">
+                    <label>🔢 Максимум человек (общее ограничение)</label>
+                    <input type="text" id="create-max-people" placeholder="Например: 5 или Без лимита">
                 </div>
 
-                <button class="btn btn-primary" id="btn-launch-radar" style="width: 100%; margin-top: 20px; padding: 14px; font-size: 15px; font-weight: bold;">
+                <div class="form-group" style="margin-top: 15px;">
+                    <label>📝 Описание / Твой контакт (@username или телефон):</label>
+                    <textarea id="create-desc" placeholder="Например: Гуляем в парке, пишите @tvoj_nick" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px; padding: 10px; color: #fff; font-size: 13px; resize: none; height: 70px; box-sizing: border-box;"></textarea>
+                </div>
+
+                <button class="btn btn-primary" id="btn-launch-radar" style="width: 100%; margin-top: 15px; padding: 14px; font-size: 15px; font-weight: bold;">
                     🚀 ЗАПУСТИТЬ РАДАР СБОРА
                 </button>
             </div>
         </div>
+
         <div id="sub-archive" class="sub-screen">
             <h2>📜 Архив сборов</h2>
-            <p class="subtitle">История завершенных встреч</p>
-            <div id="archive-empty-state" class="empty-state">Архив пуст.</div>
+            <p class="subtitle">История завершенных активностей в Гродно</p>
             <div id="archive-list"></div>
+            <div id="archive-empty-state" style="text-align: center; color: var(--text-muted); padding: 30px 0; display: none;">
+                Архив пока пуст.
+            </div>
         </div>
-
-        <div id="sub-admin" class="sub-screen">
+                <div id="sub-admin" class="sub-screen">
             <h2>🚨 Панель куратора</h2>
-            <p class="subtitle">Жалобы и нарушения в районе</p>
-            <div id="admin-empty-state" class="empty-state">Нарушений нет. Все чисто!</div>
+            <p class="subtitle">Управление жалобами и модерация</p>
             <div id="violators-list"></div>
+            <div id="admin-empty-state" style="text-align: center; color: var(--text-muted); padding: 30px 0; display: none;">
+                Нарушений нет. Всё чисто!
+            </div>
         </div>
-
     </div>
-        <style>
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10, 10, 18, 0.85);
-            backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-            border-top: 1px solid var(--border); display: flex; padding: 10px 6px; z-index: 999;
-        }
-        .nav-btn {
-            flex: 1; background: transparent; border: none; color: var(--text-muted);
-            padding: 8px 4px; font-size: 11px; font-weight: 700; cursor: pointer;
-            display: flex; flex-direction: column; align-items: center; gap: 5px;
-            transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.5px;
-        }
-        .nav-btn.active { color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); }
-        .sub-screen { display: none; }
-        .sub-screen.active { display: block; }
-        .violator-item { background: rgba(255, 56, 56, 0.04); border: 1px solid rgba(255, 56, 56, 0.15); padding: 16px; border-radius: 14px; margin-bottom: 12px; }
-    </style>
 
     <div class="bottom-nav">
         <button class="nav-btn active" data-sub="sub-radar">
-            <span style="font-size: 16px;">📡</span>Радар
+            <span>📡</span>Радар
         </button>
         <button class="nav-btn" data-sub="sub-create">
-            <span style="font-size: 16px;">⚡</span>Собрать
+            <span>➕</span>Собрать
         </button>
         <button class="nav-btn" data-sub="sub-archive">
-            <span style="font-size: 16px;">📜</span>Архив
+            <span>📜</span>Архив
         </button>
     </div>
-        <script>
-        const BIN_ID = '6a68a3d7da38895dfe9b46cf';
-        const API_KEY = '$2a$10$fCuDEyphx80p7hlYAPd8C.W8S8fZv53sNq6UhpL8m/Oot7eVvdScu';
-        const MY_TELEGRAM_ID = 6949963047;
 
-        // Координаты всех точек по районам Гродно для интерактивной карты Leaflet
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <script>
+        let mapInstance = null;
+        let mapMarkers = [];
+        let currentDistrictFilter = 'all';
+        let selectedTargetGender = 'any';
+        let compositionMode = 'free'; // 'free' или 'exact'
+
+        let activeGender = localStorage.getItem('user_gender') || 'guy';
+        let activeAge = parseInt(localStorage.getItem('user_age')) || 18;
+        let myUsername = "user_" + Math.floor(Math.random() * 8999 + 1000);
+        let myId = activeGender === 'guy' ? 6949963047 : 111111;
+
+        let meetings = JSON.parse(localStorage.getItem('gr_meetings_2026') || '[]');
+        let archive = JSON.parse(localStorage.getItem('gr_archive_2026') || '[]');
+        let complaints = JSON.parse(localStorage.getItem('gr_complaints_2026') || '[]');
+
         const grodnoLocationsData = {
-            'Центр (Советская)': [
-                { name: 'У Танка', coords: [53.6800, 23.8303], desc: 'Легендарное место сбора в центре' },
-                { name: 'Возле Фары', coords: [53.6785, 23.8340], desc: 'Территория у Фарного костела' },
-                { name: 'Драмтеатр', coords: [53.6748, 23.8290], desc: 'Смотровая площадка на Неман' },
-                { name: 'Парк Жилибера', coords: [53.6815, 23.8350], desc: 'Центральная аллея парка' }
+            "Центр (Советская)": [
+                { name: "Выход к Советской", coords: [53.6784, 23.8322], desc: "Главная пешеходная улица" },
+                { name: "У Танка", coords: [53.6812, 23.8401], desc: "Мемориал в парке Жилибера" }
             ],
-            'ТЦ Тринити': [
-                { name: 'Главный вход', coords: [53.6492, 23.8395], desc: 'Уличная площадка у входа в ТЦ' },
-                { name: 'Фуд-корт (3 этаж)', coords: [53.6492, 23.8395], desc: 'Зона отдыха и фастфуда' },
-                { name: 'Ледовая арена', coords: [53.6510, 23.8420], desc: 'Территория возле ледового дворца' }
+            "ТЦ Тринити": [
+                { name: "Главный вход Тринити", coords: [53.6451, 23.8245], desc: "Крупнейший ТРЦ города" }
             ],
-            'OldCity (Олд Сити)': [
-                { name: 'У Замка (атриум)', coords: [53.6912, 23.8490], desc: 'Главный атриум торгового центра' },
-                { name: 'Парковка у входа', coords: [53.6915, 23.8485], desc: 'Верхняя парковочная зона' }
+            "OldCity (Олд Сити)": [
+                { name: "Центральный вход OldCity", coords: [53.6705, 23.8654], desc: "Торговый центр на Дубко" }
             ],
-            'Ольшанка': [
-                { name: 'ТЦ Стелла', coords: [53.6280, 23.7850], desc: 'Центр микрорайона' },
-                { name: 'Стадион 41-й школы', coords: [53.6265, 23.7890], desc: 'Спортивная коробка' }
+            "Ольшанка": [
+                { name: "Коробка Ольшанка", coords: [53.6152, 23.8501], desc: "Спальный район" }
             ],
-            'Девятовка': [
-                { name: 'ТЦ Лимож', coords: [53.7020, 23.8550], desc: 'Площадь у торгового центра' },
-                { name: 'Стадион 27-й школы', coords: [53.6980, 23.8600], desc: 'Спортивная площадка' }
+            "Девятовка": [
+                { name: "Коробка Девятовка", coords: [53.7021, 23.8492], desc: "Возле магазинов" }
             ],
-            'Грандичи': [
-                { name: 'Евроопт (Грандичи-3)', coords: [53.7150, 23.8680], desc: 'Главная точка сбора района' },
-                { name: 'Школа №42', coords: [53.7130, 23.8650], desc: 'Территория школы' }
+            "Грандичи": [
+                { name: "Новый район Грандичи", coords: [53.7185, 23.8402], desc: "Современная застройка" }
             ],
-            'Пышки (Парк)': [
-                { name: 'Тропа здоровья (вход)', coords: [53.6850, 23.7950], desc: 'Начало лесопарковой зоны' },
-                { name: 'Смотровая у Немана', coords: [53.6820, 23.8010], desc: 'Вид на реку' }
+            "Пышки (Парк)": [
+                { name: "Главный вход в Пышки", coords: [53.6854, 23.8012], desc: "Лесопарк и тропа здоровья" }
             ],
-            'БЛК / Форты': [
-                { name: 'Мини-рынок Форты', coords: [53.6920, 23.8150], desc: 'Торговая площадка' },
-                { name: 'Стадион «Красное Знамя»', coords: [53.6950, 23.8100], desc: 'Спортивный стадион' }
+            "БЛК / Форты": [
+                { name: "Возле Фары", coords: [53.6892, 23.8251], desc: "Историческое место" }
             ]
         };
 
-        const tg = window.Telegram?.WebApp;
-        let myId = 0;
-        let myUsername = "Grodno_User";
-
-        if (tg) {
-            tg.ready();
-            tg.expand();
-            if (tg.initDataUnsafe?.user) {
-                myId = tg.initDataUnsafe.user.id;
-                myUsername = tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name;
-            }
-        }
-
-        let meetings = JSON.parse(localStorage.getItem('gr_meetings_2026')) || [];
-        let archive = JSON.parse(localStorage.getItem('gr_archive_2026')) || [];
-        let complaints = JSON.parse(localStorage.getItem('gr_complaints_2026')) || [];
-
-        let activeGender = localStorage.getItem('user_gender') || "";
-        let activeAge = parseInt(localStorage.getItem('user_age')) || 0;
-        let currentDistrictFilter = "all";
-        let selectedTargetGender = 'any';
-        let mapInstance = null;
-        let mapMarkers = [];
-
-        async function loadMeetingsFromServer() {
-            try {
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-                    headers: { 'X-Master-Key': API_KEY }
-                });
-                const data = await res.json();
-                if (data && data.record && Array.isArray(data.record.meetings)) {
-                    meetings = data.record.meetings;
-                    localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
-                }
-            } catch (e) {
-                console.error("Ошибка загрузки радара:", e);
-            }
-        }
-
-        async function saveMeetingsToServer() {
-            try {
-                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': API_KEY
-                    },
-                    body: JSON.stringify({ meetings: meetings })
-                });
-            } catch (e) {
-                console.error("Ошибка сохранения на сервер:", e);
-            }
-        }
-
-        const audio = document.getElementById('bg-audio');
-        const musicBtn = document.getElementById('btn-music-toggle');
-        const musicUpload = document.getElementById('music-upload');
-        const badge = document.getElementById('track-queue-badge');
-        let playlistUrls = [];
-        let currentTrackIndex = 0;
-
-        function initAudioEngine() {
-            musicBtn?.addEventListener('click', () => {
-                if (playlistUrls.length === 0) {
-                    alert("Добавь треки через кнопку '➕ ТРЕК'!");
-                    return;
-                }
-                if (audio.paused) { playCurrentTrack(); } 
-                else {
-                    audio.pause();
-                    musicBtn.innerText = "🎵 OFF";
-                    musicBtn.style.color = "var(--text-muted)";
-                }
-            });
-
-            musicUpload?.addEventListener('change', (e) => {
-                const files = Array.from(e.target.files);
-                if (files.length > 0) {
-                    files.forEach(file => playlistUrls.push(URL.createObjectURL(file)));
-                    badge.innerText = playlistUrls.length;
-                    badge.classList.remove('hidden');
-                    if (audio.paused) playCurrentTrack();
-                }
-            });
-
-            audio?.addEventListener('ended', () => {
-                currentTrackIndex++;
-                if (currentTrackIndex >= playlistUrls.length) currentTrackIndex = 0; 
-                playCurrentTrack();
-            });
-        }
-
-        function playCurrentTrack() {
-            if (playlistUrls.length === 0) return;
-            audio.src = playlistUrls[currentTrackIndex];
-            audio.play().then(() => {
-                musicBtn.innerText = `🎵 ТРЕК ${currentTrackIndex + 1}`;
-                musicBtn.style.color = "var(--accent-green)";
-            }).catch(err => console.log(err));
-        }
-
         function updateStatusHeader() {
-            const statusEl = document.getElementById('user-display-status');
-            if (statusEl) {
-                statusEl.innerText = `${activeGender}, ${activeAge} л. (@${myUsername}) 🛰 СЕТЬ`;
+            const info = document.getElementById('header-user-info');
+            if (info) {
+                info.innerHTML = `👤 @${myUsername} (${activeGender === 'guy' ? '🚹' : '🚺'} ${activeAge}л)`;
             }
         }
-        </script>
-               <script>
+
+        function switchCompositionMode(mode) {
+            compositionMode = mode;
+            document.getElementById('btn-mode-free').classList.toggle('active', mode === 'free');
+            document.getElementById('btn-mode-exact').classList.toggle('active', mode === 'exact');
+            
+            if (mode === 'free') {
+                document.getElementById('composition-free-box').style.display = 'flex';
+                document.getElementById('composition-exact-box').style.display = 'none';
+            } else {
+                document.getElementById('composition-free-box').style.display = 'none';
+                document.getElementById('composition-exact-box').style.display = 'flex';
+                selectedTargetGender = 'exact_numbers';
+            }
+        }
+
+        window.setTargetGender = function(btn) {
+            document.querySelectorAll('#composition-free-box .tag-chip-comp').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedTargetGender = btn.getAttribute('data-gender');
+        };
+
         function initLeafletMap() {
             if (mapInstance) return;
-            
-            // Жесткие границы Гродно, чтобы карту мира нельзя было прокрутить за пределы города
-            const grodnoBounds = L.latLngBounds(
-                [53.55, 23.65], // Юго-запад
-                [53.78, 24.00]  // Северо-восток
-            );
+            const grodnoBounds = L.latLngBounds([53.55, 23.65], [53.78, 24.00]);
 
-            // Инициализируем карту строго по Гродно
             mapInstance = L.map('grodno-leaflet-map', {
                 zoomControl: true,
                 attributionControl: false,
@@ -542,7 +388,6 @@
                 maxZoom: 17
             }).setView([53.6768, 23.8303], 13);
 
-            // Темная киберпанк-тема тайлов карты
             L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
                 maxZoom: 19,
                 subdomains: 'abcd'
@@ -555,7 +400,6 @@
             if (!mapInstance) return;
             mapMarkers.forEach(m => mapInstance.removeLayer(m));
             mapMarkers = [];
-
             const activeDistricts = meetings.map(m => m.district);
 
             Object.keys(grodnoLocationsData).forEach(districtName => {
@@ -564,10 +408,8 @@
 
                 points.forEach(pt => {
                     const markerColor = hasActiveMeetings ? '#ff3838' : '#00a2ff';
-                    const markerRadius = hasActiveMeetings ? 8 : 6;
-
                     const circleMarker = L.circleMarker(pt.coords, {
-                        radius: markerRadius,
+                        radius: hasActiveMeetings ? 8 : 6,
                         fillColor: markerColor,
                         color: '#fff',
                         weight: 1.5,
@@ -575,125 +417,36 @@
                         fillOpacity: 0.85
                     }).addTo(mapInstance);
 
-                    circleMarker.bindPopup(`
-                        <div style="color: #000; font-family: sans-serif; font-size: 12px;">
-                            <b style="color: #00a2ff;">${districtName}</b><br>
-                            <b>${pt.name}</b><br>
-                            <span style="color: #555;">${pt.desc}</span>
-                        </div>
-                    `);
-
                     circleMarker.on('click', () => {
                         currentDistrictFilter = districtName;
                         document.querySelectorAll('#radar-filter-bar .filter-chip').forEach(c => {
-                            if (c.getAttribute('data-filter') === districtName) {
-                                c.classList.add('active');
-                            } else {
-                                c.classList.remove('active');
-                            }
+                            c.classList.toggle('active', c.getAttribute('data-filter') === districtName);
                         });
                         renderMeetingsList();
                     });
-
                     mapMarkers.push(circleMarker);
                 });
             });
         }
 
-        function updatePlaceTags() {
-            const districtSelect = document.getElementById('create-district');
-            const activeTagInput = document.querySelector('input[name="radar-tag"]:checked');
-            if (!districtSelect) return;
-            
-            const currentDistrict = districtSelect.value;
-            const currentTag = activeTagInput ? activeTagInput.value.trim() : '🚶‍♂️ Прогулка';
-            const exactPlaceInput = document.getElementById('create-exact-place');
-            if (!exactPlaceInput) return;
-            
-            let tagsContainer = document.getElementById('grodno-tags-container');
-            if (!tagsContainer) {
-                tagsContainer = document.createElement('div');
-                tagsContainer.id = 'grodno-tags-container';
-                tagsContainer.style.cssText = 'display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;';
-                exactPlaceInput.parentNode.insertBefore(tagsContainer, exactPlaceInput.nextSibling);
-            }
-            
-            tagsContainer.innerHTML = ''; 
-            const districtPoints = grodnoLocationsData[currentDistrict] || [];
-            
-            districtPoints.forEach(placeObj => {
-                const tagBtn = document.createElement('button');
-                tagBtn.type = 'button';
-                tagBtn.innerText = placeObj.name;
-                tagBtn.style.cssText = 'background:rgba(255,255,255,0.05); color:#00a2ff; border:1px solid rgba(0,162,255,0.3); padding:5px 10px; border-radius:15px; font-size:11px; cursor:pointer; font-weight:600;';
-                tagBtn.addEventListener('click', () => {
-                    exactPlaceInput.value = placeObj.name;
-                });
-                tagsContainer.appendChild(tagBtn);
-            });
-        }
-
-        window.setTargetGender = function(btn) {
-            document.querySelectorAll('#target-gender-selector .tag-chip-comp').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            selectedTargetGender = btn.getAttribute('data-gender');
-
-            const limitBlock = document.getElementById('max-people-block');
-            if (limitBlock) {
-                if (selectedTargetGender === 'only_guys' || selectedTargetGender === 'only_girls' || selectedTargetGender === 'any') {
-                    limitBlock.style.display = 'block';
-                } else {
-                    limitBlock.style.display = 'none';
-                }
-            }
-        };
-                           document.addEventListener('DOMContentLoaded', async () => {
-            if (myId === 6949963047) {
-                const bottomNav = document.querySelector('.bottom-nav');
-                if (bottomNav) {
-                    const adminNavBtn = document.createElement('button');
-                    adminNavBtn.className = 'nav-btn';
-                    adminNavBtn.setAttribute('data-sub', 'sub-admin');
-                    adminNavBtn.innerHTML = '<span style="font-size: 16px;">🚨</span>Куратор';
-                    
-                    adminNavBtn.addEventListener('click', () => {
-                        document.querySelectorAll('.bottom-nav .nav-btn').forEach(b => b.classList.remove('active'));
-                        document.querySelectorAll('.sub-screen').forEach(s => s.classList.remove('active'));
-                        adminNavBtn.classList.add('active');
-                        document.getElementById('sub-admin')?.classList.add('active');
-                        renderAll();
-                    });
-                    
-                    bottomNav.appendChild(adminNavBtn);
-                }
-            }
-
+        document.addEventListener('DOMContentLoaded', async () => {
             if (localStorage.getItem('user_registered') === 'true') {
                 document.getElementById('screen-auth')?.classList.remove('active');
                 document.getElementById('screen-main')?.classList.add('active');
                 updateStatusHeader();
-                await loadMeetingsFromServer();
                 renderAll();
                 setTimeout(initLeafletMap, 200);
             } else {
                 document.getElementById('screen-auth')?.classList.add('active');
             }
-            
-            initAudioEngine();
-            updatePlaceTags();
-
-            document.getElementById('create-district')?.addEventListener('change', updatePlaceTags);
-            document.querySelectorAll('input[name="radar-tag"]').forEach(radio => {
-                radio.addEventListener('change', updatePlaceTags);
-            });
         });
 
         document.getElementById('btn-submit-auth')?.addEventListener('click', (e) => {
             e.preventDefault();
             const gen = document.getElementById('auth-gender').value;
             const age = parseInt(document.getElementById('auth-age').value);
-            if (!gen || !age || age < 12 || age > 35) {
-                alert('Укажите корректный пол и возраст от 12 до 35 лет!');
+            if (!age || age < 12 || age > 35) {
+                alert('Укажите корректный возраст от 12 до 35 лет!');
                 return;
             }
             localStorage.setItem('user_gender', gen);
@@ -702,7 +455,7 @@
             activeGender = gen; activeAge = age;
             document.getElementById('screen-auth').classList.remove('active');
             document.getElementById('screen-main')?.classList.add('active');
-            updateStatusHeader(); 
+            updateStatusHeader();
             renderAll();
             setTimeout(initLeafletMap, 200);
         });
@@ -715,9 +468,7 @@
                 btn.classList.add('active');
                 document.getElementById(targetSub)?.classList.add('active');
                 renderAll();
-                if (targetSub === 'sub-radar') {
-                    setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 150);
-                }
+                if (targetSub === 'sub-radar') setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 150);
             });
         });
 
@@ -730,86 +481,50 @@
             });
         });
 
-        document.getElementById('btn-launch-radar')?.addEventListener('click', async function(e) {
+        document.getElementById('btn-launch-radar')?.addEventListener('click', function(e) {
             e.preventDefault();
-            
-            const district = document.getElementById('create-district')?.value || 'Не указан';
+            const district = document.getElementById('create-district')?.value || 'Центр';
             const exactPlace = document.getElementById('create-exact-place')?.value.trim();
             const desc = document.getElementById('create-desc')?.value.trim() || 'Без описания';
+            const ageMin = parseInt(document.getElementById('age-min')?.value) || 12;
+            const ageMax = parseInt(document.getElementById('age-max')?.value) || 35;
+            const maxPeople = document.getElementById('create-max-people')?.value || 'Без лимита';
             
-            const girlsCount = document.getElementById('count-girls')?.value || '0';
-            const guysCount = document.getElementById('count-guys')?.value || '0';
-            const maxPeopleInput = document.getElementById('create-max-people')?.value || 'Без лимита';
+            const girlsCount = compositionMode === 'exact' ? (document.getElementById('count-girls')?.value || '0') : '0';
+            const guysCount = compositionMode === 'exact' ? (document.getElementById('count-guys')?.value || '0') : '0';
 
             if (!exactPlace) {
-                alert('Пожалуйста, укажите точное место встречи!');
+                alert('Укажите точное место встречи!');
                 return;
             }
 
-            let timeText = '';
             const timeType = document.querySelector('input[name="time-type"]:checked')?.value;
-            if (timeType === 'now') {
-                timeText = '⚡ СРОЧНО';
-            } else {
-                const hour = document.getElementById('create-hour')?.value || '12';
-                const minute = document.getElementById('create-minute')?.value || '00';
-                timeText = `${hour}:${minute}`;
-            }
-
+            const timeText = timeType === 'now' ? '⚡ СРОЧНО' : '📅 По расписанию';
             const tag = document.querySelector('input[name="radar-tag"]:checked')?.value || '🚶‍♂️ Прогулка';
 
             const newMeeting = {
-                id: 'm_' + Date.now() + "_" + Math.random().toString(36).substr(2, 5),
-                district: district,
-                exactPlace: exactPlace,
-                time: timeText,
-                category: tag,
-                description: desc,
-                targetGender: selectedTargetGender,
-                girlsCount: girlsCount,
-                guysCount: guysCount,
-                maxPeople: maxPeopleInput,
-                creator: myUsername,
-                members: [myUsername]
+                id: 'm_' + Date.now(),
+                district, exactPlace, time: timeText, category: tag,
+                description: desc, targetGender: selectedTargetGender,
+                ageMin, ageMax, girlsCount, guysCount, maxPeople,
+                creator: myUsername, members: [myUsername]
             };
 
             meetings.unshift(newMeeting);
-            if (!archive.some(item => item.id === newMeeting.id)) {
-                archive.unshift(newMeeting);
-            }
+            archive.unshift(newMeeting);
             localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
             localStorage.setItem('gr_archive_2026', JSON.stringify(archive));
 
-            await saveMeetingsToServer();
-
-            alert('Радар успешно запущен!');
+            alert('Радар запущен!');
             renderAll();
             document.querySelector('.nav-btn[data-sub="sub-radar"]')?.click();
-            setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 150);
         });
 
         function renderAll() {
             renderMeetingsList();
             renderArchiveList();
             renderViolators();
-            updateDistrictBadges();
             renderMapMarkers();
-        }
-
-        function updateDistrictBadges() {
-            const counts = {};
-            meetings.forEach(m => counts[m.district] = (counts[m.district] || 0) + 1);
-
-            const badges = {
-                "Центр (Советская)": "b-center", "ТЦ Тринити": "b-trinity", "OldCity (Олд Сити)": "b-oldcity",
-                "Ольшанка": "b-olshanka", "Грандичи": "b-grandichi", "Девятовка": "b-devyatovka",
-                "Пышки (Парк)": "b-pyshki", "БЛК / Форты": "b-forty"
-            };
-
-            Object.keys(badges).forEach(key => {
-                const el = document.getElementById(badges[key]);
-                if (el) el.innerText = counts[key] ? `🔥 ${counts[key]}` : "";
-            });
         }
 
         function renderMeetingsList() {
@@ -818,10 +533,7 @@
             if (!container) return;
             container.innerHTML = '';
 
-            const filtered = meetings.filter(m => {
-                if (currentDistrictFilter !== "all" && m.district !== currentDistrictFilter) return false;
-                return true;
-            });
+            const filtered = meetings.filter(m => currentDistrictFilter === 'all' || m.district === currentDistrictFilter);
 
             if (filtered.length === 0) {
                 if (emptyMsg) emptyMsg.style.display = 'block';
@@ -831,74 +543,85 @@
 
             filtered.forEach(m => {
                 const card = document.createElement('div');
-                card.className = `card status-planning`;
-                
-                const isCreator = m.creator === myUsername || myUsername === "Grodno_User";
-                
+                card.className = 'card';
+                const isCreator = m.creator === myUsername;
+
+                let составТекст = '🌐 Все равно';
+                if (m.targetGender === 'only_guys') составТекст = '🚹 Только пацаны';
+                else if (m.targetGender === 'only_girls') составТекст = '🚺 Только девушки';
+                else if (m.targetGender === 'exact_numbers') составТекст = `🔢 Дев: ${m.girlsCount} | Пац: ${m.guysCount}`;
+
                 card.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <strong style="color: var(--accent); font-size: 15px;">📍 ${m.district}</strong>
-                        <span style="font-size: 11px; background: #1a1b26; padding: 4px 10px; border-radius: 12px; color: var(--text-muted); font-weight: bold;">⏳ ${m.time || 'Срочно'}</span>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <strong style="color: var(--accent);">📍 ${m.district}</strong>
+                        <span style="font-size: 11px; background: #1a1b26; padding: 3px 8px; border-radius: 8px; color: var(--text-muted);">${m.time}</span>
                     </div>
-                    <p style="margin: 0 0 6px 0; font-size: 14px;"><b>Где:</b> ${m.exactPlace}</p>
-                    <p style="margin: 0 0 6px 0; font-size: 14px;"><b>Категория:</b> ${m.category || 'Прогулка'}</p>
-                    <p style="margin: 0 0 6px 0; font-size: 12px; color: #a4b0be;">👥 Состав — Девушек: <b>${m.girlsCount || 0}</b> | Пацанов: <b>${m.guysCount || 0}</b> | Лимит: <b>${m.maxPeople || 'Без лимита'}</b></p>
-                    <p style="margin: 0 0 10px 0; font-size: 13px; color: #a4b0be;">${m.description || 'Описания нет.'}</p>
-                    <p style="margin: 0 0 10px 0; font-size: 12px; color: var(--accent);">👤 Организатор: @${m.creator || 'Аноним'}</p>
-                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <p style="margin: 0 0 5px 0; font-size: 14px;"><b>Где:</b> ${m.exactPlace}</p>
+                    <p style="margin: 0 0 5px 0; font-size: 13px; color: var(--text-muted);">👥 Состав: <b>${составТекст}</b></p>
+                    <p style="margin: 0 0 5px 0; font-size: 13px; color: var(--text-muted);">🔞 Возраст: <b>от ${m.ageMin} до ${m.ageMax} лет</b></p>
+                    <p style="margin: 0 0 8px 0; font-size: 13px;">${m.description}</p>
+                    <p style="margin: 0 0 10px 0; font-size: 12px; color: var(--accent);">👤 Создатель: @${m.creator}</p>
+                    <p style="margin: 0 0 10px 0; font-size: 12px; color: var(--accent-green);">📋 Участники (${m.members.length}): ${m.members.map(u => '@'+u).join(', ')}</p>
+                    <div style="display: flex; gap: 8px;">
                         <button class="btn btn-primary" style="padding: 10px; font-size: 13px; flex: 2;" onclick="joinMeeting('${m.id}')">⚡ Буду на месте</button>
-                        ${isCreator ? `<button class="btn btn-danger" style="padding: 10px; font-size: 13px; flex: 1.5; background: #8b0000;" onclick="cancelMeeting('${m.id}')">🚪 Отменить</button>` : ''}
-                        <button class="btn btn-danger" style="padding: 10px; font-size: 13px; flex: 1; background: #261616; color: var(--accent-red);" onclick="reportDescription('${m.creator}', '${m.id}')">⚠ ЖБ</button>
+                        ${isCreator ? `<button class="btn btn-danger" style="padding: 10px; font-size: 13px; flex: 1;" onclick="cancelMeeting('${m.id}')">🚪 Отменить</button>` : ''}
                     </div>
                 `;
                 container.appendChild(card);
             });
         }
 
-        window.cancelMeeting = async function(id) {
-            if (!confirm("Ты уверен, что хочешь отменить и удалить этот сбор?")) return;
+        window.joinMeeting = function(id) {
+            const m = meetings.find(item => item.id === id);
+            if (!m) return;
+
+            // Защита: проверка возраста
+            if (activeAge < m.ageMin || activeAge > m.ageMax) {
+                alert(`Не подходишь по возрасту! Требуется от ${m.ageMin} до ${m.ageMax} лет.`);
+                return;
+            }
+
+            // Защита: если ищут только девушек, парень не может присоединиться
+            if (m.targetGender === 'only_girls' && activeGender === 'guy') {
+                alert('⛔ Сюда могут присоединяться только девушки!');
+                return;
+            }
+
+            // Защита: если ищут только пацанов, девушка не может присоединиться
+            if (m.targetGender === 'only_guys' && activeGender === 'girl') {
+                alert('⛔ Сюда могут присоединяться только пацаны!');
+                return;
+            }
+
+            if (!m.members.includes(myUsername)) {
+                m.members.push(myUsername);
+                localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
+                alert('Ты успешно записался! Контакты участников видны в карточке.');
+                renderAll();
+            } else {
+                alert('Ты уже в списке участников!');
+            }
+        };
+
+        window.cancelMeeting = function(id) {
+            if (!confirm('Удалить этот сбор?')) return;
             meetings = meetings.filter(item => item.id !== id);
             localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
-            await saveMeetingsToServer();
-            alert("Сход успешно отменен и удален с радара!");
-            renderAll();
-        };
-
-        window.joinMeeting = async function(id) {
-            const m = meetings.find(item => item.id === id); 
-            if (m && !archive.some(item => item.id === id)) {
-                archive.unshift(m);
-                localStorage.setItem('gr_archive_2026', JSON.stringify(archive));
-            }
-            if (m && !m.members.includes(myUsername)) {
-                m.members.push(myUsername);
-                await saveMeetingsToServer();
-            }
-            alert("Ты вписался в компанию!");
-            renderAll();
-        };
-
-        window.reportDescription = function(username, meetingId) {
-            const reason = prompt("Укажите причину жалобы (Мат, неадекватность):");
-            if (!reason) return;
-            complaints.unshift({ id: Date.now(), violator: username, type: "Жалоба на описание", reason: reason, meetingId: meetingId });
-            localStorage.setItem('gr_complaints_2026', JSON.stringify(complaints));
-            alert("Жалоба доставлена куратору!");
             renderAll();
         };
 
         function renderArchiveList() {
             const container = document.getElementById('archive-list');
             const empty = document.getElementById('archive-empty-state');
-            if(!container) return; container.innerHTML = '';
+            if (!container) return; container.innerHTML = '';
             if (archive.length === 0) { if (empty) empty.style.display = 'block'; return; }
             if (empty) empty.style.display = 'none';
 
             archive.forEach(m => {
                 const card = document.createElement('div'); card.className = 'card';
-                card.innerHTML = `<strong style="color: var(--accent-green);">📍 Район: ${m.district}</strong>
-                    <p style="margin: 5px 0; font-size: 13px;"><b>Место:</b> ${m.exactPlace}</p>
-                    <p style="margin: 5px 0 10px 0; font-size: 12px; color: var(--text-muted);">Организатор: @${m.creator || 'Аноним'}</p>`;
+                card.innerHTML = `<strong style="color: var(--accent-green);">📍 ${m.district}</strong>
+                    <p style="margin: 5px 0; font-size: 13px;">${m.exactPlace}</p>
+                    <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Создатель: @${m.creator}</p>`;
                 container.appendChild(card);
             });
         }
@@ -909,42 +632,7 @@
             if (!list) return; list.innerHTML = '';
             if (complaints.length === 0) { if (empty) empty.style.display = 'block'; return; }
             if (empty) empty.style.display = 'none';
-
-            complaints.forEach((c, idx) => {
-                const item = document.createElement('div'); item.className = 'violator-item';
-                item.innerHTML = `
-                    <div style="font-size: 11px; color: var(--accent); text-transform: uppercase; font-weight: bold; margin-bottom: 4px;">${c.type}</div>
-                    <p style="margin: 0 0 4px 0;">👤 <b>Нарушитель:</b> @${c.violator}</p>
-                    <p style="margin: 0 0 12px 0; font-size: 13px; color: #ff8a80;">⚠️ <b>Суть:</b> ${c.reason}</p>
-                    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                        <button class="btn btn-primary" style="padding: 7px 10px; font-size: 11px; flex: 2;" onclick="copyUltimatum('${c.violator}')">📋 Ультиматум</button>
-                        <button class="btn btn-success" style="padding: 7px 10px; font-size: 11px; flex: 1;" onclick="adminCloseCase(${idx}, true)">Оправдать</button>
-                        <button class="btn btn-danger" style="padding: 7px 10px; font-size: 11px; flex: 1;" onclick="adminCloseCase(${idx}, false)">БАН</button>
-                    </div>
-                `;
-                list.appendChild(item);
-            });
         }
-
-        window.copyUltimatum = function(username) {
-            const text = `ВНИМАНИЕ! На твой профиль поступила официальная жалоба.\n\nУ тебя есть выбор (выбери ОДИН вариант):\n1. ВИДЕО-КРУЖОК с лицом и фразой: „Гродно 2026“.\n2. Ссылка на открытый Instagram с био: „Гродно 2026“.;`;
-            navigator.clipboard.writeText(text).then(() => alert(`Ультиматум для @${username} скопирован!`));
-        };
-
-        window.adminCloseCase = function(index, approved) {
-            alert(approved ? "Дело закрыто. Пользователь оправдан." : "Нарушителю выдан БАН.");
-            complaints.splice(index, 1); 
-            localStorage.setItem('gr_complaints_2026', JSON.stringify(complaints));
-            renderAll();
-        };
     </script>
 </body>
 </html>
-
-
-         
-
-    
-    
-    
-    
