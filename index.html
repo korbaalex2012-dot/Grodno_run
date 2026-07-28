@@ -733,7 +733,7 @@
             });
         }
 
-        function renderMeetingsList() {
+               function renderMeetingsList() {
             const container = document.getElementById('radar-list');
             const emptyMsg = document.getElementById('empty-state-msg');
             if (!container) return;
@@ -753,6 +753,9 @@
             filtered.forEach(m => {
                 const card = document.createElement('div');
                 card.className = `card status-planning`;
+                
+                const isCreator = m.creator === myUsername || myUsername === "Grodno_User";
+                
                 card.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                         <strong style="color: var(--accent); font-size: 15px;">📍 ${m.district}</strong>
@@ -761,14 +764,28 @@
                     <p style="margin: 0 0 6px 0; font-size: 14px;"><b>Где:</b> ${m.exactPlace}</p>
                     <p style="margin: 0 0 6px 0; font-size: 14px;"><b>Категория:</b> ${m.category || 'Прогулка'}</p>
                     <p style="margin: 0 0 10px 0; font-size: 13px; color: #a4b0be;">${m.description || 'Описания нет.'}</p>
-                    <div style="display: flex; gap: 8px;">
-                        <button class="btn btn-primary" style="padding: 10px; font-size: 13px; flex: 3;" onclick="joinMeeting('${m.id}')">⚡ Буду на месте</button>
+                    <p style="margin: 0 0 10px 0; font-size: 12px; color: var(--accent);">👤 Организатор: @${m.creator || 'Аноним'}</p>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button class="btn btn-primary" style="padding: 10px; font-size: 13px; flex: 2;" onclick="joinMeeting('${m.id}')">⚡ Буду на месте</button>
+                        ${isCreator ? `<button class="btn btn-danger" style="padding: 10px; font-size: 13px; flex: 1.5; background: #8b0000;" onclick="cancelMeeting('${m.id}')">🚪 Отменить</button>` : ''}
                         <button class="btn btn-danger" style="padding: 10px; font-size: 13px; flex: 1; background: #261616; color: var(--accent-red);" onclick="reportDescription('${m.creator}', '${m.id}')">⚠ ЖБ</button>
                     </div>
                 `;
                 container.appendChild(card);
             });
         }
+        window.cancelMeeting = async function(id) {
+            if (!confirm("Ты уверен, что хочешь отменить и удалить этот сбор?")) return;
+            
+            meetings = meetings.filter(item => item.id !== id);
+            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
+            
+            await saveMeetingsToServer();
+            
+            alert("Сход успешно отменен и удален с радара!");
+            renderAll();
+        };
+
 
         window.joinMeeting = async function(id) {
             const m = meetings.find(item => item.id === id); 
