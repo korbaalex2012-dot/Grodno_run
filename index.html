@@ -64,7 +64,27 @@
         .btn-success { background: var(--accent-green); color: #0d0e15; }
         .btn-danger { background: var(--accent-red); color: #fff; }
 
-        /* Навигация снизу */
+        /* Быстрые теги мест и категорий */
+        .cyber-tag-btn {
+            padding: 8px 12px; border: 1px solid rgba(0, 162, 255, 0.4); color: var(--text-main);
+            border-radius: 8px; cursor: pointer; display: inline-block; font-size: 12px; font-weight: 600;
+            background: rgba(255,255,255,0.03); transition: all 0.2s; user-select: none;
+        }
+        .cyber-tag-btn.active {
+            background: rgba(0, 162, 255, 0.2);
+            border-color: var(--accent);
+            color: #fff;
+            box-shadow: 0 0 10px var(--accent-glow);
+            font-weight: bold;
+        }
+
+        .quick-place-chip {
+            background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: var(--accent);
+            padding: 6px 10px; border-radius: 8px; font-size: 11px; cursor: pointer; display: inline-block;
+        }
+        .quick-place-chip:active { background: rgba(0,162,255,0.2); }
+
+        /* Нижняя навигация */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0;
             background: rgba(13, 14, 21, 0.95);
@@ -110,7 +130,8 @@
             </div>
         </div>
     </div>
-        <div id="screen-main" class="screen">
+
+    <div id="screen-main" class="screen">
         <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; margin-bottom: 12px; background: rgba(22,24,33,0.8);">
             <div style="display: flex; align-items: center; gap: 8px;">
                 <span style="font-size: 16px;">📍</span>
@@ -131,14 +152,12 @@
 
             <div style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 12px;" id="radar-filter-bar">
                 <button class="btn filter-chip active" data-filter="all" style="background: var(--bg-card); color: #fff; padding: 6px 12px; font-size: 12px; border: 1px solid var(--border); white-space: nowrap;">Все районы</button>
-                <button class="btn filter-chip" data-filter="Центр (Советская)" style="background: var(--bg-card); color: var(--text-muted); padding: 6px 12px; font-size: 12px; border: 1px solid var(--border); white-space: nowrap;">Центр <span id="b-center" style="color:var(--accent); margin-left:4px;"></span></button>
-                <button class="btn filter-chip" data-filter="ТЦ Тринити" style="background: var(--bg-card); color: var(--text-muted); padding: 6px 12px; font-size: 12px; border: 1px solid var(--border); white-space: nowrap;">Тринити <span id="b-trinity" style="color:var(--accent); margin-left:4px;"></span></button>
-                <button class="btn filter-chip" data-filter="OldCity (Олд Сити)" style="background: var(--bg-card); color: var(--text-muted); padding: 6px 12px; font-size: 12px; border: 1px solid var(--border); white-space: nowrap;">OldCity <span id="b-oldcity" style="color:var(--accent); margin-left:4px;"></span></button>
-                <button class="btn filter-chip" data-filter="Ольшанка" style="background: var(--bg-card); color: var(--text-muted); padding: 6px 12px; font-size: 12px; border: 1px solid var(--border); white-space: nowrap;">Ольшанка <span id="b-olshanka" style="color:var(--accent); margin-left:4px;"></span></button>
-                <button class="btn filter-chip" data-filter="Девятовка" style="background: var(--bg-card); color: var(--text-muted); padding: 6px 12px; font-size: 12px; border: 1px solid var(--border); white-space: nowrap;">Девятовка <span id="b-devyatovka" style="color:var(--accent); margin-left:4px;"></span></button>
-                <button class="btn filter-chip" data-filter="Грандичи" style="background: var(--bg-card); color: var(--text-muted); padding: 6px 12px; font-size: 12px; border: 1px solid var(--border); white-space: nowrap;">Грандичи <span id="b-grandichi" style="color:var(--accent); margin-left:4px;"></span></button>
-                <button class="btn filter-chip" data-filter="Пышки (Парк)" style="background: var(--bg-card); color: var(--text-muted); padding: 6px 12px; font-size: 12px; border: 1px solid var(--border); white-space: nowrap;">Пышки <span id="b-pyshki" style="color:var(--accent); margin-left:4px;"></span></button>
-                <button class="btn filter-chip" data-filter="БЛК / Форты" style="background: var(--bg-card); color: var(--text-muted); padding: 6px 12px; font-size: 12px; border: 1px solid var(--border); white-space: nowrap;">БЛК <span id="b-forty" style="color:var(--accent); margin-left:4px;"></span></button>
+                <button class="btn filter-chip" data-filter="Центр (Советская)" style="background: var(--bg-card); color: var(--text-muted); padding: 6px 12px; font-size: 12px; border: 1px solid var(--border); white-space: nowrap;">Центр</button>
+                <button class="btn filter-chip" data-filter="ТЦ Тринити" style="background: var(--bg-card); color: var(--text-muted); padding: 6px 12px; font-size: 12px; border: 1px solid var(--border); white-space: nowrap;">Тринити</button>
+                <button class="btn filter-chip" data-filter="OldCity (Олд Сити)" style="background: var(--bg-card); color: var(--text-muted); padding: 6px 12px; font-size: 12px; border: 1px solid var(--border); white-space: nowrap;">OldCity</button>
+                <button class="btn filter-chip" data-filter="Ольшанка" style="background: var(--bg-card); color: var(--text-muted); padding: 6px 12px; font-size: 12px; border: 1px solid var(--border); white-space: nowrap;">Ольшанка</button>
+                <button class="btn filter-chip" data-filter="Девятовка" style="background: var(--bg-card); color: var(--text-muted); padding: 6px 12px; font-size: 12px; border: 1px solid var(--border); white-space: nowrap;">Девятовка</button>
+                <button class="btn filter-chip" data-filter="Пышки (Парк)" style="background: var(--bg-card); color: var(--text-muted); padding: 6px 12px; font-size: 12px; border: 1px solid var(--border); white-space: nowrap;">Пышки</button>
             </div>
 
             <div id="radar-list"></div>
@@ -151,54 +170,37 @@
             <h2>➕ Запустить сбор</h2>
             <p class="subtitle">Отметь локацию на общем радаре Гродно</p>
             <div class="card" style="border-top: 4px solid var(--accent);">
+                
                 <div class="form-group">
                     <label>📍 Выберите район</label>
-                    <select id="create-district">
+                    <select id="create-district" onchange="updatePlaceTags()">
                         <option value="Центр (Советская)">Центр (Советская)</option>
                         <option value="ТЦ Тринити">ТЦ Тринити</option>
                         <option value="OldCity (Олд Сити)">OldCity (Олд Сити)</option>
                         <option value="Ольшанка">Ольшанка</option>
                         <option value="Девятовка">Девятовка</option>
-                        <option value="Грандичи">Грандичи</option>
                         <option value="Пышки (Парк)">Пышки (Парк)</option>
-                        <option value="БЛК / Форты">БЛК / Форты</option>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label>🔥 Категория встреч:</label>
-                    <style>
-                        .cyber-tag-btn {
-                            padding: 8px 12px; border: 1px solid rgba(0, 162, 255, 0.4); color: var(--text-main);
-                            border-radius: 8px; cursor: pointer; display: inline-block; font-size: 12px; font-weight: 600;
-                            background: rgba(255,255,255,0.03); transition: all 0.2s;
-                        }
-                        input[type="radio"]:checked + .cyber-tag-btn {
-                            background: rgba(0, 162, 255, 0.2) !important;
-                            border-color: var(--accent) !important;
-                            color: #fff !important;
-                            box-shadow: 0 0 10px var(--accent-glow);
-                            font-weight: bold;
-                        }
-                        .comp-mode-btn {
-                            flex: 1; padding: 10px; font-size: 12px; font-weight: 700; background: var(--bg-input);
-                            border: 1px solid var(--border); color: var(--text-muted); border-radius: 10px; cursor: pointer; text-align: center;
-                        }
-                        .comp-mode-btn.active { background: rgba(0,162,255,0.2); color: var(--accent); border-color: var(--accent); }
-                    </style>
-                    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 5px;">
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 5px;">
                         <input type="radio" id="tag-walk" name="radar-tag" value="🚶‍♂️ Прогулка" checked style="display:none;">
                         <label for="tag-walk" class="cyber-tag-btn">🚶‍♂️ Прогулка</label>
+
                         <input type="radio" id="tag-football" name="radar-tag" value="⚽ Футбол" style="display:none;">
                         <label for="tag-football" class="cyber-tag-btn">⚽ Футбол</label>
+
                         <input type="radio" id="tag-basketball" name="radar-tag" value="🏀 Баскетбол" style="display:none;">
                         <label for="tag-basketball" class="cyber-tag-btn">🏀 Баскетбол</label>
+
                         <input type="radio" id="tag-volleyball" name="radar-tag" value="🏐 Волейбол" style="display:none;">
                         <label for="tag-volleyball" class="cyber-tag-btn">🏐 Волейбол</label>
-                        <input type="radio" id="tag-workout" name="radar-tag" value="🏋️‍♂️ Турники / Бег" style="display:none;">
-                        <label for="tag-workout" class="cyber-tag-btn">🏋️‍♂️ Турники / Бег</label>
+
                         <input type="radio" id="tag-bike" name="radar-tag" value="🚲 Велик" style="display:none;">
                         <label for="tag-bike" class="cyber-tag-btn">🚲 Велик</label>
+
                         <input type="radio" id="tag-game" name="radar-tag" value="🎮 Гейминг" style="display:none;">
                         <label for="tag-game" class="cyber-tag-btn">🎮 Гейминг</label>
                     </div>
@@ -206,7 +208,8 @@
 
                 <div class="form-group" style="margin-top: 15px;">
                     <label>🎯 Точное место встречи:</label>
-                    <input type="text" id="create-exact-place" placeholder="Например: Коробка на Ожешко">
+                    <input type="text" id="create-exact-place" placeholder="Например: Коробка на Ожешко, Скейт-парк">
+                    <div id="quick-places-container" style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px;"></div>
                 </div>
 
                 <div class="form-group" style="margin-top: 15px;">
@@ -224,24 +227,24 @@
                 <div class="form-group" style="margin-top: 15px;">
                     <label>👥 Кто нужен по составу?</label>
                     <div style="display: flex; gap: 8px; margin-top: 6px;">
-                        <button type="button" class="comp-mode-btn active" id="btn-mode-free" onclick="switchCompositionMode('free')">🌐 Свободный состав</button>
-                        <button type="button" class="comp-mode-btn" id="btn-mode-exact" onclick="switchCompositionMode('exact')">🔢 Точные цифры</button>
+                        <button type="button" class="btn cyber-tag-btn active" id="btn-mode-free" onclick="switchCompositionMode('free')" style="flex:1;">🌐 Свободный режим</button>
+                        <button type="button" class="btn cyber-tag-btn" id="btn-mode-exact" onclick="switchCompositionMode('exact')" style="flex:1;">🔢 Точные цифры</button>
                     </div>
 
                     <div id="composition-free-box" style="display: flex; gap: 6px; margin-top: 10px;">
-                        <button type="button" class="cyber-tag-btn tag-chip-comp active" data-gender="any" onclick="setTargetGender(this)">🌍 Все равно</button>
-                        <button type="button" class="cyber-tag-btn tag-chip-comp" data-gender="only_guys" onclick="setTargetGender(this)">🚹 Только пацаны</button>
-                        <button type="button" class="cyber-tag-btn tag-chip-comp" data-gender="only_girls" onclick="setTargetGender(this)">🚺 Только девушки</button>
+                        <button type="button" class="cyber-tag-btn active" data-gender="any" onclick="setTargetGender(this, 'any')">🌍 Все равно</button>
+                        <button type="button" class="cyber-tag-btn" data-gender="only_guys" onclick="setTargetGender(this, 'only_guys')">🚹 Только пацаны</button>
+                        <button type="button" class="cyber-tag-btn" data-gender="only_girls" onclick="setTargetGender(this, 'only_girls')">🚺 Только девушки</button>
                     </div>
 
                     <div id="composition-exact-box" style="display: none; display: flex; gap: 10px; margin-top: 10px;">
                         <div style="flex: 1;">
-                            <label style="font-size: 11px; color: var(--text-muted);">Девушек (чел):</label>
-                            <input type="number" id="count-girls" min="0" value="0" style="margin-top: 4px;">
+                            <label style="font-size: 11px; color: var(--text-muted);">Девушек:</label>
+                            <input type="number" id="count-girls" min="0" value="1" style="margin-top: 4px;">
                         </div>
                         <div style="flex: 1;">
-                            <label style="font-size: 11px; color: var(--text-muted);">Пацанов (чел):</label>
-                            <input type="number" id="count-guys" min="0" value="0" style="margin-top: 4px;">
+                            <label style="font-size: 11px; color: var(--text-muted);">Пацанов:</label>
+                            <input type="number" id="count-guys" min="0" value="1" style="margin-top: 4px;">
                         </div>
                     </div>
                 </div>
@@ -249,19 +252,19 @@
                 <div class="form-group" style="margin-top: 15px;">
                     <label>🔞 Ограничение по возрасту (от и до):</label>
                     <div style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
-                        <input type="number" id="age-min" min="12" max="35" value="14" placeholder="От" style="text-align: center;">
+                        <input type="number" id="age-min" min="12" max="35" value="14" style="text-align: center;">
                         <span style="color: var(--text-muted);">—</span>
-                        <input type="number" id="age-max" min="12" max="35" value="25" placeholder="До" style="text-align: center;">
+                        <input type="number" id="age-max" min="12" max="35" value="25" style="text-align: center;">
                     </div>
                 </div>
 
                 <div class="form-group" id="max-people-block" style="margin-top: 15px;">
-                    <label>🔢 Максимум человек (общее ограничение)</label>
+                    <label>🔢 Максимум человек</label>
                     <input type="text" id="create-max-people" placeholder="Например: 5 или Без лимита">
                 </div>
 
                 <div class="form-group" style="margin-top: 15px;">
-                    <label>📝 Описание / Твой контакт (@username или телефон):</label>
+                    <label>📝 Описание / Твой контакт (@username):</label>
                     <textarea id="create-desc" placeholder="Например: Гуляем в парке, пишите @tvoj_nick" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px; padding: 10px; color: #fff; font-size: 13px; resize: none; height: 70px; box-sizing: border-box;"></textarea>
                 </div>
 
@@ -299,6 +302,9 @@
         <button class="nav-btn" data-sub="sub-archive">
             <span>📜</span>Архив
         </button>
+        <button class="nav-btn" data-sub="sub-admin">
+            <span>🚨</span>Куратор
+        </button>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -313,39 +319,37 @@
         let activeGender = localStorage.getItem('user_gender') || 'guy';
         let activeAge = parseInt(localStorage.getItem('user_age')) || 18;
         let myUsername = "user_" + Math.floor(Math.random() * 8999 + 1000);
-        let myId = activeGender === 'guy' ? 6949963047 : 111111;
 
         let meetings = JSON.parse(localStorage.getItem('gr_meetings_2026') || '[]');
         let archive = JSON.parse(localStorage.getItem('gr_archive_2026') || '[]');
         let complaints = JSON.parse(localStorage.getItem('gr_complaints_2026') || '[]');
 
-        const grodnoLocationsData = {
-            "Центр (Советская)": [
-                { name: "Выход к Советской", coords: [53.6784, 23.8322], desc: "Главная пешеходная улица" },
-                { name: "У Танка", coords: [53.6812, 23.8401], desc: "Мемориал в парке Жилибера" }
-            ],
-            "ТЦ Тринити": [
-                { name: "Главный вход Тринити", coords: [53.6451, 23.8245], desc: "Крупнейший ТРЦ города" }
-            ],
-            "OldCity (Олд Сити)": [
-                { name: "Центральный вход OldCity", coords: [53.6705, 23.8654], desc: "Торговый центр на Дубко" }
-            ],
-            "Ольшанка": [
-                { name: "Коробка Ольшанка", coords: [53.6152, 23.8501], desc: "Спальный район" }
-            ],
-            "Девятовка": [
-                { name: "Коробка Девятовка", coords: [53.7021, 23.8492], desc: "Возле магазинов" }
-            ],
-            "Грандичи": [
-                { name: "Новый район Грандичи", coords: [53.7185, 23.8402], desc: "Современная застройка" }
-            ],
-            "Пышки (Парк)": [
-                { name: "Главный вход в Пышки", coords: [53.6854, 23.8012], desc: "Лесопарк и тропа здоровья" }
-            ],
-            "БЛК / Форты": [
-                { name: "Возле Фары", coords: [53.6892, 23.8251], desc: "Историческое место" }
-            ]
+        const districtQuickPlaces = {
+            "Центр (Советская)": ["У Танка", "Возле Фары", "Драмтеатр", "Парк Жилибера"],
+            "ТЦ Тринити": ["Главный вход", "Арена", "Фуд-корт"],
+            "OldCity (Олд Сити)": ["Центральный вход", "Стоянка", "У фонтана"],
+            "Ольшанка": ["Коробка", "Евроопт", "Парк"],
+            "Девятовка": ["Коробка", "Алми", "Рынок"],
+            "Пышки (Парк)": ["Главный вход", "Тропа здоровья", "Пляж"]
         };
+
+        function updatePlaceTags() {
+            const district = document.getElementById('create-district').value;
+            const container = document.getElementById('quick-places-container');
+            if (!container) return;
+            container.innerHTML = '';
+            
+            const places = districtQuickPlaces[district] || ["Центр", "Площадка"];
+            places.forEach(place => {
+                const chip = document.createElement('span');
+                chip.className = 'quick-place-chip';
+                chip.textContent = place;
+                chip.onclick = () => {
+                    document.getElementById('create-exact-place').value = place;
+                };
+                container.appendChild(chip);
+            });
+        }
 
         function updateStatusHeader() {
             const info = document.getElementById('header-user-info');
@@ -359,23 +363,29 @@
             document.getElementById('btn-mode-free').classList.toggle('active', mode === 'free');
             document.getElementById('btn-mode-exact').classList.toggle('active', mode === 'exact');
             
+            const freeBox = document.getElementById('composition-free-box');
+            const exactBox = document.getElementById('composition-exact-box');
+            const maxBlock = document.getElementById('max-people-block');
+
             if (mode === 'free') {
-                document.getElementById('composition-free-box').style.display = 'flex';
-                document.getElementById('composition-exact-box').style.display = 'none';
+                freeBox.style.display = 'flex';
+                exactBox.style.display = 'none';
+                if (maxBlock) maxBlock.style.display = 'block';
+                selectedTargetGender = 'any';
             } else {
-                document.getElementById('composition-free-box').style.display = 'none';
-                document.getElementById('composition-exact-box').style.display = 'flex';
+                freeBox.style.display = 'none';
+                exactBox.style.display = 'flex';
+                if (maxBlock) maxBlock.style.display = 'none'; // Лимит скрывается при точных цифрах
                 selectedTargetGender = 'exact_numbers';
             }
         }
 
-        window.setTargetGender = function(btn) {
-            document.querySelectorAll('#composition-free-box .tag-chip-comp').forEach(b => b.classList.remove('active'));
+        function setTargetGender(btn, genderVal) {
+            document.querySelectorAll('#composition-free-box .cyber-tag-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            selectedTargetGender = btn.getAttribute('data-gender');
-        };
-
-        function initLeafletMap() {
+            selectedTargetGender = genderVal;
+        }
+                function initLeafletMap() {
             if (mapInstance) return;
             const grodnoBounds = L.latLngBounds([53.55, 23.65], [53.78, 24.00]);
 
@@ -402,30 +412,36 @@
             mapMarkers = [];
             const activeDistricts = meetings.map(m => m.district);
 
-            Object.keys(grodnoLocationsData).forEach(districtName => {
-                const points = grodnoLocationsData[districtName];
+            const allDistrictCoords = {
+                "Центр (Советская)": [53.6784, 23.8322],
+                "ТЦ Тринити": [53.6451, 23.8245],
+                "OldCity (Олд Сити)": [53.6705, 23.8654],
+                "Ольшанка": [53.6152, 23.8501],
+                "Девятовка": [53.7021, 23.8492],
+                "Пышки (Парк)": [53.6854, 23.8012]
+            };
+
+            Object.keys(allDistrictCoords).forEach(districtName => {
+                const coords = allDistrictCoords[districtName];
                 const hasActiveMeetings = activeDistricts.includes(districtName);
 
-                points.forEach(pt => {
-                    const markerColor = hasActiveMeetings ? '#ff3838' : '#00a2ff';
-                    const circleMarker = L.circleMarker(pt.coords, {
-                        radius: hasActiveMeetings ? 8 : 6,
-                        fillColor: markerColor,
-                        color: '#fff',
-                        weight: 1.5,
-                        opacity: 1,
-                        fillOpacity: 0.85
-                    }).addTo(mapInstance);
+                const circleMarker = L.circleMarker(coords, {
+                    radius: hasActiveMeetings ? 9 : 6,
+                    fillColor: hasActiveMeetings ? '#ff3838' : '#00a2ff',
+                    color: '#fff',
+                    weight: 1.5,
+                    opacity: 1,
+                    fillOpacity: 0.85
+                }).addTo(mapInstance);
 
-                    circleMarker.on('click', () => {
-                        currentDistrictFilter = districtName;
-                        document.querySelectorAll('#radar-filter-bar .filter-chip').forEach(c => {
-                            c.classList.toggle('active', c.getAttribute('data-filter') === districtName);
-                        });
-                        renderMeetingsList();
+                circleMarker.on('click', () => {
+                    currentDistrictFilter = districtName;
+                    document.querySelectorAll('#radar-filter-bar .filter-chip').forEach(c => {
+                        c.classList.toggle('active', c.getAttribute('data-filter') === districtName);
                     });
-                    mapMarkers.push(circleMarker);
+                    renderMeetingsList();
                 });
+                mapMarkers.push(circleMarker);
             });
         }
 
@@ -435,6 +451,7 @@
                 document.getElementById('screen-main')?.classList.add('active');
                 updateStatusHeader();
                 renderAll();
+                updatePlaceTags();
                 setTimeout(initLeafletMap, 200);
             } else {
                 document.getElementById('screen-auth')?.classList.add('active');
@@ -457,6 +474,7 @@
             document.getElementById('screen-main')?.classList.add('active');
             updateStatusHeader();
             renderAll();
+            updatePlaceTags();
             setTimeout(initLeafletMap, 200);
         });
 
@@ -486,12 +504,12 @@
             const district = document.getElementById('create-district')?.value || 'Центр';
             const exactPlace = document.getElementById('create-exact-place')?.value.trim();
             const desc = document.getElementById('create-desc')?.value.trim() || 'Без описания';
-            const ageMin = parseInt(document.getElementById('age-min')?.value) || 12;
-            const ageMax = parseInt(document.getElementById('age-max')?.value) || 35;
-            const maxPeople = document.getElementById('create-max-people')?.value || 'Без лимита';
+            const ageMin = parseInt(document.getElementById('age-min')?.value) || 14;
+            const ageMax = parseInt(document.getElementById('age-max')?.value) || 25;
+            const maxPeople = compositionMode === 'free' ? (document.getElementById('create-max-people')?.value || 'Без лимита') : 'Точный состав';
             
-            const girlsCount = compositionMode === 'exact' ? (document.getElementById('count-girls')?.value || '0') : '0';
-            const guysCount = compositionMode === 'exact' ? (document.getElementById('count-guys')?.value || '0') : '0';
+            const girlsCount = compositionMode === 'exact' ? (document.getElementById('count-girls')?.value || '1') : '0';
+            const guysCount = compositionMode === 'exact' ? (document.getElementById('count-guys')?.value || '1') : '0';
 
             if (!exactPlace) {
                 alert('Укажите точное место встречи!');
@@ -515,7 +533,7 @@
             localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
             localStorage.setItem('gr_archive_2026', JSON.stringify(archive));
 
-            alert('Радар запущен!');
+            alert('Радар успешно запущен!');
             renderAll();
             document.querySelector('.nav-btn[data-sub="sub-radar"]')?.click();
         });
@@ -575,19 +593,16 @@
             const m = meetings.find(item => item.id === id);
             if (!m) return;
 
-            // Защита: проверка возраста
             if (activeAge < m.ageMin || activeAge > m.ageMax) {
                 alert(`Не подходишь по возрасту! Требуется от ${m.ageMin} до ${m.ageMax} лет.`);
                 return;
             }
 
-            // Защита: если ищут только девушек, парень не может присоединиться
             if (m.targetGender === 'only_girls' && activeGender === 'guy') {
                 alert('⛔ Сюда могут присоединяться только девушки!');
                 return;
             }
 
-            // Защита: если ищут только пацанов, девушка не может присоединиться
             if (m.targetGender === 'only_guys' && activeGender === 'girl') {
                 alert('⛔ Сюда могут присоединяться только пацаны!');
                 return;
@@ -636,3 +651,4 @@
     </script>
 </body>
 </html>
+
