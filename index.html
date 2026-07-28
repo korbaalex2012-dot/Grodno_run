@@ -386,9 +386,9 @@
         <button class="nav-btn" data-sub="sub-archive">
             <span style="font-size: 16px;">📜</span>Архив
         </button>
-        <button class="nav-btn" data-sub="sub-admin">
-            <span style="font-size: 16px;">🚨</span>Куратор
-        </button>
+        <button class="nav-btn" data-sub="sub-admin" id="nav-admin-btn" style="display: none;">
+    <span style="font-size: 16px;">🚨</span>Куратор
+</button>
     </div>
         <script>
         const BIN_ID = '6a68a3d7da38895dfe9b46cf';
@@ -733,7 +733,7 @@
             });
         }
 
-               function renderMeetingsList() {
+                      function renderMeetingsList() {
             const container = document.getElementById('radar-list');
             const emptyMsg = document.getElementById('empty-state-msg');
             if (!container) return;
@@ -774,6 +774,7 @@
                 container.appendChild(card);
             });
         }
+
         window.cancelMeeting = async function(id) {
             if (!confirm("Ты уверен, что хочешь отменить и удалить этот сбор?")) return;
             
@@ -785,8 +786,6 @@
             alert("Сход успешно отменен и удален с радара!");
             renderAll();
         };
-
-
         window.joinMeeting = async function(id) {
             const m = meetings.find(item => item.id === id); 
             if (m && !archive.some(item => item.id === id)) {
