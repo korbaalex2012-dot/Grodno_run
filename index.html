@@ -704,13 +704,18 @@
             btn.innerText = 'Запуск...';
             btn.disabled = true;
 
+                       const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000);
+
             try {
                 const response = await fetch(workerUrl, {
                     method: 'POST',
                     mode: 'cors',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(payload),
+                    signal: controller.signal
                 });
+                clearTimeout(timeoutId);
 
                 if (response.ok) {
                     alert('Радар успешно запущен!');
@@ -719,8 +724,13 @@
                     alert(`Ошибка сервера: ${response.status}`);
                 }
             } catch (error) {
-                console.error('Network error:', error);
-                alert('Ошибка сети! Проверьте подключение.');
+                clearTimeout(timeoutId);
+                if (error.name === 'AbortError') {
+                    alert('Превышено время ожидания! Проверь VPN или интернет.');
+                } else {
+                    console.error('Network error:', error);
+                    alert('Ошибка сети! Проверь подключение.');
+                }
             } finally {
                 btn.innerText = origText;
                 btn.disabled = false;
