@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, maximum-scale=1.0, user-scalable=no">
     <title>Grodno Run 2026 — Cyber Radar Premium</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         :root {
             --bg-main: #0a0a12;
@@ -145,8 +147,7 @@
             <button type="button" id="btn-music-toggle" style="background: var(--bg-input); border: 1px solid var(--border); color: var(--text-muted); padding: 7px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; font-weight: 800;">🎵 OFF</button>
         </div>
     </div>
-
-    <div id="screen-auth" class="screen">
+        <div id="screen-auth" class="screen active">
         <div class="alert">
             ⚠ ВНИМАНИЕ: Все данные проверяются роботом. За ложный пол или возраст — моментальный бан на всех районах Гродно БЕЗ права разблокировки!
         </div>
@@ -167,54 +168,19 @@
             <button type="button" id="btn-submit-auth" class="btn btn-success">Пройти авторизацию</button>
         </div>
     </div>
-        <div id="screen-main" class="screen">
+
+    <div id="screen-main" class="screen">
         
         <div id="sub-radar" class="sub-screen active">
-            <div class="cyber-map">
-                <div class="map-bg-grid"></div>
-                <div class="map-point" id="map-pt-center" style="top: 40%; left: 50%;"></div><div class="map-label" style="top: 40%; left: 50%;">Советская</div>
-                <div class="map-point" id="map-pt-trinity" style="top: 72%; left: 66%;"></div><div class="map-label" style="top: 72%; left: 66%;">Тринити</div>
-                <div class="map-point" id="map-pt-oldcity" style="top: 25%; left: 45%;"></div><div class="map-label" style="top: 25%; left: 45%;">OldCity</div>
-                <div class="map-point" id="map-pt-olshanka" style="top: 86%; left: 33%;"></div><div class="map-label" style="top: 86%; left: 33%;">Ольшанка</div>
-                <div class="map-point" id="map-pt-grandichi" style="top: 14%; left: 58%;"></div><div class="map-label" style="top: 14%; left: 58%;">Грандичи</div>
-                <div class="map-point" id="map-pt-devyatovka" style="top: 32%; left: 64%;"></div><div class="map-label" style="top: 32%; left: 64%;">Девятовка</div>
-                <div class="map-point" id="map-pt-pyshki" style="top: 46%; left: 18%;"></div><div class="map-label" style="top: 46%; left: 18%;">Пышки</div>
-                <div class="map-point" id="map-pt-forty" style="top: 34%; left: 28%;"></div><div class="map-label" style="top: 34%; left: 28%;">Форты</div>
+            
+            <div class="card" style="padding: 10px; margin-bottom: 16px;">
+                <div style="font-size: 11px; font-weight: 700; color: var(--accent); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">
+                    🗺️ Интерактивная карта Гродно (Зум / Перетаскивание)
+                </div>
+                <div id="grodno-leaflet-map" style="width: 100%; height: 240px; border-radius: 12px; border: 1px solid var(--border); background: #06060c; z-index: 1;"></div>
             </div>
 
             <style>
-                .cyber-map {
-                    position: relative; width: 100%; height: 190px;
-                    background: #06060c; border: 1px solid var(--border);
-                    border-radius: 16px; margin-bottom: 20px;
-                    overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
-                }
-                .map-bg-grid {
-                    position: absolute; width: 100%; height: 100%;
-                    background-image: linear-gradient(rgba(0, 162, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 162, 255, 0.05) 1px, transparent 1px);
-                    background-size: 16px 16px;
-                }
-                .map-point {
-                    position: absolute; width: 12px; height: 12px;
-                    background: #232335; border-radius: 50%;
-                    transform: translate(-50%, -50%); transition: all 0.3s ease;
-                }
-                .map-point.active {
-                    background: var(--accent-red); box-shadow: 0 0 12px var(--accent-red), 0 0 25px var(--accent-red);
-                    animation: pulse-dot 1.4s infinite;
-                }
-                @keyframes pulse-dot {
-                    0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-                    50% { transform: translate(-50%, -50%) scale(1.7); opacity: 0.4; }
-                    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-                }
-                .map-label {
-                    position: absolute; font-size: 10px; color: #4b5361;
-                    transform: translate(-50%, 9px); white-space: nowrap;
-                    font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
-                }
-                .map-point.active + .map-label { color: #fff; text-shadow: 0 0 6px rgba(255,255,255,0.5); }
-                
                 .filter-bar { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 18px; padding-bottom: 6px; }
                 .filter-bar::-webkit-scrollbar { display: none; }
                 .filter-chip {
@@ -236,10 +202,11 @@
                 <div class="filter-chip" data-filter="Пышки (Парк)">Пышки <span id="b-pyshki"></span></div>
                 <div class="filter-chip" data-filter="БЛК / Форты">Форты <span id="b-forty"></span></div>
             </div>
+            
             <div id="empty-state-msg" class="empty-state">На радаре пока пусто... Запусти движ сам!</div>
             <div id="radar-list"></div>
         </div>
-                    <div id="sub-create" class="sub-screen">
+                <div id="sub-create" class="sub-screen">
             <h2>➕ Запустить сбор</h2>
             <p class="subtitle">Отметь локацию на общем радаре Гродно</p>
             <div class="card" style="border-top: 4px solid var(--accent);">
@@ -335,24 +302,34 @@
                     <label>📝 Короткое описание / Приметы:</label>
                     <textarea id="create-desc" placeholder="Кто нужен? Что берём с собой? Сколько сидим?" style="height: 80px; resize: none;"></textarea>
                 </div>
-                            <div style="margin-bottom: 16px;">
-                <label style="font-size: 13px; color: var(--text-muted); display: block; margin-bottom: 8px;">👥 КТО НУЖЕН ПО СОСТАВУ?</label>
-                <div style="display: flex; gap: 6px; flex-wrap: wrap;" id="target-gender-selector">
-                    <button type="button" class="tag-chip active" data-gender="any" onclick="setTargetGender(this)">🌍 Все равно</button>
-                    <button type="button" class="tag-chip" data-gender="guys" onclick="setTargetGender(this)">🚹 Пацаны</button>
-                    <button type="button" class="tag-chip" data-gender="girls" onclick="setTargetGender(this)">🚺 Девчонки</button>
-                    <button type="button" class="tag-chip" data-gender="mix" onclick="setTargetGender(this)">⚖️ 2 пацана / 2 девки</button>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 8px;">👥 КТО НУЖЕН ПО СОСТАВУ?</label>
+                    <style>
+                        .tag-chip-comp {
+                            background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: var(--text-muted);
+                            padding: 8px 12px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+                        }
+                        .tag-chip-comp.active { background: rgba(0, 162, 255, 0.15); color: var(--accent); border-color: var(--accent); }
+                    </style>
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap;" id="target-gender-selector">
+                        <button type="button" class="tag-chip-comp active" data-gender="any" onclick="setTargetGender(this)">🌍 Все равно</button>
+                        <button type="button" class="tag-chip-comp" data-gender="guys" onclick="setTargetGender(this)">🚹 Пацаны</button>
+                        <button type="button" class="tag-chip-comp" data-gender="girls" onclick="setTargetGender(this)">🚺 Девчонки</button>
+                        <button type="button" class="tag-chip-comp" data-gender="mix" onclick="setTargetGender(this)">⚖️ 2 пац. / 2 дев.</button>
+                    </div>
                 </div>
-            </div>
-            <div style="margin-bottom: 20px;">
-                <label style="font-size: 13px; color: var(--text-muted); display: block; margin-bottom: 8px;">🔢 МАКСИМУМ ЧЕЛОВЕК</label>
-                <select id="create-max-people" style="width: 100%; background: #1a1b26; border: 1px solid var(--border); color: #fff; padding: 10px; border-radius: 8px; font-size: 14px;">
-                    <option value="unlimited">Сколько соберётся (без лимита)</option>
-                    <option value="3">До 3 человек</option>
-                    <option value="5">Максимум 5 человек</option>
-                    <option value="10">Компания до 10 человек</option>
-                </select>
-            </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 8px;">🔢 МАКСИМУМ ЧЕЛОВЕК</label>
+                    <select id="create-max-people" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 12px; font-size: 14px;">
+                        <option value="unlimited">Сколько соберётся (без лимита)</option>
+                        <option value="3">До 3 человек</option>
+                        <option value="5">Максимум 5 человек</option>
+                        <option value="10">Компания до 10 человек</option>
+                    </select>
+                </div>
+
                 <button type="button" id="btn-launch-radar" class="btn btn-primary">
                     🚀 ЗАПУСТИТЬ РАДАР СБОРА
                 </button>
@@ -374,8 +351,7 @@
         </div>
 
     </div>
-
-    <style>
+        <style>
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10, 10, 18, 0.85);
             backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
@@ -407,56 +383,45 @@
         <script>
         const BIN_ID = '6a68a3d7da38895dfe9b46cf';
         const API_KEY = '$2a$10$fCuDEyphx80p7hlYAPd8C.W8S8fZv53sNq6UhpL8m/Oot7eVvdScu';
-        const workerUrl = "https://noisy-art-8292.korba-alex2012.workers.dev";
         const MY_TELEGRAM_ID = 6949963047;
 
-        const grodnoLocations = {
-            'Центр (Советская)': {
-                'default': ['У Танка', 'Возле Фары', 'Драмтеатр', 'Парк Жилибера'],
-                '⚽ Футбол': ['Стадион «Неман» (запасное)', 'Парк Жилибера'],
-                '🏀 Баскетбол': ['Коложский парк (площадка)', 'Стадион «Неман»'],
-                '🏐 Волейбол': ['Коложский парк'],
-                '🏓 Наст. теннис': ['Антикафе в центре', 'Парк Жилибера'],
-                '🏋️‍♂️ Турники / Бег': ['Коложский парк', 'Набережная'],
-                '🚲 Велик': ['У Танка', 'Набережная (Старый мост)'],
-                '🎮 Гейминг': ['Компьютерный клуб', 'Антикафе в центре']
-            },
-            'ТЦ Тринити': {
-                'default': ['Главный вход', 'Фуд-корт (3 этаж)', 'Возле Кравта', 'Ледовая арена'],
-                '🚲 Велик': ['Велодорожка на Лебедева'],
-                '🎮 Гейминг': ['Зона развлечений (3 этаж)']
-            },
-            'OldCity (Олд Сити)': {
-                'default': ['У Замка (атриум)', 'Парковка у входа', 'Фуд-корт']
-            },
-            'Ольшанка': {
-                'default': ['ТЦ Стелла', 'Амбулатория', 'Конечная автобусов'],
-                '⚽ Футбол': ['Стадион 41-й школы'],
-                '🏀 Баскетбол': ['Площадка у 41-й школы'],
-                '🏋️‍♂️ Турники / Бег': ['Площадка у ФОК']
-            },
-            'Девятовка': {
-                'default': ['ТЦ Лимож', 'Костёл', 'Мини-рынок Чехов', 'Польская школа'],
-                '⚽ Футбол': ['Стадион 27-й школы', 'Стадион 32-й школы'],
-                '🏀 Баскетбол': ['Площадка на Лиможа', 'Стадион 27-й школы'],
-                '🏋️‍♂️ Турники / Бег': ['Воркаут у 27-й школы']
-            },
-            'Грандичи': {
-                'default': ['Евроопт (Грандичи-3)', 'Школа №42', 'Конечная автобусов'],
-                '⚽ Футбол': ['Стадион школы №42'],
-                '🏀 Баскетбол': ['Площадка у школы №42']
-            },
-            'Пышки (Парк)': {
-                'default': ['Тропа здоровья (вход)', 'Джунгли Парк', 'Меловые карьеры', 'Смотровая у Немана'],
-                '🏋️‍♂️ Турники / Бег': ['Тропа здоровья (воркаут)', 'Трензал под открытым небом'],
-                '🚲 Велик': ['Главный прокат', 'Новый мост (Поповича)']
-            },
-            'БЛК / Форты': {
-                'default': ['Мини-рынок Форты', 'ТЦ Корона (БЛК)', 'Вход в Пышки с БЛК'],
-                '⚽ Футбол': ['Стадион «Красное Знамя» (КЗ)', 'Площадка 23-й школы'],
-                '🏀 Баскетбол': ['Стадион «Красное Знамя» (КЗ)', 'Площадка ГрГУ'],
-                '🏋️‍♂️ Турники / Бег': ['Стадион КЗ', 'Площадка ГрГУ']
-            }
+        // Координаты всех точек по районам Гродно для интерактивной карты Leaflet
+        const grodnoLocationsData = {
+            'Центр (Советская)': [
+                { name: 'У Танка', coords: [53.6800, 23.8303], desc: 'Легендарное место сбора в центре' },
+                { name: 'Возле Фары', coords: [53.6785, 23.8340], desc: 'Территория у Фарного костела' },
+                { name: 'Драмтеатр', coords: [53.6748, 23.8290], desc: 'Смотровая площадка на Неман' },
+                { name: 'Парк Жилибера', coords: [53.6815, 23.8350], desc: 'Центральная аллея парка' }
+            ],
+            'ТЦ Тринити': [
+                { name: 'Главный вход', coords: [53.6492, 23.8395], desc: 'Уличная площадка у входа в ТЦ' },
+                { name: 'Фуд-корт (3 этаж)', coords: [53.6492, 23.8395], desc: 'Зона отдыха и фастфуда' },
+                { name: 'Ледовая арена', coords: [53.6510, 23.8420], desc: 'Территория возле ледового дворца' }
+            ],
+            'OldCity (Олд Сити)': [
+                { name: 'У Замка (атриум)', coords: [53.6912, 23.8490], desc: 'Главный атриум торгового центра' },
+                { name: 'Парковка у входа', coords: [53.6915, 23.8485], desc: 'Верхняя парковочная зона' }
+            ],
+            'Ольшанка': [
+                { name: 'ТЦ Стелла', coords: [53.6280, 23.7850], desc: 'Центр микрорайона' },
+                { name: 'Стадион 41-й школы', coords: [53.6265, 23.7890], desc: 'Спортивная коробка' }
+            ],
+            'Девятовка': [
+                { name: 'ТЦ Лимож', coords: [53.7020, 23.8550], desc: 'Площадь у торгового центра' },
+                { name: 'Стадион 27-й школы', coords: [53.6980, 23.8600], desc: 'Спортивная площадка' }
+            ],
+            'Грандичи': [
+                { name: 'Евроопт (Грандичи-3)', coords: [53.7150, 23.8680], desc: 'Главная точка сбора района' },
+                { name: 'Школа №42', coords: [53.7130, 23.8650], desc: 'Территория школы' }
+            ],
+            'Пышки (Парк)': [
+                { name: 'Тропа здоровья (вход)', coords: [53.6850, 23.7950], desc: 'Начало лесопарковой зоны' },
+                { name: 'Смотровая у Немана', coords: [53.6820, 23.8010], desc: 'Вид на реку' }
+            ],
+            'БЛК / Форты': [
+                { name: 'Мини-рынок Форты', coords: [53.6920, 23.8150], desc: 'Торговая площадка' },
+                { name: 'Стадион «Красное Знамя»', coords: [53.6950, 23.8100], desc: 'Спортивный стадион' }
+            ]
         };
 
         const tg = window.Telegram?.WebApp;
@@ -479,6 +444,9 @@
         let activeGender = localStorage.getItem('user_gender') || "";
         let activeAge = parseInt(localStorage.getItem('user_age')) || 0;
         let currentDistrictFilter = "all";
+        let selectedTargetGender = 'any';
+        let mapInstance = null;
+        let mapMarkers = [];
 
         async function loadMeetingsFromServer() {
             try {
@@ -516,58 +484,6 @@
         const badge = document.getElementById('track-queue-badge');
         let playlistUrls = [];
         let currentTrackIndex = 0;
-
-               document.addEventListener('DOMContentLoaded', async () => {
-            // === ДОБАВЛЯЕМ КНОПКУ КУРАТОРА ТОЛЬКО ДЛЯ ТЕБЯ ===
-            if (myId === 6949963047) {
-                const bottomNav = document.querySelector('.bottom-nav');
-                if (bottomNav) {
-                    const adminNavBtn = document.createElement('button');
-                    adminNavBtn.className = 'nav-btn';
-                    adminNavBtn.setAttribute('data-sub', 'sub-admin');
-                    adminNavBtn.innerHTML = '<span style="font-size: 16px;">🚨</span>Куратор';
-                    
-                    adminNavBtn.addEventListener('click', () => {
-                        document.querySelectorAll('.bottom-nav .nav-btn').forEach(b => b.classList.remove('active'));
-                        document.querySelectorAll('.sub-screen').forEach(s => s.classList.remove('active'));
-                        adminNavBtn.classList.add('active');
-                        document.getElementById('sub-admin')?.classList.add('active');
-                        renderAll();
-                    });
-                    
-                    bottomNav.appendChild(adminNavBtn);
-                }
-            }
-            // ==================================================
-
-            if (localStorage.getItem('user_registered') === 'true') {
-                document.getElementById('screen-auth')?.classList.remove('active');
-                document.getElementById('screen-main')?.classList.add('active');
-                updateStatusHeader();
-                await loadMeetingsFromServer();
-                renderAll();
-            } else {
-                document.getElementById('screen-auth')?.classList.add('active');
-            }
-            // ... дальше идет остальной твой код ...
-            if (localStorage.getItem('user_registered') === 'true') {
-                document.getElementById('screen-auth')?.classList.remove('active');
-                document.getElementById('screen-main')?.classList.add('active');
-                updateStatusHeader();
-                await loadMeetingsFromServer();
-                renderAll();
-            } else {
-                document.getElementById('screen-auth')?.classList.add('active');
-            }
-            
-            initAudioEngine();
-            updatePlaceTags();
-
-            document.getElementById('create-district')?.addEventListener('change', updatePlaceTags);
-            document.querySelectorAll('input[name="radar-tag"]').forEach(radio => {
-                radio.addEventListener('change', updatePlaceTags);
-            });
-        });
 
         function initAudioEngine() {
             musicBtn?.addEventListener('click', () => {
@@ -615,7 +531,76 @@
                 statusEl.innerText = `${activeGender}, ${activeAge} л. (@${myUsername}) 🛰 СЕТЬ`;
             }
         }
-                    function updatePlaceTags() {
+        </script>
+        <script>
+        function initLeafletMap() {
+            if (mapInstance) return;
+            // Центрируем карту на Гродно
+            mapInstance = L.map('grodno-leaflet-map', {
+                zoomControl: true,
+                attributionControl: false
+            }).setView([53.6768, 23.8303], 13);
+
+            // Темная киберпанк-тема тайлов карты
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                maxZoom: 19,
+                subdomains: 'abcd'
+            }).addTo(mapInstance);
+
+            renderMapMarkers();
+        }
+
+        function renderMapMarkers() {
+            if (!mapInstance) return;
+            // Очищаем старые маркеры
+            mapMarkers.forEach(m => mapInstance.removeLayer(m));
+            mapMarkers = [];
+
+            const activeDistricts = meetings.map(m => m.district);
+
+            Object.keys(grodnoLocationsData).forEach(districtName => {
+                const points = grodnoLocationsData[districtName];
+                const hasActiveMeetings = activeDistricts.includes(districtName);
+
+                points.forEach(pt => {
+                    const markerColor = hasActiveMeetings ? '#ff3838' : '#00a2ff';
+                    const markerRadius = hasActiveMeetings ? 8 : 6;
+
+                    const circleMarker = L.circleMarker(pt.coords, {
+                        radius: markerRadius,
+                        fillColor: markerColor,
+                        color: '#fff',
+                        weight: 1.5,
+                        opacity: 1,
+                        fillOpacity: 0.85
+                    }).addTo(mapInstance);
+
+                    circleMarker.bindPopup(`
+                        <div style="color: #000; font-family: sans-serif; font-size: 12px;">
+                            <b style="color: #00a2ff;">${districtName}</b><br>
+                            <b>${pt.name}</b><br>
+                            <span style="color: #555;">${pt.desc}</span>
+                        </div>
+                    `);
+
+                    circleMarker.on('click', () => {
+                        currentDistrictFilter = districtName;
+                        document.querySelectorAll('#radar-filter-bar .filter-chip').forEach(c => {
+                            if (c.getAttribute('data-filter') === districtName) {
+                                c.classList.add('active');
+                            } else {
+                                c.classList.remove('active');
+                            }
+                        });
+                        renderMeetingsList();
+                    });
+
+                    mapMarkers.push(circleMarker);
+                });
+            });
+        }
+
+        function updatePlaceTags() {
             const districtSelect = document.getElementById('create-district');
             const activeTagInput = document.querySelector('input[name="radar-tag"]:checked');
             if (!districtSelect) return;
@@ -634,20 +619,66 @@
             }
             
             tagsContainer.innerHTML = ''; 
-            const districtData = grodnoLocations[currentDistrict] || {};
-            const tagsToShow = districtData[currentTag] || districtData['default'] || [];
+            const districtPoints = grodnoLocationsData[currentDistrict] || [];
             
-            tagsToShow.forEach(placeName => {
+            districtPoints.forEach(placeObj => {
                 const tagBtn = document.createElement('button');
                 tagBtn.type = 'button';
-                tagBtn.innerText = placeName;
+                tagBtn.innerText = placeObj.name;
                 tagBtn.style.cssText = 'background:rgba(255,255,255,0.05); color:#00a2ff; border:1px solid rgba(0,162,255,0.3); padding:5px 10px; border-radius:15px; font-size:11px; cursor:pointer; font-weight:600;';
                 tagBtn.addEventListener('click', () => {
-                    exactPlaceInput.value = placeName;
+                    exactPlaceInput.value = placeObj.name;
                 });
                 tagsContainer.appendChild(tagBtn);
             });
         }
+
+        window.setTargetGender = function(btn) {
+            document.querySelectorAll('#target-gender-selector .tag-chip-comp').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedTargetGender = btn.getAttribute('data-gender');
+        };
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (myId === 6949963047) {
+                const bottomNav = document.querySelector('.bottom-nav');
+                if (bottomNav) {
+                    const adminNavBtn = document.createElement('button');
+                    adminNavBtn.className = 'nav-btn';
+                    adminNavBtn.setAttribute('data-sub', 'sub-admin');
+                    adminNavBtn.innerHTML = '<span style="font-size: 16px;">🚨</span>Куратор';
+                    
+                    adminNavBtn.addEventListener('click', () => {
+                        document.querySelectorAll('.bottom-nav .nav-btn').forEach(b => b.classList.remove('active'));
+                        document.querySelectorAll('.sub-screen').forEach(s => s.classList.remove('active'));
+                        adminNavBtn.classList.add('active');
+                        document.getElementById('sub-admin')?.classList.add('active');
+                        renderAll();
+                    });
+                    
+                    bottomNav.appendChild(adminNavBtn);
+                }
+            }
+
+            if (localStorage.getItem('user_registered') === 'true') {
+                document.getElementById('screen-auth')?.classList.remove('active');
+                document.getElementById('screen-main')?.classList.add('active');
+                updateStatusHeader();
+                await loadMeetingsFromServer();
+                renderAll();
+                setTimeout(initLeafletMap, 200);
+            } else {
+                document.getElementById('screen-auth')?.classList.add('active');
+            }
+            
+            initAudioEngine();
+            updatePlaceTags();
+
+            document.getElementById('create-district')?.addEventListener('change', updatePlaceTags);
+            document.querySelectorAll('input[name="radar-tag"]').forEach(radio => {
+                radio.addEventListener('change', updatePlaceTags);
+            });
+        });
 
         document.getElementById('btn-submit-auth')?.addEventListener('click', (e) => {
             e.preventDefault();
@@ -663,7 +694,9 @@
             activeGender = gen; activeAge = age;
             document.getElementById('screen-auth').classList.remove('active');
             document.getElementById('screen-main').classList.add('active');
-            updateStatusHeader(); renderAll();
+            updateStatusHeader(); 
+            renderAll();
+            setTimeout(initLeafletMap, 200);
         });
 
         document.querySelectorAll('.bottom-nav .nav-btn').forEach(btn => {
@@ -674,6 +707,9 @@
                 btn.classList.add('active');
                 document.getElementById(targetSub)?.classList.add('active');
                 renderAll();
+                if (targetSub === 'sub-radar') {
+                    setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 150);
+                }
             });
         });
 
@@ -685,31 +721,14 @@
                 renderMeetingsList();
             });
         });
-               document.getElementById('btn-launch-radar')?.addEventListener('click', async function(e) {
+
+        document.getElementById('btn-launch-radar')?.addEventListener('click', async function(e) {
             e.preventDefault();
             
-            // === ВСТАВЬ ЭТО СЮДА ===
-            const targetGender = typeof selectedTargetGender !== 'undefined' ? selectedTargetGender : 'any';
-            const maxPeople = document.getElementById('create-max-people')?.value || 'unlimited';
-            // ======================          
             const district = document.getElementById('create-district')?.value || 'Не указан';
             const exactPlace = document.getElementById('create-exact-place')?.value.trim();
-                const desc = document.getElementById('create-desc')?.value.trim() || 'Без описания';
-
-    // Тот самый объект, куда сохраняются данные сбора:
-    const meetingData = {
-        district: district,
-        exactPlace: exactPlace,
-        description: desc,
-        
-        // ВСТАВЬ ЭТИ ДВЕ СТРОЧКИ СЮДА:
-        targetGender: targetGender,
-        maxPeople: maxPeople,
-        
-        creator: myUsername
-    };
-
-                   
+            const desc = document.getElementById('create-desc')?.value.trim() || 'Без описания';
+            const maxPeople = document.getElementById('create-max-people')?.value || 'unlocked';
 
             if (!exactPlace) {
                 alert('Пожалуйста, укажите точное место встречи!');
@@ -735,6 +754,8 @@
                 time: timeText,
                 category: tag,
                 description: desc,
+                targetGender: selectedTargetGender,
+                maxPeople: maxPeople,
                 creator: myUsername,
                 members: [myUsername]
             };
@@ -751,35 +772,15 @@
             alert('Радар успешно запущен!');
             renderAll();
             document.querySelector('.nav-btn[data-sub="sub-radar"]')?.click();
+            setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 150);
         });
 
         function renderAll() {
             renderMeetingsList();
             renderArchiveList();
             renderViolators();
-            updateCyberMap();
             updateDistrictBadges();
-        }
-
-        function updateCyberMap() {
-            const config = {
-                "Центр (Советская)": "map-pt-center", "ТЦ Тринити": "map-pt-trinity", "OldCity (Олд Сити)": "map-pt-oldcity",
-                "Ольшанка": "map-pt-olshanka", "Грандичи": "map-pt-grandichi", "Девятовка": "map-pt-devyatovka",
-                "Пышки (Парк)": "map-pt-pyshki", "БЛК / Форты": "map-pt-forty"
-            };
-
-            Object.values(config).forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.className = "map-point";
-            });
-
-            meetings.forEach(m => {
-                const id = config[m.district];
-                const el = document.getElementById(id);
-                if (el) {
-                    el.className = "map-point active";
-                }
-            });
+            renderMapMarkers();
         }
 
         function updateDistrictBadges() {
@@ -798,7 +799,7 @@
             });
         }
 
-                      function renderMeetingsList() {
+        function renderMeetingsList() {
             const container = document.getElementById('radar-list');
             const emptyMsg = document.getElementById('empty-state-msg');
             if (!container) return;
@@ -828,6 +829,7 @@
                     </div>
                     <p style="margin: 0 0 6px 0; font-size: 14px;"><b>Где:</b> ${m.exactPlace}</p>
                     <p style="margin: 0 0 6px 0; font-size: 14px;"><b>Категория:</b> ${m.category || 'Прогулка'}</p>
+                    <p style="margin: 0 0 6px 0; font-size: 12px; color: #a4b0be;">👥 Состав: <b>${m.targetGender}</b> | Лимит: <b>${m.maxPeople}</b></p>
                     <p style="margin: 0 0 10px 0; font-size: 13px; color: #a4b0be;">${m.description || 'Описания нет.'}</p>
                     <p style="margin: 0 0 10px 0; font-size: 12px; color: var(--accent);">👤 Организатор: @${m.creator || 'Аноним'}</p>
                     <div style="display: flex; gap: 8px; flex-wrap: wrap;">
@@ -842,15 +844,13 @@
 
         window.cancelMeeting = async function(id) {
             if (!confirm("Ты уверен, что хочешь отменить и удалить этот сбор?")) return;
-            
             meetings = meetings.filter(item => item.id !== id);
             localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
-            
             await saveMeetingsToServer();
-            
             alert("Сход успешно отменен и удален с радара!");
             renderAll();
         };
+
         window.joinMeeting = async function(id) {
             const m = meetings.find(item => item.id === id); 
             if (m && !archive.some(item => item.id === id)) {
@@ -923,16 +923,12 @@
             complaints.splice(index, 1); 
             localStorage.setItem('gr_complaints_2026', JSON.stringify(complaints));
             renderAll();
-                    let selectedTargetGender = 'any';
-        function setTargetGender(btn) {
-            document.querySelectorAll('#target-gender-selector .tag-chip').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            selectedTargetGender = btn.getAttribute('data-gender');
-        }
-            
         };
     </script>
 </body>
 </html>
 
+    
+    
+    
     
