@@ -713,14 +713,14 @@
             if (complaints.length === 0) { if (empty) empty.style.display = 'block'; return; }
             if (empty) empty.style.display = 'none';
         }
-                window.switchMyProfile = function() {
-            activeGender = activeGender === 'guy' ? 'girl' : 'guy';
+                       window.toggleMyGender = function() {
+            activeGender = (activeGender === 'guy') ? 'girl' : 'guy';
             localStorage.setItem('user_gender', activeGender);
             updateStatusHeader();
-            alert('Пол изменен на: ' + (activeGender === 'guy' ? '🚹 Парень' : '🚺 Девушка'));
+            alert('Твой пол изменен на: ' + (activeGender === 'guy' ? '🚹 Парень' : '🚺 Девушка'));
             renderAll();
         };
-        
+
     </script>
 </body>
 </html>
