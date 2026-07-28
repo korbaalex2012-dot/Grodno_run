@@ -532,13 +532,24 @@
             }
         }
         </script>
-        <script>
+               <script>
         function initLeafletMap() {
             if (mapInstance) return;
-            // Центрируем карту на Гродно
+            
+            // Жесткие границы Гродно, чтобы карту мира нельзя было прокрутить за пределы города
+            const grodnoBounds = L.latLngBounds(
+                [53.55, 23.65], // Юго-запад
+                [53.78, 24.00]  // Северо-восток
+            );
+
+            // Инициализируем карту строго по Гродно
             mapInstance = L.map('grodno-leaflet-map', {
                 zoomControl: true,
-                attributionControl: false
+                attributionControl: false,
+                maxBounds: grodnoBounds,
+                maxBoundsViscosity: 1.0,
+                minZoom: 12,
+                maxZoom: 17
             }).setView([53.6768, 23.8303], 13);
 
             // Темная киберпанк-тема тайлов карты
@@ -552,7 +563,6 @@
 
         function renderMapMarkers() {
             if (!mapInstance) return;
-            // Очищаем старые маркеры
             mapMarkers.forEach(m => mapInstance.removeLayer(m));
             mapMarkers = [];
 
@@ -637,9 +647,17 @@
             document.querySelectorAll('#target-gender-selector .tag-chip-comp').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             selectedTargetGender = btn.getAttribute('data-gender');
-        };
 
-        document.addEventListener('DOMContentLoaded', async () => {
+            const limitBlock = document.getElementById('max-people-block');
+            if (limitBlock) {
+                if (selectedTargetGender === 'only_guys' || selectedTargetGender === 'only_girls' || selectedTargetGender === 'any') {
+                    limitBlock.style.display = 'block';
+                } else {
+                    limitBlock.style.display = 'none';
+                }
+            }
+        };
+                           document.addEventListener('DOMContentLoaded', async () => {
             if (myId === 6949963047) {
                 const bottomNav = document.querySelector('.bottom-nav');
                 if (bottomNav) {
@@ -693,7 +711,7 @@
             localStorage.setItem('user_registered', 'true');
             activeGender = gen; activeAge = age;
             document.getElementById('screen-auth').classList.remove('active');
-            document.getElementById('screen-main').classList.add('active');
+            document.getElementById('screen-main')?.classList.add('active');
             updateStatusHeader(); 
             renderAll();
             setTimeout(initLeafletMap, 200);
@@ -728,7 +746,10 @@
             const district = document.getElementById('create-district')?.value || 'Не указан';
             const exactPlace = document.getElementById('create-exact-place')?.value.trim();
             const desc = document.getElementById('create-desc')?.value.trim() || 'Без описания';
-            const maxPeople = document.getElementById('create-max-people')?.value || 'unlocked';
+            
+            const girlsCount = document.getElementById('count-girls')?.value || '0';
+            const guysCount = document.getElementById('count-guys')?.value || '0';
+            const maxPeopleInput = document.getElementById('create-max-people')?.value || 'Без лимита';
 
             if (!exactPlace) {
                 alert('Пожалуйста, укажите точное место встречи!');
@@ -755,7 +776,9 @@
                 category: tag,
                 description: desc,
                 targetGender: selectedTargetGender,
-                maxPeople: maxPeople,
+                girlsCount: girlsCount,
+                guysCount: guysCount,
+                maxPeople: maxPeopleInput,
                 creator: myUsername,
                 members: [myUsername]
             };
@@ -829,7 +852,7 @@
                     </div>
                     <p style="margin: 0 0 6px 0; font-size: 14px;"><b>Где:</b> ${m.exactPlace}</p>
                     <p style="margin: 0 0 6px 0; font-size: 14px;"><b>Категория:</b> ${m.category || 'Прогулка'}</p>
-                    <p style="margin: 0 0 6px 0; font-size: 12px; color: #a4b0be;">👥 Состав: <b>${m.targetGender}</b> | Лимит: <b>${m.maxPeople}</b></p>
+                    <p style="margin: 0 0 6px 0; font-size: 12px; color: #a4b0be;">👥 Состав — Девушек: <b>${m.girlsCount || 0}</b> | Пацанов: <b>${m.guysCount || 0}</b> | Лимит: <b>${m.maxPeople || 'Без лимита'}</b></p>
                     <p style="margin: 0 0 10px 0; font-size: 13px; color: #a4b0be;">${m.description || 'Описания нет.'}</p>
                     <p style="margin: 0 0 10px 0; font-size: 12px; color: var(--accent);">👤 Организатор: @${m.creator || 'Аноним'}</p>
                     <div style="display: flex; gap: 8px; flex-wrap: wrap;">
@@ -914,7 +937,7 @@
         }
 
         window.copyUltimatum = function(username) {
-            const text = `ВНИМАНИЕ! На твой профиль поступила официальная жалоба.\n\nУ тебя есть выбор (выбери ОДИН вариант):\n1. ВИДЕО-КРУЖОК с лицом и фразой: „Гродно 2026“.\n2. Ссылка на открытый Instagram с био: „Гродно 2026“.`;
+            const text = `ВНИМАНИЕ! На твой профиль поступила официальная жалоба.\n\nУ тебя есть выбор (выбери ОДИН вариант):\n1. ВИДЕО-КРУЖОК с лицом и фразой: „Гродно 2026“.\n2. Ссылка на открытый Instagram с био: „Гродно 2026“.;`;
             navigator.clipboard.writeText(text).then(() => alert(`Ультиматум для @${username} скопирован!`));
         };
 
@@ -927,6 +950,9 @@
     </script>
 </body>
 </html>
+
+
+         
 
     
     
