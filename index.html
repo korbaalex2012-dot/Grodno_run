@@ -345,6 +345,7 @@
             document.querySelectorAll('#category-buttons-box .cyber-tag-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             selectedCategory = btn.getAttribute('data-cat');
+            updatePlaceTags();
         }
 
         function switchCompositionMode(mode) {
@@ -434,7 +435,8 @@
                 mapMarkers.push(circleMarker);
             });
         }
-                document.addEventListener('DOMContentLoaded', async () => {
+
+        document.addEventListener('DOMContentLoaded', async () => {
             if (localStorage.getItem('user_registered') === 'true') {
                 document.getElementById('screen-auth')?.classList.remove('active');
                 document.getElementById('screen-main')?.classList.add('active');
