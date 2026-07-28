@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, maximum-scale=1.0, user-scalable=no">
     <title>Grodno Run 2026 — Cyber Radar Premium</title>
-    <script src="https://telegram.org"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
             --bg-main: #0a0a12;
@@ -116,16 +116,6 @@
             box-shadow: 0 0 12px var(--accent-glow);
         }
 
-        .tags-suggest { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-        .tag-btn {
-            background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: #cbd5e1;
-            padding: 6px 14px; border-radius: 20px; font-size: 12px; cursor: pointer;
-        }
-        .tag-btn:active { background: var(--accent); color: #fff; }
-    </style>
-</head>
-<body>
-        <style>
         /* Интерактивная кибер-карта Гродно */
         .cyber-map {
             position: relative;
@@ -198,7 +188,6 @@
             display: flex; flex-direction: column; align-items: center; gap: 5px;
             transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.5px;
         }
-
         .nav-btn.active { color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); }
         .sub-screen { display: none; }
         .sub-screen.active { display: block; }
@@ -211,21 +200,26 @@
         }
         .filter-chip.active { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
 
-        .counter-row {
-            display: flex; justify-content: space-between; align-items: center;
-            background: var(--bg-input); padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border);
+        .cyber-tag-btn {
+            padding: 8px 12px; border: 1px solid rgba(0, 162, 255, 0.4); color: var(--text-main);
+            border-radius: 8px; cursor: pointer; display: inline-block; font-size: 12px; font-weight: 600;
+            background: rgba(255,255,255,0.03); transition: all 0.2s;
         }
-        .counter { display: flex; align-items: center; gap: 10px; }
-        .counter button {
-            width: 36px; height: 36px; background: rgba(255,255,255,0.05); border: 1px solid var(--border);
-            color: #fff; border-radius: 8px; font-size: 20px; font-weight: bold; cursor: pointer;
+        input[type="radio"]:checked + .cyber-tag-btn {
+            background: rgba(0, 162, 255, 0.2) !important;
+            border-color: var(--accent) !important;
+            color: #fff !important;
+            box-shadow: 0 0 10px var(--accent-glow);
+            font-weight: bold;
         }
-        .counter input { width: 35px; text-align: center; background: transparent; border: none; color: #fff; font-size: 16px; font-weight: bold; }
+
         .empty-state { text-align: center; padding: 45px 20px; color: var(--text-muted); font-size: 14px; }
         .violator-item { background: rgba(255, 56, 56, 0.04); border: 1px solid rgba(255, 56, 56, 0.15); padding: 16px; border-radius: 14px; margin-bottom: 12px; }
         .track-counter { font-size: 11px; background: var(--accent); color: #fff; padding: 1px 6px; border-radius: 10px; font-weight: bold; margin-left: 4px; }
         .hidden { display: none !important; }
     </style>
+</head>
+<body>
 
     <audio id="bg-audio"></audio>
 
@@ -264,8 +258,9 @@
             <button type="button" id="btn-submit-auth" class="btn btn-success">Пройти авторизацию</button>
         </div>
     </div>
-        <div id="screen-main" class="screen">
-        <!-- ПОД-ЭКРАН 1: ЛЕНТА РАДАРА С НЕОНОВОЙ КАРТОЙ -->
+
+    <div id="screen-main" class="screen active">
+        
         <div id="sub-radar" class="sub-screen active">
             <div class="cyber-map">
                 <div class="map-bg-grid"></div>
@@ -293,14 +288,12 @@
             <div id="empty-state-msg" class="empty-state">На радаре пока пусто... Запусти движ сам!</div>
             <div id="radar-list"></div>
         </div>
-
-        <!-- ПОД-ЭКРАН 2: НАЧАЛО ФОРМЫ СОЗДАНИЯ СБОРА -->
-        <div id="sub-create" class="sub-screen">
+                <div id="sub-create" class="sub-screen">
             <h2>➕ Запустить сбор</h2>
             <p class="subtitle">Отметь локацию на общем радаре Гродно</p>
             <div class="card" style="border-top: 4px solid var(--accent);">
                 <div class="form-group">
-                    <label>📍 Выберите район для карты и фильтра</label>
+                    <label>📍 Выберите район</label>
                     <select id="create-district">
                         <option value="Центр (Советская)">Центр (Советская)</option>
                         <option value="ТЦ Тринити">ТЦ Тринити</option>
@@ -313,77 +306,77 @@
                     </select>
                 </div>
 
+                <div class="form-group">
+                    <label>🔥 Категория встреч:</label>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 5px;">
+                        <input type="radio" id="tag-walk" name="radar-tag" value="🚶‍♂️ Прогулка" checked style="display:none;">
+                        <label for="tag-walk" class="cyber-tag-btn">🚶‍♂️ Прогулка</label>
+
+                        <input type="radio" id="tag-football" name="radar-tag" value="⚽ Футбол" style="display:none;">
+                        <label for="tag-football" class="cyber-tag-btn">⚽ Футбол</label>
+
+                        <input type="radio" id="tag-basketball" name="radar-tag" value="🏀 Баскетбол" style="display:none;">
+                        <label for="tag-basketball" class="cyber-tag-btn">🏀 Баскетбол</label>
+
+                        <input type="radio" id="tag-volleyball" name="radar-tag" value="🏐 Волейбол" style="display:none;">
+                        <label for="tag-volleyball" class="cyber-tag-btn">🏐 Волейбол</label>
+
+                        <input type="radio" id="tag-pingpong" name="radar-tag" value="🏓 Наст. теннис" style="display:none;">
+                        <label for="tag-pingpong" class="cyber-tag-btn">🏓 Наст. теннис</label>
+
+                        <input type="radio" id="tag-workout" name="radar-tag" value="🏋️‍♂️ Турники / Бег" style="display:none;">
+                        <label for="tag-workout" class="cyber-tag-btn">🏋️‍♂️ Турники / Бег</label>
+
+                        <input type="radio" id="tag-bike" name="radar-tag" value="🚲 Велик" style="display:none;">
+                        <label for="tag-bike" class="cyber-tag-btn">🚲 Велик</label>
+
+                        <input type="radio" id="tag-game" name="radar-tag" value="🎮 Гейминг" style="display:none;">
+                        <label for="tag-game" class="cyber-tag-btn">🎮 Гейминг</label>
+                    </div>
+                </div>
+
                 <div class="form-group" style="margin-top: 15px;">
-    <label class="cyber-label">🎯 Точное место встречи:</label>
-    <input type="text" id="create-exact-place" class="cyber-input" placeholder="Например: Коробка на Ожешко, Скейт-парк">
-</div>
+                    <label>🎯 Точное место встречи:</label>
+                    <input type="text" id="create-exact-place" placeholder="Например: Коробка на Ожешко, Скейт-парк">
+                </div>
 
-<div class="form-group">
-    <label class="cyber-label">🔥 Категория (Тег настроения):</label>
-    <div class="cyber-tags-container" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 5px;">
-        <input type="radio" id="tag-sport" name="radar-tag" value="🏀 Спорт" checked style="display:none;">
-        <label for="tag-sport" class="cyber-tag-btn" style="padding: 8px 12px; border: 1px solid #00f0ff; color: #00f0ff; border-radius: 4px; cursor: pointer; display: inline-block;">🏀 Спорт</label>
+                <div class="form-group">
+                    <label>⏱️ Когда собираемся?</label>
+                    <div style="display: flex; gap: 15px; margin-top: 5px; margin-bottom: 10px;">
+                        <label style="color: #ff3838; cursor: pointer; font-weight: bold;">
+                            <input type="radio" name="time-type" value="now" checked onclick="document.getElementById('custom-time-block').style.display='none';"> ⚡ СРОЧНО
+                        </label>
+                        <label style="color: #00a2ff; cursor: pointer; font-weight: bold;">
+                            <input type="radio" name="time-type" value="custom" onclick="document.getElementById('custom-time-block').style.display='flex';"> 📅 Выбрать время
+                        </label>
+                    </div>
+                    
+                    <div id="custom-time-block" style="display: none; gap: 10px; align-items: center;">
+                        <select id="create-hour" style="width: 80px; text-align: center;">
+                            <option value="12">12</option><option value="13">13</option><option value="14">14</option>
+                            <option value="15">15</option><option value="16">16</option><option value="17">17</option>
+                            <option value="18">18</option><option value="19">19</option><option value="20">20</option>
+                            <option value="21">21</option><option value="22">22</option>
+                        </select>
+                        <span style="color:#00a2ff; font-weight: bold;">:</span>
+                        <select id="create-minute" style="width: 80px; text-align: center;">
+                            <option value="00">00</option><option value="15">15</option>
+                            <option value="30">30</option><option value="45">45</option>
+                        </select>
+                    </div>
+                </div>
 
-        <input type="radio" id="tag-bike" name="radar-tag" value="🚲 Велик" style="display:none;">
-        <label for="tag-bike" class="cyber-tag-btn" style="padding: 8px 12px; border: 1px solid #00f0ff; color: #00f0ff; border-radius: 4px; cursor: pointer; display: inline-block;">🚲 Велик</label>
+                <div class="form-group">
+                    <label>📝 Короткое описание / Приметы:</label>
+                    <textarea id="create-desc" placeholder="Кто нужен? Что берём с собой? Сколько сидим?" style="height: 80px; resize: none;"></textarea>
+                </div>
 
-        <input type="radio" id="tag-game" name="radar-tag" value="🎮 Гейминг" style="display:none;">
-        <label for="tag-game" class="cyber-tag-btn" style="padding: 8px 12px; border: 1px solid #00f0ff; color: #00f0ff; border-radius: 4px; cursor: pointer; display: inline-block;">🎮 Гейминг</label>
-
-        <input type="radio" id="tag-chill" name="radar-tag" value="💨 Чилл" style="display:none;">
-        <label for="tag-chill" class="cyber-tag-btn" style="padding: 8px 12px; border: 1px solid #00f0ff; color: #00f0ff; border-radius: 4px; cursor: pointer; display: inline-block;">💨 Чилл</label>
-    </div>
-</div>
-
-<div class="form-group">
-    <label class="cyber-label">⏱️ Когда собираемся?</label>
-    <div style="display: flex; gap: 15px; margin-top: 5px; margin-bottom: 10px;">
-        <label style="color: #ff007f; cursor: pointer;">
-            <input type="radio" name="time-type" value="now" checked onclick="document.getElementById('custom-time-block').style.display='none';"> ⚡ СРОЧНО
-        </label>
-        <label style="color: #00f0ff; cursor: pointer;">
-            <input type="radio" name="time-type" value="custom" onclick="document.getElementById('custom-time-block').style.display='flex';"> 📅 Выбрать время
-        </label>
-    </div>
-    
-    <div id="custom-time-block" style="display: none; gap: 10px; align-items: center;">
-        <select id="create-hour" class="cyber-input" style="width: 70px; text-align: center;">
-            <option value="12">12</option><option value="13">13</option><option value="14">14</option>
-            <option value="15">15</option><option value="16">16</option><option value="17">17</option>
-            <option value="18">18</option><option value="19">19</option><option value="20">20</option>
-            <option value="21">21</option><option value="22">22</option>
-        </select>
-        <span style="color:#00f0ff;">:</span>
-        <select id="create-minute" class="cyber-input" style="width: 70px; text-align: center;">
-            <option value="00">00</option><option value="15">15</option>
-            <option value="30">30</option><option value="45">45</option>
-        </select>
-    </div>
-</div>
-
-<div class="form-group">
-    <label class="cyber-label">📝 Короткое описание:</label>
-    <textarea id="create-desc" class="cyber-input" placeholder="Кто нужен? Что берём с собой? Сколько сидим?" style="height: 80px; resize: none;"></textarea>
-</div>
-
-<button type="submit" id="btn-launch-radar" class="btn btn-primary" style="margin-bottom: 25px; width: 100%;">
-    🚀 ЗАПУСТИТЬ РАДАР СБОРА
-</button>
-
-<style>
-input[type="radio"]:checked + .cyber-tag-btn {
-    background: rgba(0, 240, 255, 0.2) !important;
-    box-shadow: 0 0 10px #00f0ff;
-    font-weight: bold;
-}
-</style>
-</div>
-</div>
-                🚀 Запустить радар сбора
-            </button>
+                <button type="button" id="btn-launch-radar" class="btn btn-primary">
+                    🚀 ЗАПУСТИТЬ РАДАР СБОРА
+                </button>
+            </div>
         </div>
 
-        <!-- ПОД-ЭКРАН 3: АРХИВ «МОИ СХОДКИ» -->
         <div id="sub-archive" class="sub-screen">
             <h2>💼 Мои Сходки</h2>
             <p class="subtitle">Сходки, на которые ты вписался. Жалобы доступны через 1 час.</p>
@@ -391,14 +384,13 @@ input[type="radio"]:checked + .cyber-tag-btn {
             <div id="archive-list"></div>
         </div>
 
-        <!-- ПОД-ЭКРАН 4: ЛИЧНАЯ СКРЫТАЯ АДМИНКА -->
         <div id="sub-admin" class="sub-screen">
             <h2>⚡ Админка куратора</h2>
             <p class="subtitle">Панель тотального контроля проверок и жалоб</p>
             
             <div class="card" style="border: 1px solid var(--accent); background: rgba(0, 162, 255, 0.03);">
                 <h3>🕵️ Эмулятор Профиля (Маскировка)</h3>
-                <p class="hint" style="margin-bottom: 12px; color: var(--accent);">Измени свои параметры, чтобы тайно просматривать анкеты любых возрастов и полов:</p>
+                <p class="subtitle" style="margin-bottom: 12px; color: var(--accent);">Измени свои параметры, чтобы тайно просматривать анкеты любых возрастов и полов:</p>
                 <div style="display: flex; gap: 10px; margin-bottom: 10px;">
                     <select id="admin-fake-gender" style="flex: 1;">
                         <option value="Парень">Маскировка: Парень</option>
@@ -416,88 +408,68 @@ input[type="radio"]:checked + .cyber-tag-btn {
             </div>
         </div>
 
-        <!-- НИЖНЕЕ МЕНЮ НАВИГАЦИИ -->
-        <div class="bottom-nav">
-            <button class="nav-btn active" data-sub="sub-radar"><span>🛰</span>Радар</button>
-            <button class="nav-btn" data-sub="sub-create"><span>➕</span>Создать</button>
-            <button class="nav-btn" data-sub="sub-archive"><span>💼</span>Мои Сходки</button>
-            <button class="nav-btn hidden" id="nav-admin-btn" data-sub="sub-admin"><span>⚡</span>Админка</button>
-        </div>
-        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <button class="nav-btn active" data-sub="sub-radar"><span>🛰</span>Радар</button>
+        <button class="nav-btn" data-sub="sub-create"><span>➕</span>Создать</button>
+        <button class="nav-btn" data-sub="sub-archive"><span>💼</span>Мои Сходки</button>
+        <button class="nav-btn hidden" id="nav-admin-btn" data-sub="sub-admin"><span>⚡</span>Админка</button>
+    </div>
         <script>
-            // Функция автоматической загрузки активных радаров из Telegram-канала (БЕЗ токена!)
-async function loadRadarsFromChannel() {
-    try {
-        // Запрашиваем публичный веб-виджет истории твоего ТГК
-        const response = await fetch('https://allorigins.win' + encodeURIComponent('https://t.me'));
-        const data = await response.json();
-        const html = data.contents;
-        
-        // Массив для очистки старых и записи новых радаров
-        if (typeof meetings === 'undefined') window.meetings = [];
-        meetings.length = 0; 
-
-        // Ищем посты с зашифрованными хэшами во фрейме канала
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        const messages = doc.querySelectorAll('.tgme_widget_message_text');
-        const times = doc.querySelectorAll('.time');
-
-        messages.forEach((msg, index) => {
-            const text = msg.innerText;
-            // Ищем ключевое слово, по которому Mini App поймет, что это карточка радара
-            if (text.includes('RADAR_DATA:')) {
-                const base64Data = text.split('RADAR_DATA:')[1].trim();
-                
-                // Расшифровываем хэш с полной поддержкой кириллицы
-                const rawJson = decodeURIComponent(atob(base64Data).split('').map(function(c) {
-                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                }).join(''));
-                
-                const parsed = JSON.parse(rawJson);
-                
-                // Проверка таймера жизни сходки: игнорируем посты старше 3 часов (10800000 мс)
-                const postTimeAttr = times[index]?.getAttribute('datetime');
-                const postTimestamp = postTimeAttr ? new Date(postTimeAttr).getTime() : Date.now();
-                if (Date.now() - postTimestamp > 10800000) return; 
-
-                // Собираем валидную карточку для карты Гродно
-                meetings.push({
-                    id: 'meeting-' + postTimestamp,
-                    district: parsed.d,
-                    exactPlace: parsed.e,
-                    target: parsed.t,
-                    link: parsed.l,
-                    ageFrom: parsed.af,
-                    ageTo: parsed.at,
-                    desc: parsed.desc,
-                    lat: parsed.lat,
-                    lng: parsed.lng,
-                    time: new Date(postTimestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-                    playersCount: 1
-                });
-            }
-        });
-        
-        // Перерисовываем карту и списки с новыми точками
-        if (typeof renderAll === 'function') renderAll();
-    } catch (e) {
-        console.error("Ошибка загрузки базы из ТГК:", e);
-    }
-}
-
-// Запускаем сканирование канала сразу при входе в игру
-document.addEventListener('DOMContentLoaded', () => {
-    loadRadarsFromChannel();
-    // Обновляем карту каждые 30 секунд в фоне
-    setInterval(loadRadarsFromChannel, 30000);
-});      
-            // Перехватываем управление кнопкой, чтобы убрать ошибку
-window.submitForm = function() {
-    alert("Шаг 1 пройден! Кнопка больше не ломает игру.");
-};            
-        // ТВОЙ НАСТОЯЩИЙ ID ИЗ ТЕЛЕГРАМА ДЛЯ ВХОДА В АДМИНКУ
+        // Твой рабочий Worker URL
+        const workerUrl = "https://noisy-art-8292.korba-alex2012.workers.dev/";
         const MY_TELEGRAM_ID = 6949963047;
+
+        // База локаций Гродно по видам спорта и интересам
+        const grodnoLocations = {
+            'Центр (Советская)': {
+                'default': ['У Танка', 'Возле Фары', 'Драмтеатр', 'Парк Жилибера'],
+                '⚽ Футбол': ['Стадион «Неман» (запасное)', 'Парк Жилибера'],
+                '🏀 Баскетбол': ['Коложский парк (площадка)', 'Стадион «Неман»'],
+                '🏐 Волейбол': ['Коложский парк'],
+                '🏓 Наст. теннис': ['Антикафе в центре', 'Парк Жилибера'],
+                '🏋️‍♂️ Турники / Бег': ['Коложский парк', 'Набережная'],
+                '🚲 Велик': ['У Танка', 'Набережная (Старый мост)'],
+                '🎮 Гейминг': ['Компьютерный клуб', 'Антикафе в центре']
+            },
+            'ТЦ Тринити': {
+                'default': ['Главный вход', 'Фуд-корт (3 этаж)', 'Возле Кравта', 'Ледовая арена'],
+                '🚲 Велик': ['Велодорожка на Лебедева'],
+                '🎮 Гейминг': ['Зона развлечений (3 этаж)']
+            },
+            'OldCity (Олд Сити)': {
+                'default': ['У Замка (атриум)', 'Парковка у входа', 'Фуд-корт']
+            },
+            'Ольшанка': {
+                'default': ['ТЦ Стелла', 'Амбулатория', 'Конечная автобусов'],
+                '⚽ Футбол': ['Стадион 41-й школы'],
+                '🏀 Баскетбол': ['Площадка у 41-й школы'],
+                '🏋️‍♂️ Турники / Бег': ['Площадка у ФОК']
+            },
+            'Девятовка': {
+                'default': ['ТЦ Лимож', 'Костёл', 'Мини-рынок Чехов', 'Польская школа'],
+                '⚽ Футбол': ['Стадион 27-й школы', 'Стадион 32-й школы'],
+                '🏀 Баскетбол': ['Площадка на Лиможа', 'Стадион 27-й школы'],
+                '🏋️‍♂️ Турники / Бег': ['Воркаут у 27-й школы']
+            },
+            'Грандичи': {
+                'default': ['Евроопт (Грандичи-3)', 'Школа №42', 'Конечная автобусов'],
+                '⚽ Футбол': ['Стадион школы №42'],
+                '🏀 Баскетбол': ['Площадка у школы №42']
+            },
+            'Пышки (Парк)': {
+                'default': ['Тропа здоровья (вход)', 'Джунгли Парк', 'Меловые карьеры', 'Смотровая у Немана'],
+                '🏋️‍♂️ Турники / Бег': ['Тропа здоровья (воркаут)', 'Трензал под открытым небом'],
+                '🚲 Велик': ['Главный прокат', 'Новый мост (Поповича)']
+            },
+            'БЛК / Форты': {
+                'default': ['Мини-рынок Форты', 'ТЦ Корона (БЛК)', 'Вход в Пышки с БЛК'],
+                '⚽ Футбол': ['Стадион «Красное Знамя» (КЗ)', 'Площадка 23-й школы'],
+                '🏀 Баскетбол': ['Стадион «Красное Знамя» (КЗ)', 'Площадка ГрГУ'],
+                '🏋️‍♂️ Турники / Бег': ['Стадион КЗ', 'Площадка ГрГУ']
+            }
+        };
 
         const tg = window.Telegram?.WebApp;
         let myId = 0;
@@ -517,12 +489,11 @@ window.submitForm = function() {
         let archive = JSON.parse(localStorage.getItem('gr_archive_2026')) || [];
         let complaints = JSON.parse(localStorage.getItem('gr_complaints_2026')) || [];
 
-        // Данные текущей сессии
         let activeGender = localStorage.getItem('user_gender') || "";
         let activeAge = parseInt(localStorage.getItem('user_age')) || 0;
         let currentDistrictFilter = "all";
 
-        // МУЗЫКАЛЬНЫЙ ДВИЖОК СМАРТФОНА
+        // Музыкальный плеер
         const audio = document.getElementById('bg-audio');
         const musicBtn = document.getElementById('btn-music-toggle');
         const musicUpload = document.getElementById('music-upload');
@@ -530,27 +501,32 @@ window.submitForm = function() {
         let playlistUrls = [];
         let currentTrackIndex = 0;
 
-        window.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('nav-admin-btn').classList.remove('hidden');
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('nav-admin-btn')?.classList.remove('hidden');
 
-            // Автоочистка сходок старше 3 часов (10800000 мс)
             const now = Date.now();
             meetings = meetings.filter(m => (now - m.timeCreated) < 10800000);
             localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
 
             if (localStorage.getItem('user_registered') === 'true') {
-                document.getElementById('screen-auth').classList.remove('active');
-                document.getElementById('screen-main').classList.add('active');
+                document.getElementById('screen-auth')?.classList.remove('active');
+                document.getElementById('screen-main')?.classList.add('active');
                 updateStatusHeader();
                 renderAll();
             } else {
-                document.getElementById('screen-auth').classList.add('active');
+                document.getElementById('screen-auth')?.classList.add('active');
             }
             initAudioEngine();
+            updatePlaceTags();
+
+            document.getElementById('create-district')?.addEventListener('change', updatePlaceTags);
+            document.querySelectorAll('input[name="radar-tag"]').forEach(radio => {
+                radio.addEventListener('change', updatePlaceTags);
+            });
         });
 
         function initAudioEngine() {
-            musicBtn.addEventListener('click', () => {
+            musicBtn?.addEventListener('click', () => {
                 if (playlistUrls.length === 0) {
                     alert("Добавь треки через кнопку '➕ ТРЕК'!");
                     return;
@@ -563,7 +539,7 @@ window.submitForm = function() {
                 }
             });
 
-            musicUpload.addEventListener('change', (e) => {
+            musicUpload?.addEventListener('change', (e) => {
                 const files = Array.from(e.target.files);
                 if (files.length > 0) {
                     files.forEach(file => playlistUrls.push(URL.createObjectURL(file)));
@@ -573,7 +549,7 @@ window.submitForm = function() {
                 }
             });
 
-            audio.addEventListener('ended', () => {
+            audio?.addEventListener('ended', () => {
                 currentTrackIndex++;
                 if (currentTrackIndex >= playlistUrls.length) currentTrackIndex = 0; 
                 playCurrentTrack();
@@ -590,42 +566,49 @@ window.submitForm = function() {
         }
 
         function updateStatusHeader() {
-            document.getElementById('user-display-status').innerText = `${activeGender}, ${activeAge} л. (@${myUsername}) 🛰 СЕТЬ`;
+            const statusEl = document.getElementById('user-display-status');
+            if (statusEl) {
+                statusEl.innerText = `${activeGender}, ${activeAge} л. (@${myUsername}) 🛰 СЕТЬ`;
+            }
         }
 
-        window.applyPlaceTag = function(val) { document.getElementById('create-exact-place').value = val; };
-        window.applyTargetTag = function(val) { document.getElementById('create-target').value = val; };
-
-        // ДИНАМИЧЕСКИЕ ЛОКАЦИИ ГРОДНО
-        function updateDynamicPlaceTags() {
-            const district = document.getElementById('create-district').value;
-            const tagsContainer = document.querySelector('.tags-suggest');
-            if (!tagsContainer) return;
-
-            let tags = [];
-            if (district === "Центр (Советская)") tags = ["у фонтана", "качели у Немана", "около Фары Витовта", "Драмтеатр"];
-            else if (district === "ТЦ Тринити") tags = ["фудкорт 3 этаж", "у Кравта", "инфоцентр", "ледовая арена"];
-            else if (district === "OldCity (Олд Сити)") tags = ["у замка в центре", "фудкорт", "главный вход"];
-            else if (district === "Ольшанка") tags = ["СШ 41", "ТЦ Ольшанка", "сквер Наполеона Орды"];
-            else if (district === "Грандичи") tags = ["новая школа", "амфитеатр", "аллея"];
-            else if (district === "Девятовка") tags = ["у Алми", "Белые Росы", "дворик с колодцем"];
-            else if (district === "Пышки (Парк)") tags = ["Тропа здоровья", "у Немана", "Тортуога"];
-            else if (district === "БЛК / Форты") tags = ["Мини-рынок Форты", "пышечная", "у стадиона"];
-
-            tagsContainer.innerHTML = '';
-            tags.forEach(t => {
-                const span = document.createElement('span');
-                span.className = 'tag-btn';
-                span.innerText = `#${t.replace(/ /g, '_')}`;
-                span.onclick = () => applyPlaceTag(t);
-                tagsContainer.appendChild(span);
+        function updatePlaceTags() {
+            const districtSelect = document.getElementById('create-district');
+            const activeTagInput = document.querySelector('input[name="radar-tag"]:checked');
+            
+            if (!districtSelect) return;
+            
+            const currentDistrict = districtSelect.value;
+            const currentTag = activeTagInput ? activeTagInput.value.trim() : '🚶‍♂️ Прогулка';
+            const exactPlaceInput = document.getElementById('create-exact-place');
+            if (!exactPlaceInput) return;
+            
+            let tagsContainer = document.getElementById('grodno-tags-container');
+            if (!tagsContainer) {
+                tagsContainer = document.createElement('div');
+                tagsContainer.id = 'grodno-tags-container';
+                tagsContainer.style.cssText = 'display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;';
+                exactPlaceInput.parentNode.insertBefore(tagsContainer, exactPlaceInput.nextSibling);
+            }
+            
+            tagsContainer.innerHTML = ''; 
+            const districtData = grodnoLocations[currentDistrict] || {};
+            const tagsToShow = districtData[currentTag] || districtData['default'] || [];
+            
+            tagsToShow.forEach(placeName => {
+                const tagBtn = document.createElement('button');
+                tagBtn.type = 'button';
+                tagBtn.innerText = placeName;
+                tagBtn.style.cssText = 'background:rgba(255,255,255,0.05); color:#00a2ff; border:1px solid rgba(0,162,255,0.3); padding:5px 10px; border-radius:15px; font-size:11px; cursor:pointer; font-weight:600;';
+                
+                tagBtn.addEventListener('click', () => {
+                    exactPlaceInput.value = placeName;
+                });
+                tagsContainer.appendChild(tagBtn);
             });
         }
-
-        document.getElementById('create-district').addEventListener('change', updateDynamicPlaceTags);
-        setTimeout(updateDynamicPlaceTags, 500);
-                    // КНОПКА АВТОРИЗАЦИИ
-        document.getElementById('btn-submit-auth').addEventListener('click', (e) => {
+                    // Авторизация
+        document.getElementById('btn-submit-auth')?.addEventListener('click', (e) => {
             e.preventDefault();
             const gen = document.getElementById('auth-gender').value;
             const age = parseInt(document.getElementById('auth-age').value);
@@ -642,30 +625,17 @@ window.submitForm = function() {
             updateStatusHeader(); renderAll();
         });
 
-        // МАСКИРОВКА АДМИНА
-        document.getElementById('btn-apply-fake').addEventListener('click', () => {
+        // Маскировка Админа
+        document.getElementById('btn-apply-fake')?.addEventListener('click', () => {
             activeGender = document.getElementById('admin-fake-gender').value;
             activeAge = parseInt(document.getElementById('admin-fake-age').value);
             updateStatusHeader(); renderAll();
             alert("Маскировка куратора применена! Радар перенастроен.");
         });
 
-        document.querySelectorAll('.btn-minus').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const inp = document.getElementById(btn.getAttribute('data-target'));
-                if (inp.value > 0) inp.value = parseInt(inp.value) - 1;
-            });
-        });
-        document.querySelectorAll('.btn-plus').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const inp = document.getElementById(btn.getAttribute('data-target'));
-                inp.value = parseInt(inp.value) + 1;
-            });
-        });
-
-        // НАВИГАЦИЯ ПО МЕНЮ С КОНТРОЛЕМ ПИН-КОДА АДМИНКИ
+        // Навигация по кнопкам меню
         document.querySelectorAll('.bottom-nav .nav-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', () => {
                 const targetSub = btn.getAttribute('data-sub');
                 if (targetSub === "sub-admin" && localStorage.getItem('admin_authorized') !== 'true') {
                     const pin = prompt("🔐 Доступ ограничен. Введите ПИН-КОД куратора:");
@@ -680,7 +650,7 @@ window.submitForm = function() {
                 document.querySelectorAll('.bottom-nav .nav-btn').forEach(b => b.classList.remove('active'));
                 document.querySelectorAll('.sub-screen').forEach(s => s.classList.remove('active'));
                 btn.classList.add('active');
-                document.getElementById(targetSub).classList.add('active');
+                document.getElementById(targetSub)?.classList.add('active');
                 renderAll();
             });
         });
@@ -694,201 +664,70 @@ window.submitForm = function() {
             });
         });
 
-        // 🚀 НАДЁЖНЫЙ КИБЕР-ГЕНЕРАТОР: Перенаправление в бота через защищённый старт-параметр
-// ========================================================
-// ПОДГОТОВКА ДАННЫХ И КУЛЬТОВЫХ ТОЧЕК ГРОДНО
-// ========================================================
-const grodnoLocations = {
-    'Центр (Советская)': {
-        'default': ['У Танка', 'Возле Фары', 'Драмтеатр', 'Парк Жилибера'],
-        '🏀 Спорт': ['Стадион «Неман»', 'Коложский парк (площадка)'],
-        '🚴‍♂️ Велик': ['У Танка', 'Набережная (Старый мост)'],
-        '🎮 Гейминг': ['Компьютерный клуб', 'Антикафе в центре']
-    },
-    'ТЦ Тринити': {
-        'default': ['Главный вход', 'Фуд-корт (3 этаж)', 'Возле Кравта', 'Ледовая арена'],
-        '🚴‍♂️ Велик': ['Велодорожка на Лебедева'],
-        '🎮 Гейминг': ['Зона развлечений (Тринити)']
-    },
-    'OldCity (Олд Сити)': {
-        'default': ['У Замка (атриум внутри)', 'Парковка у входа', 'Фуд-корт']
-    },
-    'Ольшанка': {
-        'default': ['ТЦ Стелла', 'Амбулатория', 'Конечная остановка'],
-        '🏀 Спорт': ['Стадион 41-й школы']
-    },
-    'Девятовка': {
-        'default': ['ТЦ Лимож', 'Костёл', 'Чехов (мини-рынок)', 'Польская школа'],
-        '🏀 Спорт': ['Стадион 27-й школы', 'Площадка на Лиможа']
-    },
-    'Грандичи': {
-        'default': ['Евроопт (Грандичи-3)', 'Новая школа №42', 'Конечная автобусов']
-    },
-    'Пышки (Парк)': {
-        'default': ['Тропа здоровья (вход)', 'Джунгли Парк', 'Меловые карьеры', 'Смотровая у Немана'],
-        '🚴‍♂️ Велик': ['Главный прокат', 'Новый мост (Поповича)']
-    },
-    'БЛК / Форты': {
-        'default': ['Мини-рынок Форты', 'ТЦ Корона (БЛК)', 'Вход в Пышки с БЛК'],
-        '🏀 Спорт': ['Стадион «Красное Знамя» (КЗ)', 'Площадка ГрГУ']
-    }
-};
+        // Запуск Радара и отправка данных в Worker
+        document.getElementById('btn-launch-radar')?.addEventListener('click', async function(e) {
+            e.preventDefault();
 
-const workerUrl = "https://workers.dev";
+            const district = document.getElementById('create-district')?.value || 'Не указан';
+            const exactPlace = document.getElementById('create-exact-place')?.value.trim();
+            const desc = document.getElementById('create-desc')?.value.trim() || 'Без описания';
 
-// ========================================================
-// ЛОГИКА ДИНАМИЧЕСКИХ ПОДСКАЗОК И ИНТЕРФЕЙСА
-// ========================================================
+            if (!exactPlace) {
+                alert('Пожалуйста, укажите точное место встречи!');
+                return;
+            }
 
-function updatePlaceTags() {
-    const districtSelect = document.getElementById('create-district');
-    const activeTagInput = document.querySelector('input[name="radar-tag"]:checked');
-    
-    if (!districtSelect) return;
-    
-    const currentDistrict = districtSelect.value;
-    const currentTag = activeTagInput ? activeTagInput.value.trim() : 'default';
-    
-    const exactPlaceInput = document.getElementById('create-exact-place');
-    if (!exactPlaceInput) return;
-    
-    let tagsContainer = document.getElementById('grodno-tags-container');
-    if (!tagsContainer) {
-        tagsContainer = document.createElement('div');
-        tagsContainer.id = 'grodno-tags-container';
-        tagsContainer.style.cssText = 'display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;';
-        exactPlaceInput.parentNode.insertBefore(tagsContainer, exactPlaceInput.nextSibling);
-    }
-    
-    tagsContainer.innerHTML = ''; 
-    
-    const districtData = grodnoLocations[currentDistrict] || {};
-    const tagsToShow = districtData[currentTag] || districtData['default'] || [];
-    
-    tagsToShow.forEach(placeName => {
-        const tagBtn = document.createElement('button');
-        tagBtn.type = 'button';
-        tagBtn.innerText = placeName;
-        tagBtn.style.cssText = 'background:#1a2332; color:#5fa3e4; border:1px solid #2c3e55; padding:6px 12px; border-radius:20px; font-size:12px; cursor:pointer; margin-bottom:4px;';
-        
-        tagBtn.addEventListener('click', () => {
-            exactPlaceInput.value = placeName;
-        });
-        
-        tagsContainer.appendChild(tagBtn);
-    });
-}
+            let timeText = '';
+            const timeType = document.querySelector('input[name="time-type"]:checked')?.value;
+            if (timeType === 'now') {
+                timeText = '⚡ СРОЧНО';
+            } else {
+                const hour = document.getElementById('create-hour')?.value || '12';
+                const minute = document.getElementById('create-minute')?.value || '00';
+                timeText = `${hour}:${minute}`;
+            }
 
-function updateDescriptionPlaceholder() {
-    const descInput = document.getElementById('create-desc');
-    if (descInput) {
-        descInput.placeholder = "Кто нужен? Что берём? В чём ты будешь одет(а)? (Например: белая худи, синий велик, буду с собакой...)";
-    }
-}
+            const tag = document.querySelector('input[name="radar-tag"]:checked')?.value || '🚶‍♂️ Прогулка';
 
-// Загрузка интерфейса независимо от сетевых ошибок
-document.addEventListener('DOMContentLoaded', () => {
-    updateDescriptionPlaceholder();
-    
-    document.getElementById('create-district')?.addEventListener('change', updatePlaceTags);
-    
-    document.querySelectorAll('input[name="radar-tag"]').forEach(radio => {
-        radio.addEventListener('change', updatePlaceTags);
-    });
-    
-    setTimeout(updatePlaceTags, 500);
-    
-    // БЕЗОПАСНАЯ ОТПРАВКА СТАТИСТИКИ (НЕ БЛОКИРУЕТ СТРАНИЦУ)
-    setTimeout(async () => {
-        if (window.Telegram?.WebApp) {
+            const payload = {
+                action: 'create_radar',
+                district: district,
+                exactPlace: exactPlace,
+                time: timeText,
+                category: tag,
+                description: desc,
+                creator: myUsername
+            };
+
+            const btn = document.getElementById('btn-launch-radar');
+            const origText = btn.innerText;
+            btn.innerText = 'Запуск...';
+            btn.disabled = true;
+
             try {
-                const initData = window.Telegram.WebApp.initDataUnsafe;
-                const user = initData?.user || {};
-                
-                await fetch(workerUrl, {
+                const response = await fetch(workerUrl, {
                     method: 'POST',
                     mode: 'cors',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'ping',
-                        userId: user.id || 'unknown',
-                        firstName: user.first_name || 'Anonymous',
-                        username: user.username || ''
-                    })
+                    body: JSON.stringify(payload)
                 });
-            } catch (err) {
-                console.log('Статистика временно недоступна, но приложение работает.');
+
+                if (response.ok) {
+                    alert('Радар успешно запущен!');
+                    document.querySelector('.nav-btn[data-sub="sub-radar"]')?.click();
+                } else {
+                    alert(`Ошибка сервера: ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Network error:', error);
+                alert('Ошибка сети! Проверьте подключение.');
+            } finally {
+                btn.innerText = origText;
+                btn.disabled = false;
             }
-        }
-    }, 1000);
-});
-
-// ========================================================
-// ОБРАБОТКА НАЖАТИЯ НА КНОПКУ «ЗАПУСТИТЬ РАДАР»
-// ========================================================
-document.getElementById('btn-launch-radar').addEventListener('click', async function(e) {
-    e.preventDefault();
-
-    const district = document.getElementById('create-district')?.value || 'Не указан';
-    const exactPlace = document.getElementById('create-exact-place')?.value.trim();
-    const desc = document.getElementById('create-desc')?.value.trim() || 'Без описания';
-
-    if (!exactPlace) {
-        alert('Пожалуйста, укажите точное место встречи!');
-        return;
-    }
-
-    let timeText = '';
-    const timeType = document.querySelector('input[name="time-type"]:checked')?.value;
-    if (timeType === 'now') {
-        timeText = '⚡ СРОЧНО';
-    } else {
-        const hour = document.getElementById('create-hour')?.value || '00';
-        const minute = document.getElementById('create-minute')?.value || '00';
-        timeText = `${hour}:${minute}`;
-    }
-
-    const tag = document.querySelector('input[name="radar-tag"]:checked')?.value || '🏀 Спорт';
-
-    const messageText = `🏃‍♂️ *Grodno Run — Поиск компании* 🏃‍♀️\n\n` +
-                        `📍 *Район:* ${district}\n` +
-                        `🏢 *Место:* ${exactPlace}\n` +
-                        `⏰ *Время:* ${timeText}\n` +
-                        `🏷 *Категория:* ${tag}\n\n` +
-                        `📝 *Описание/Приметы:* ${desc}`;
-
-    const btn = document.getElementById('btn-launch-radar');
-    const originalText = btn.innerText;
-    btn.innerText = 'Запуск...';
-    btn.disabled = true;
-
-    try {
-        const response = await fetch(workerUrl, {
-            method: 'POST',
-            mode: 'cors',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ 
-                action: 'create_radar',
-                text: messageText 
-            })
         });
 
-        if (response.ok) {
-            alert('Радар успешно запущен!');
-        } else {
-            alert(`Ошибка сервера: ${response.status}`);
-        }
-    } catch (error) {
-        console.error('Network error:', error);
-        alert('Ошибка сети! Убедись, что обновил код воркера и включил CORS.');
-    } finally {
-        btn.innerText = originalText;
-        btn.disabled = false;
-    }
-});
-                    function renderAll() {
+        function renderAll() {
             renderMeetingsList();
             renderArchiveList();
             renderViolators();
@@ -896,7 +735,6 @@ document.getElementById('btn-launch-radar').addEventListener('click', async func
             updateDistrictBadges();
         }
 
-        // ОБНОВЛЕНИЕ НЕОНОВЫХ ТОЧЕК НА КАРТЕ ГОРОДА ГРОДНО
         function updateCyberMap() {
             const config = {
                 "Центр (Советская)": "map-pt-center", "ТЦ Тринити": "map-pt-trinity", "OldCity (Олд Сити)": "map-pt-oldcity",
@@ -919,7 +757,6 @@ document.getElementById('btn-launch-radar').addEventListener('click', async func
             });
         }
 
-        // ЦИФРЫ-ОГОНЬКИ НА ФИЛЬТРАХ РАЙОНОВ
         function updateDistrictBadges() {
             const counts = {};
             meetings.forEach(m => counts[m.district] = (counts[m.district] || 0) + 1);
@@ -936,87 +773,62 @@ document.getElementById('btn-launch-radar').addEventListener('click', async func
             });
         }
 
-        // ОТРИСОВКА ЛЕНТЫ СБОРОВ С АВТОБАЛАНСОМ
         function renderMeetingsList() {
             const container = document.getElementById('radar-list');
             const emptyMsg = document.getElementById('empty-state-msg');
+            if (!container) return;
             container.innerHTML = '';
 
             const filtered = meetings.filter(m => {
                 if (currentDistrictFilter !== "all" && m.district !== currentDistrictFilter) return false;
-                if (Math.abs(activeAge - m.ageFrom) > 3 && Math.abs(activeAge - m.ageTo) > 3) return false;
-                if (activeGender === "Парень" && m.malesNeeded > 0 && m.malesJoined >= m.malesNeeded) return false;
-                if (activeGender === "Девушка" && m.femalesNeeded > 0 && m.femalesJoined >= m.femalesNeeded) return false;
                 return true;
             });
 
             if (filtered.length === 0) {
-                emptyMsg.style.display = 'block';
+                if (emptyMsg) emptyMsg.style.display = 'block';
                 return;
             }
-            emptyMsg.style.display = 'none';
+            if (emptyMsg) emptyMsg.style.display = 'none';
 
             filtered.forEach(m => {
-                const diffTime = Date.now() - m.timeCreated;
-                let statusClass = "status-planning"; let statusText = "⏳ Планируется";
-
-                if ((m.malesJoined + m.femalesJoined) >= 5) {
-                    statusClass = "status-mega"; statusText = "🔥 МЕГА-СБОР";
-                } else if (diffTime > 3600000) {
-                    statusClass = "status-active-now"; statusText = "🚀 Движ в разгаре!";
-                }
-
-                let deleteBtnHtml = "";
-                if (m.creator === myUsername) {
-                    deleteBtnHtml = `<button class="btn btn-danger" style="padding: 10px; font-size: 13px; margin-top: 8px; background: linear-gradient(135deg, #ff3838, #b33771);" onclick="deleteMyMeeting(${m.id})">❌ Удалить мой сбор</button>`;
-                }
-
                 const card = document.createElement('div');
-                card.className = `card ${statusClass}`;
+                card.className = `card status-planning`;
                 card.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                         <strong style="color: var(--accent); font-size: 15px;">📍 ${m.district}</strong>
-                        <span style="font-size: 11px; background: #1a1b26; padding: 4px 10px; border-radius: 12px; color: var(--text-muted); font-weight: bold;">${statusText}</span>
+                        <span style="font-size: 11px; background: #1a1b26; padding: 4px 10px; border-radius: 12px; color: var(--text-muted); font-weight: bold;">⏳ ${m.time || 'Срочно'}</span>
                     </div>
                     <p style="margin: 0 0 6px 0; font-size: 14px;"><b>Где:</b> ${m.exactPlace}</p>
-                    <p style="margin: 0 0 6px 0; font-size: 14px;"><b>Цель:</b> ${m.target}</p>
+                    <p style="margin: 0 0 6px 0; font-size: 14px;"><b>Категория:</b> ${m.category || 'Прогулка'}</p>
                     <p style="margin: 0 0 10px 0; font-size: 13px; color: #a4b0be;">${m.desc || 'Описания нет.'}</p>
-                    <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
-                        Возраст: 🔞 ${m.ageFrom}-${m.ageTo} л. | Места: 👨 ${m.malesJoined}/${m.malesNeeded} | 👩 ${m.femalesJoined}/${m.femalesNeeded}
-                    </div>
                     <div style="display: flex; gap: 8px;">
-                        <button class="btn btn-primary" style="padding: 10px; font-size: 13px; flex: 3;" onclick="joinMeeting(${m.id})">⚡ Буду на месте</button>
-                        <button class="btn btn-danger" style="padding: 10px; font-size: 13px; flex: 1; background: #261616; color: var(--accent-red);" onclick="reportDescription('${m.creator}', ${m.id})">⚠ ЖБ</button>
+                        <button class="btn btn-primary" style="padding: 10px; font-size: 13px; flex: 3;" onclick="joinMeeting('${m.id}')">⚡ Буду на месте</button>
+                        <button class="btn btn-danger" style="padding: 10px; font-size: 13px; flex: 1; background: #261616; color: var(--accent-red);" onclick="reportDescription('${m.creator}', '${m.id}')">⚠ ЖБ</button>
                     </div>
-                    ${deleteBtnHtml}
                 `;
                 container.appendChild(card);
             });
-            }
-                    window.deleteMyMeeting = function(id) {
+        }
+
+        window.deleteMyMeeting = function(id) {
             if (confirm("Удалить этот сбор?")) {
                 meetings = meetings.filter(m => m.id !== id);
                 localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
-                renderAll();
-                // Сообщаем боту об удалении
                 if (tg && tg.sendData) {
                     tg.sendData(JSON.stringify({ type: "delete_meeting", id: id }));
                 }
+                renderAll();
             }
         };
 
         window.joinMeeting = function(id) {
-            const m = meetings.find(item => item.id === id); if (!m) return;
-            if (activeGender === "Парень" && m.malesJoined < m.malesNeeded) m.malesJoined++;
-            if (activeGender === "Девушка" && m.femalesJoined < m.femalesNeeded) m.femalesJoined++;
-
+            const m = meetings.find(item => item.id === id); 
             if (!archive.some(item => item.id === id)) {
-                archive.unshift(m); localStorage.setItem('gr_archive_2026', JSON.stringify(archive));
+                if (m) archive.unshift(m);
+                localStorage.setItem('gr_archive_2026', JSON.stringify(archive));
             }
-            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
+            alert("Ты вписался в компанию!");
             renderAll();
-            alert("Ты вписался в компанию! Открываем чат встречи.");
-            window.location.href = m.chatLink;
         };
 
         window.reportDescription = function(username, meetingId) {
@@ -1032,43 +844,24 @@ document.getElementById('btn-launch-radar').addEventListener('click', async func
             const container = document.getElementById('archive-list');
             const empty = document.getElementById('archive-empty-state');
             if(!container) return; container.innerHTML = '';
-            if (archive.length === 0) { empty.style.display = 'block'; return; }
-            empty.style.display = 'none';
+            if (archive.length === 0) { if (empty) empty.style.display = 'block'; return; }
+            if (empty) empty.style.display = 'none';
 
             archive.forEach(m => {
-                const diff = Date.now() - m.timeCreated;
-                const timeLeft = Math.ceil((3600000 - diff) / 1000 / 60);
-                let btnHtml = (diff >= 3600000) ? 
-                    `<button class="btn btn-danger" style="padding: 8px; font-size: 13px;" onclick="reportRealMeeting('${m.creator}', ${m.id})">⚠ Подать ЖБ по факту встречи</button>` :
-                    `<button class="btn" style="padding: 8px; font-size: 12px; background: #1a1b26; color: #444;" disabled>⏳ ЖБ по факту встречи (Доступно через ${timeLeft} мин)</button>`;
-
                 const card = document.createElement('div'); card.className = 'card';
                 card.innerHTML = `<strong style="color: var(--accent-green);">📍 Район: ${m.district}</strong>
-                    <p style="margin: 5px 0; font-size: 13px;"><b>Цель:</b> ${m.target}</p>
-                    <p style="margin: 5px 0 10px 0; font-size: 12px; color: var(--text-muted);">Организатор: @${m.creator}</p>${btnHtml}`;
+                    <p style="margin: 5px 0; font-size: 13px;"><b>Место:</b> ${m.exactPlace}</p>
+                    <p style="margin: 5px 0 10px 0; font-size: 12px; color: var(--text-muted);">Организатор: @${m.creator || 'Аноним'}</p>`;
                 container.appendChild(card);
             });
         }
-
-        window.reportRealMeeting = function(username, meetingId) {
-            const code = prompt("Выберите номер нарушения:\n1 - Не тот возраст\n2 - Слив встречи\n3 - Не тот пол");
-            if (!code) return;
-            let reason = "Нарушение условий";
-            if(code === "1") reason = "Обман с возрастом";
-            if(code === "2") reason = "Слив встречи в последний момент";
-            if(code === "3") reason = "Обман с полом";
-            complaints.unshift({ id: Date.now(), violator: username, type: "Жалоба по факту встречи", reason: reason, meetingId: meetingId });
-            localStorage.setItem('gr_complaints_2026', JSON.stringify(complaints));
-            alert("Жалоба по факту встречи зарегистрирована!");
-            renderAll();
-        };
 
         function renderViolators() {
             const list = document.getElementById('violators-list');
             const empty = document.getElementById('admin-empty-state');
             if (!list) return; list.innerHTML = '';
-            if (complaints.length === 0) { empty.style.display = 'block'; return; }
-            empty.style.display = 'none';
+            if (complaints.length === 0) { if (empty) empty.style.display = 'block'; return; }
+            if (empty) empty.style.display = 'none';
 
             complaints.forEach((c, idx) => {
                 const item = document.createElement('div'); item.className = 'violator-item';
@@ -1077,7 +870,7 @@ document.getElementById('btn-launch-radar').addEventListener('click', async func
                     <p style="margin: 0 0 4px 0;">👤 <b>Нарушитель:</b> @${c.violator}</p>
                     <p style="margin: 0 0 12px 0; font-size: 13px; color: #ff8a80;">⚠️ <b>Суть:</b> ${c.reason}</p>
                     <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                        <button class="btn btn-primary" style="padding: 7px 10px; font-size: 11px; flex: 2;" onclick="copyUltimatum('${c.violator}')">📋 Копировать ультиматум</button>
+                        <button class="btn btn-primary" style="padding: 7px 10px; font-size: 11px; flex: 2;" onclick="copyUltimatum('${c.violator}')">📋 Ультиматум</button>
                         <button class="btn btn-success" style="padding: 7px 10px; font-size: 11px; flex: 1;" onclick="adminCloseCase(${idx}, true)">Оправдать</button>
                         <button class="btn btn-danger" style="padding: 7px 10px; font-size: 11px; flex: 1;" onclick="adminCloseCase(${idx}, false)">БАН</button>
                     </div>
@@ -1093,9 +886,10 @@ document.getElementById('btn-launch-radar').addEventListener('click', async func
 
         window.adminCloseCase = function(index, approved) {
             alert(approved ? "Дело закрыто. Пользователь оправдан." : "Нарушителю выдан БАН.");
-            complaints.splice(index, 1); localStorage.setItem('gr_complaints_2026', JSON.stringify(complaints));
-                    renderAll();
-    };
-</script>
+            complaints.splice(index, 1); 
+            localStorage.setItem('gr_complaints_2026', JSON.stringify(complaints));
+            renderAll();
+        };
+    </script>
 </body>
 </html>
