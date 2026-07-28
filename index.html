@@ -335,7 +335,24 @@
                     <label>📝 Короткое описание / Приметы:</label>
                     <textarea id="create-desc" placeholder="Кто нужен? Что берём с собой? Сколько сидим?" style="height: 80px; resize: none;"></textarea>
                 </div>
-
+                            <div style="margin-bottom: 16px;">
+                <label style="font-size: 13px; color: var(--text-muted); display: block; margin-bottom: 8px;">👥 КТО НУЖЕН ПО СОСТАВУ?</label>
+                <div style="display: flex; gap: 6px; flex-wrap: wrap;" id="target-gender-selector">
+                    <button type="button" class="tag-chip active" data-gender="any" onclick="setTargetGender(this)">🌍 Все равно</button>
+                    <button type="button" class="tag-chip" data-gender="guys" onclick="setTargetGender(this)">🚹 Пацаны</button>
+                    <button type="button" class="tag-chip" data-gender="girls" onclick="setTargetGender(this)">🚺 Девчонки</button>
+                    <button type="button" class="tag-chip" data-gender="mix" onclick="setTargetGender(this)">⚖️ 2 пацана / 2 девки</button>
+                </div>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="font-size: 13px; color: var(--text-muted); display: block; margin-bottom: 8px;">🔢 МАКСИМУМ ЧЕЛОВЕК</label>
+                <select id="create-max-people" style="width: 100%; background: #1a1b26; border: 1px solid var(--border); color: #fff; padding: 10px; border-radius: 8px; font-size: 14px;">
+                    <option value="unlimited">Сколько соберётся (без лимита)</option>
+                    <option value="3">До 3 человек</option>
+                    <option value="5">Максимум 5 человек</option>
+                    <option value="10">Компания до 10 человек</option>
+                </select>
+            </div>
                 <button type="button" id="btn-launch-radar" class="btn btn-primary">
                     🚀 ЗАПУСТИТЬ РАДАР СБОРА
                 </button>
@@ -668,12 +685,31 @@
                 renderMeetingsList();
             });
         });
-
-        document.getElementById('btn-launch-radar')?.addEventListener('click', async function(e) {
+               document.getElementById('btn-launch-radar')?.addEventListener('click', async function(e) {
             e.preventDefault();
+            
+            // === ВСТАВЬ ЭТО СЮДА ===
+            const targetGender = typeof selectedTargetGender !== 'undefined' ? selectedTargetGender : 'any';
+            const maxPeople = document.getElementById('create-max-people')?.value || 'unlimited';
+            // ======================          
             const district = document.getElementById('create-district')?.value || 'Не указан';
             const exactPlace = document.getElementById('create-exact-place')?.value.trim();
-            const desc = document.getElementById('create-desc')?.value.trim() || 'Без описания';
+                const desc = document.getElementById('create-desc')?.value.trim() || 'Без описания';
+
+    // Тот самый объект, куда сохраняются данные сбора:
+    const meetingData = {
+        district: district,
+        exactPlace: exactPlace,
+        description: desc,
+        
+        // ВСТАВЬ ЭТИ ДВЕ СТРОЧКИ СЮДА:
+        targetGender: targetGender,
+        maxPeople: maxPeople,
+        
+        creator: myUsername
+    };
+
+                   
 
             if (!exactPlace) {
                 alert('Пожалуйста, укажите точное место встречи!');
@@ -887,6 +923,13 @@
             complaints.splice(index, 1); 
             localStorage.setItem('gr_complaints_2026', JSON.stringify(complaints));
             renderAll();
+                    let selectedTargetGender = 'any';
+        function setTargetGender(btn) {
+            document.querySelectorAll('#target-gender-selector .tag-chip').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedTargetGender = btn.getAttribute('data-gender');
+        }
+            
         };
     </script>
 </body>
