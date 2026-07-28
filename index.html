@@ -757,43 +757,52 @@
             });
         });
 
-                document.getElementById('btn-submit-auth')?.addEventListener('click', (e) => {
+                        document.getElementById('btn-submit-auth')?.addEventListener('click', (e) => {
             e.preventDefault();
             
-            const genderSelect = document.getElementById('auth-gender');
-            const ageInput = document.getElementById('auth-age');
-            
-            if (!genderSelect || !ageInput) {
-                alert('Ошибка: элементы авторизации не найдены!');
-                return;
-            }
-
-            const gen = genderSelect.value;
-            const age = parseInt(ageInput.value);
-
-            if (!gen || isNaN(age) || age < 12 || age > 35) {
-                alert('Укажите корректный пол и возраст от 12 до 35 лет!');
-                return;
-            }
-
-            localStorage.setItem('user_gender', gen);
-            localStorage.setItem('user_age', age);
-            localStorage.setItem('user_registered', 'true');
-            
-            activeGender = gen; 
-            activeAge = age;
-
-            document.getElementById('screen-auth')?.classList.remove('active');
-            document.getElementById('screen-main')?.classList.add('active');
-            
-            updateStatusHeader(); 
-            renderAll();
-            
-            setTimeout(() => {
-                if (typeof initLeafletMap === 'function') {
-                    initLeafletMap();
+            try {
+                const genderSelect = document.getElementById('auth-gender');
+                const ageInput = document.getElementById('auth-age');
+                
+                if (!genderSelect || !ageInput) {
+                    alert('Ошибка: элементы формы не найдены!');
+                    return;
                 }
-            }, 200);
+
+                const gen = genderSelect.value;
+                const age = parseInt(ageInput.value);
+
+                if (!gen || isNaN(age) || age < 12 || age > 35) {
+                    alert('Укажите корректный пол и возраст от 12 до 35 лет!');
+                    return;
+                }
+
+                localStorage.setItem('user_gender', gen);
+                localStorage.setItem('user_age', age);
+                localStorage.setItem('user_registered', 'true');
+                
+                activeGender = gen; 
+                activeAge = age;
+
+                const screenAuth = document.getElementById('screen-auth');
+                const screenMain = document.getElementById('screen-main');
+
+                if (screenAuth) screenAuth.classList.remove('active');
+                if (screenMain) screenMain.classList.add('active');
+                
+                updateStatusHeader(); 
+                renderAll();
+                
+                setTimeout(() => {
+                    if (typeof initLeafletMap === 'function') {
+                        initLeafletMap();
+                    }
+                }, 200);
+
+            } catch (err) {
+                console.error("Ошибка при авторизации:", err);
+                alert("Произошла ошибка: " + err.message);
+            }
         });
 
         document.querySelectorAll('.bottom-nav .nav-btn').forEach(btn => {
