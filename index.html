@@ -307,7 +307,7 @@
         let archive = JSON.parse(localStorage.getItem('gr_archive_2026') || '[]');
         let complaints = JSON.parse(localStorage.getItem('gr_complaints_2026') || '[]');
 
-                const districtQuickPlaces = {
+        const districtQuickPlaces = {
             "Центр (Советская)": ["У Танка", "Возле Фары", "Драмтеатр", "Парк Жилибера"],
             "ТЦ Тринити": ["Главный вход", "Арена", "Фуд-корт"],
             "OldCity (Олд Сити)": ["Центральный вход", "Стоянка", "У фонтана"],
@@ -317,12 +317,14 @@
         };
 
         function updatePlaceTags() {
-            const district = document.getElementById('create-district').value;
+            const districtElement = document.getElementById('create-district');
             const container = document.getElementById('quick-places-container');
-            if (!container) return;
+            if (!container || !districtElement) return;
             container.innerHTML = '';
             
+            const district = districtElement.value;
             const places = districtQuickPlaces[district] || ["Центр", "Площадка"];
+            
             places.forEach(place => {
                 const chip = document.createElement('span');
                 chip.className = 'quick-place-chip';
@@ -334,12 +336,17 @@
             });
         }
 
+        function updateStatusHeader() {
+            const info = document.getElementById('header-user-info');
+            if (info) {
+                info.innerHTML = `👤 @${myUsername} (${activeGender === 'guy' ? '🚹' : '🚺'} ${activeAge}л)`;
+            }
+        }
+
         function setCategoryTag(btn) {
             document.querySelectorAll('#category-buttons-box .cyber-tag-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             selectedCategory = btn.getAttribute('data-cat');
-            
-            // Эта строка заставляет плашки с местами обновляться при клике на категорию
             updatePlaceTags();
         }
 
@@ -637,5 +644,3 @@
     </script>
 </body>
 </html>
-
-    
