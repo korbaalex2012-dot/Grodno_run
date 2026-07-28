@@ -307,7 +307,7 @@
         let archive = JSON.parse(localStorage.getItem('gr_archive_2026') || '[]');
         let complaints = JSON.parse(localStorage.getItem('gr_complaints_2026') || '[]');
 
-        const districtQuickPlaces = {
+                const districtQuickPlaces = {
             "Центр (Советская)": ["У Танка", "Возле Фары", "Драмтеатр", "Парк Жилибера"],
             "ТЦ Тринити": ["Главный вход", "Арена", "Фуд-корт"],
             "OldCity (Олд Сити)": ["Центральный вход", "Стоянка", "У фонтана"],
@@ -334,17 +334,12 @@
             });
         }
 
-        function updateStatusHeader() {
-            const info = document.getElementById('header-user-info');
-            if (info) {
-                info.innerHTML = `👤 @${myUsername} (${activeGender === 'guy' ? '🚹' : '🚺'} ${activeAge}л)`;
-            }
-        }
-
         function setCategoryTag(btn) {
             document.querySelectorAll('#category-buttons-box .cyber-tag-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             selectedCategory = btn.getAttribute('data-cat');
+            
+            // Эта строка заставляет плашки с местами обновляться при клике на категорию
             updatePlaceTags();
         }
 
