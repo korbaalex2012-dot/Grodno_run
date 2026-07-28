@@ -501,21 +501,39 @@
         let playlistUrls = [];
         let currentTrackIndex = 0;
 
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('nav-admin-btn')?.classList.remove('hidden');
+               // Функция загрузки карточек с сервера Cloudflare
+        async function loadMeetingsFromServer() {
+            try {
+                const res = await fetch(workerUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'get_radars' })
+                });
+                const data = await res.json();
+                if (data.success && Array.isArray(data.meetings)) {
+                    meetings = data.meetings;
+                    localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
+                }
+            } catch (e) {
+                console.error("Ошибка загрузки радара:", e);
+            }
+        }
 
-            const now = Date.now();
-            meetings = meetings.filter(m => (now - m.timeCreated) < 10800000);
-            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
+        document.addEventListener('DOMContentLoaded', async () => {
+            document.getElementById('nav-admin-btn')?.classList.remove('hidden');
 
             if (localStorage.getItem('user_registered') === 'true') {
                 document.getElementById('screen-auth')?.classList.remove('active');
                 document.getElementById('screen-main')?.classList.add('active');
                 updateStatusHeader();
+                
+                // Сначала подтягиваем свежие сходки всех юзеров, потом отрисовываем
+                await loadMeetingsFromServer();
                 renderAll();
             } else {
                 document.getElementById('screen-auth')?.classList.add('active');
             }
+            
             initAudioEngine();
             updatePlaceTags();
 
@@ -524,7 +542,6 @@
                 radio.addEventListener('change', updatePlaceTags);
             });
         });
-
         function initAudioEngine() {
             musicBtn?.addEventListener('click', () => {
                 if (playlistUrls.length === 0) {
@@ -717,10 +734,13 @@
                 });
                 clearTimeout(timeoutId);
 
-                if (response.ok) {
+                              if (response.ok) {
                     alert('Радар успешно запущен!');
+                    await loadMeetingsFromServer();
+                    renderAll();
                     document.querySelector('.nav-btn[data-sub="sub-radar"]')?.click();
-                } else {
+                }
+ else {
                     alert(`Ошибка сервера: ${response.status}`);
                 }
             } catch (error) {
