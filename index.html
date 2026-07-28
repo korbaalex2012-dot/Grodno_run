@@ -116,56 +116,6 @@
             box-shadow: 0 0 12px var(--accent-glow);
         }
 
-        .cyber-map {
-            position: relative;
-            width: 100%; height: 190px;
-            background: #06060c; border: 1px solid var(--border);
-            border-radius: 16px; margin-bottom: 20px;
-            overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
-        }
-
-        .map-bg-grid {
-            position: absolute; width: 100%; height: 100%;
-            background-image: linear-gradient(rgba(0, 162, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 162, 255, 0.05) 1px, transparent 1px);
-            background-size: 16px 16px;
-        }
-
-        .map-point {
-            position: absolute; width: 12px; height: 12px;
-            background: #232335; border-radius: 50%;
-            transform: translate(-50%, -50%); transition: all 0.3s ease;
-        }
-
-        .map-point.active {
-            background: var(--accent-red); box-shadow: 0 0 12px var(--accent-red), 0 0 25px var(--accent-red);
-            animation: pulse-dot 1.4s infinite;
-        }
-
-        .map-point.mega {
-            background: var(--accent-purple); box-shadow: 0 0 18px var(--accent-purple), 0 0 35px var(--accent-purple);
-            animation: pulse-mega 0.7s infinite;
-        }
-
-        @keyframes pulse-dot {
-            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-            50% { transform: translate(-50%, -50%) scale(1.7); opacity: 0.4; }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        }
-
-        @keyframes pulse-mega {
-            0% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(1.9); opacity: 0.5; }
-            100% { transform: translate(-50%, -50%) scale(1); }
-        }
-
-        .map-label {
-            position: absolute; font-size: 10px; color: #4b5361;
-            transform: translate(-50%, 9px); white-space: nowrap;
-            font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
-        }
-        .map-point.active + .map-label { color: #fff; text-shadow: 0 0 6px rgba(255,255,255,0.5); }
-        .map-point.mega + .map-label { color: #f8a5c2; text-shadow: 0 0 8px var(--accent-purple); }
-
         .btn {
             display: block; width: 100%; padding: 15px; border-radius: 12px; border: none;
             font-size: 15px; font-weight: 700; cursor: pointer; text-align: center; box-sizing: border-box;
@@ -175,46 +125,6 @@
         .btn-success { background: linear-gradient(135deg, var(--accent-green), #27ae60); color: #fff; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3); }
         .btn-danger { background: linear-gradient(135deg, var(--accent-red), #c0392b); color: #fff; box-shadow: 0 4px 15px rgba(255, 56, 56, 0.3); }
 
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10, 10, 18, 0.85);
-            backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-            border-top: 1px solid var(--border); display: flex; padding: 10px 6px; z-index: 999;
-        }
-
-        .nav-btn {
-            flex: 1; background: transparent; border: none; color: var(--text-muted);
-            padding: 8px 4px; font-size: 11px; font-weight: 700; cursor: pointer;
-            display: flex; flex-direction: column; align-items: center; gap: 5px;
-            transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.5px;
-        }
-        .nav-btn.active { color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); }
-        .sub-screen { display: none; }
-        .sub-screen.active { display: block; }
-
-        .filter-bar { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 18px; padding-bottom: 6px; }
-        .filter-bar::-webkit-scrollbar { display: none; }
-        .filter-chip {
-            background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: var(--text-muted);
-            padding: 9px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; white-space: nowrap; cursor: pointer;
-        }
-        .filter-chip.active { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
-
-        .cyber-tag-btn {
-            padding: 8px 12px; border: 1px solid rgba(0, 162, 255, 0.4); color: var(--text-main);
-            border-radius: 8px; cursor: pointer; display: inline-block; font-size: 12px; font-weight: 600;
-            background: rgba(255,255,255,0.03); transition: all 0.2s;
-        }
-        input[type="radio"]:checked + .cyber-tag-btn {
-            background: rgba(0, 162, 255, 0.2) !important;
-            border-color: var(--accent) !important;
-            color: #fff !important;
-            box-shadow: 0 0 10px var(--accent-glow);
-            font-weight: bold;
-        }
-
-        .empty-state { text-align: center; padding: 45px 20px; color: var(--text-muted); font-size: 14px; }
-        .violator-item { background: rgba(255, 56, 56, 0.04); border: 1px solid rgba(255, 56, 56, 0.15); padding: 16px; border-radius: 14px; margin-bottom: 12px; }
-        .track-counter { font-size: 11px; background: var(--accent); color: #fff; padding: 1px 6px; border-radius: 10px; font-weight: bold; margin-left: 4px; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -229,13 +139,14 @@
         </div>
         <div style="display: flex; align-items: center; gap: 10px;">
             <label for="music-upload" style="margin: 0; padding: 7px 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 20px; font-size: 11px; font-weight: bold; cursor: pointer;">
-                ➕ ТРЕК<span id="track-queue-badge" class="track-counter hidden">0</span>
+                ➕ ТРЕК<span id="track-queue-badge" style="font-size: 11px; background: var(--accent); color: #fff; padding: 1px 6px; border-radius: 10px; font-weight: bold; margin-left: 4px;" class="hidden">0</span>
             </label>
             <input type="file" id="music-upload" accept="audio/*" multiple class="hidden">
             <button type="button" id="btn-music-toggle" style="background: var(--bg-input); border: 1px solid var(--border); color: var(--text-muted); padding: 7px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; font-weight: 800;">🎵 OFF</button>
         </div>
     </div>
-        <div id="screen-auth" class="screen">
+
+    <div id="screen-auth" class="screen">
         <div class="alert">
             ⚠ ВНИМАНИЕ: Все данные проверяются роботом. За ложный пол или возраст — моментальный бан на всех районах Гродно БЕЗ права разблокировки!
         </div>
@@ -256,8 +167,7 @@
             <button type="button" id="btn-submit-auth" class="btn btn-success">Пройти авторизацию</button>
         </div>
     </div>
-
-    <div id="screen-main" class="screen">
+        <div id="screen-main" class="screen">
         
         <div id="sub-radar" class="sub-screen active">
             <div class="cyber-map">
@@ -271,6 +181,49 @@
                 <div class="map-point" id="map-pt-pyshki" style="top: 46%; left: 18%;"></div><div class="map-label" style="top: 46%; left: 18%;">Пышки</div>
                 <div class="map-point" id="map-pt-forty" style="top: 34%; left: 28%;"></div><div class="map-label" style="top: 34%; left: 28%;">Форты</div>
             </div>
+
+            <style>
+                .cyber-map {
+                    position: relative; width: 100%; height: 190px;
+                    background: #06060c; border: 1px solid var(--border);
+                    border-radius: 16px; margin-bottom: 20px;
+                    overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+                }
+                .map-bg-grid {
+                    position: absolute; width: 100%; height: 100%;
+                    background-image: linear-gradient(rgba(0, 162, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 162, 255, 0.05) 1px, transparent 1px);
+                    background-size: 16px 16px;
+                }
+                .map-point {
+                    position: absolute; width: 12px; height: 12px;
+                    background: #232335; border-radius: 50%;
+                    transform: translate(-50%, -50%); transition: all 0.3s ease;
+                }
+                .map-point.active {
+                    background: var(--accent-red); box-shadow: 0 0 12px var(--accent-red), 0 0 25px var(--accent-red);
+                    animation: pulse-dot 1.4s infinite;
+                }
+                @keyframes pulse-dot {
+                    0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+                    50% { transform: translate(-50%, -50%) scale(1.7); opacity: 0.4; }
+                    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+                }
+                .map-label {
+                    position: absolute; font-size: 10px; color: #4b5361;
+                    transform: translate(-50%, 9px); white-space: nowrap;
+                    font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+                }
+                .map-point.active + .map-label { color: #fff; text-shadow: 0 0 6px rgba(255,255,255,0.5); }
+                
+                .filter-bar { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 18px; padding-bottom: 6px; }
+                .filter-bar::-webkit-scrollbar { display: none; }
+                .filter-chip {
+                    background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: var(--text-muted);
+                    padding: 9px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; white-space: nowrap; cursor: pointer;
+                }
+                .filter-chip.active { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
+                .empty-state { text-align: center; padding: 45px 20px; color: var(--text-muted); font-size: 14px; }
+            </style>
 
             <div class="filter-bar" id="radar-filter-bar">
                 <div class="filter-chip active" data-filter="all">Все районы</div>
@@ -286,8 +239,7 @@
             <div id="empty-state-msg" class="empty-state">На радаре пока пусто... Запусти движ сам!</div>
             <div id="radar-list"></div>
         </div>
-
-        <div id="sub-create" class="sub-screen">
+                    <div id="sub-create" class="sub-screen">
             <h2>➕ Запустить сбор</h2>
             <p class="subtitle">Отметь локацию на общем радаре Гродно</p>
             <div class="card" style="border-top: 4px solid var(--accent);">
@@ -307,6 +259,20 @@
 
                 <div class="form-group">
                     <label>🔥 Категория встреч:</label>
+                    <style>
+                        .cyber-tag-btn {
+                            padding: 8px 12px; border: 1px solid rgba(0, 162, 255, 0.4); color: var(--text-main);
+                            border-radius: 8px; cursor: pointer; display: inline-block; font-size: 12px; font-weight: 600;
+                            background: rgba(255,255,255,0.03); transition: all 0.2s;
+                        }
+                        input[type="radio"]:checked + .cyber-tag-btn {
+                            background: rgba(0, 162, 255, 0.2) !important;
+                            border-color: var(--accent) !important;
+                            color: #fff !important;
+                            box-shadow: 0 0 10px var(--accent-glow);
+                            font-weight: bold;
+                        }
+                    </style>
                     <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 5px;">
                         <input type="radio" id="tag-walk" name="radar-tag" value="🚶‍♂️ Прогулка" checked style="display:none;">
                         <label for="tag-walk" class="cyber-tag-btn">🚶‍♂️ Прогулка</label>
@@ -375,7 +341,8 @@
                 </button>
             </div>
         </div>
-                <div id="sub-archive" class="sub-screen">
+
+        <div id="sub-archive" class="sub-screen">
             <h2>📜 Архив сборов</h2>
             <p class="subtitle">История завершенных встреч</p>
             <div id="archive-empty-state" class="empty-state">Архив пуст.</div>
@@ -390,6 +357,24 @@
         </div>
 
     </div>
+
+    <style>
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10, 10, 18, 0.85);
+            backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+            border-top: 1px solid var(--border); display: flex; padding: 10px 6px; z-index: 999;
+        }
+        .nav-btn {
+            flex: 1; background: transparent; border: none; color: var(--text-muted);
+            padding: 8px 4px; font-size: 11px; font-weight: 700; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+            transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .nav-btn.active { color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); }
+        .sub-screen { display: none; }
+        .sub-screen.active { display: block; }
+        .violator-item { background: rgba(255, 56, 56, 0.04); border: 1px solid rgba(255, 56, 56, 0.15); padding: 16px; border-radius: 14px; margin-bottom: 12px; }
+    </style>
 
     <div class="bottom-nav">
         <button class="nav-btn active" data-sub="sub-radar">
@@ -584,8 +569,7 @@
                 statusEl.innerText = `${activeGender}, ${activeAge} л. (@${myUsername}) 🛰 СЕТЬ`;
             }
         }
-
-        function updatePlaceTags() {
+                    function updatePlaceTags() {
             const districtSelect = document.getElementById('create-district');
             const activeTagInput = document.querySelector('input[name="radar-tag"]:checked');
             if (!districtSelect) return;
@@ -825,7 +809,7 @@
             });
         }
 
-               function renderViolators() {
+        function renderViolators() {
             const list = document.getElementById('violators-list');
             const empty = document.getElementById('admin-empty-state');
             if (!list) return; list.innerHTML = '';
