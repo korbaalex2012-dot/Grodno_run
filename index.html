@@ -285,7 +285,7 @@
         <button class="nav-btn" data-sub="sub-archive">
             <span>📜</span>Архив
         </button>
-        <button class="nav-btn" data-sub="sub-admin">
+        <button class="nav-btn" id="nav-btn-admin" data-sub="sub-admin" style="display: none;">
             <span>🚨</span>Куратор
         </button>
     </div>
@@ -301,29 +301,79 @@
 
         let activeGender = localStorage.getItem('user_gender') || 'guy';
         let activeAge = parseInt(localStorage.getItem('user_age')) || 18;
-        let myUsername = "user_" + Math.floor(Math.random() * 8999 + 1000);
+        let myUsername = localStorage.getItem('gr_username') || ("user_" + Math.floor(Math.random() * 8999 + 1000));
+        localStorage.setItem('gr_username', myUsername);
+
+        // Проверка прав куратора (можно задать ник админа или сделать по флагу)
+        let isCurator = myUsername === 'admin_grodno' || localStorage.getItem('gr_is_curator') === 'true';
 
         let meetings = JSON.parse(localStorage.getItem('gr_meetings_2026') || '[]');
         let archive = JSON.parse(localStorage.getItem('gr_archive_2026') || '[]');
         let complaints = JSON.parse(localStorage.getItem('gr_complaints_2026') || '[]');
 
+        // База быстрых мест с учетом категорий
         const districtQuickPlaces = {
-            "Центр (Советская)": ["У Танка", "Возле Фары", "Драмтеатр", "Парк Жилибера"],
-            "ТЦ Тринити": ["Главный вход", "Арена", "Фуд-корт"],
-            "OldCity (Олд Сити)": ["Центральный вход", "Стоянка", "У фонтана"],
-            "Ольшанка": ["Коробка", "Евроопт", "Парк"],
-            "Девятовка": ["Коробка", "Алми", "Рынок"],
-            "Пышки (Парк)": ["Главный вход", "Тропа здоровья", "Пляж"]
+            "Центр (Советская)": {
+                "🚶‍♂️ Прогулка": ["У Танка", "Возле Фары", "Драмтеатр", "Парк Жилибера"],
+                "⚽ Футбол": ["Стадион Неман (запасное)", "Коробка на Свердлова"],
+                "🏀 Баскетбол": ["Площадка у Драмтеатра", "Коробка в парке"],
+                "🏐 Волейбол": ["Пляж Немана", "Парк Жилибера"],
+                "🚲 Велик": ["Велодорожка Центр", "Набережная"],
+                "🎮 Гейминг": ["Клуб CyberX", "Антикафе"]
+            },
+            "ТЦ Тринити": {
+                "🚶‍♂️ Прогулка": ["Главный вход", "Арена", "Фуд-корт"],
+                "⚽ Футбол": ["Поле возле Тринити"],
+                "🏀 Баскетбол": ["Площадка у арены"],
+                "🏐 Волейбол": ["Зона отдыха Тринити"],
+                "🚲 Велик": ["Парковка Тринити"],
+                "🎮 Гейминг": ["Зона развлечений ТЦ"]
+            },
+            "OldCity (Олд Сити)": {
+                "🚶‍♂️ Прогулка": ["Центральный вход", "Стоянка", "У фонтана"],
+                "⚽ Футбол": ["Коробка возле ОлдСити"],
+                "🏀 Баскетбол": ["Площадка OldCity"],
+                "🏐 Волейбол": ["Спортивная зона"],
+                "🚲 Велик": ["Велопарковка ТЦ"],
+                "🎮 Гейминг": ["Зона отдыха"]
+            },
+            "Ольшанка": {
+                "🚶‍♂️ Прогулка": ["Коробка", "Евроопт", "Парк"],
+                "⚽ Футбол": ["Школьный стадион Ольшанка", "Коробка Ольшанка"],
+                "🏀 Баскетбол": ["Баскетбольная площадка"],
+                "🏐 Волейбол": ["Пляжная зона Ольшанка"],
+                "🚲 Велик": ["Велодорожки района"],
+                "🎮 Гейминг": ["Домашний LAN"]
+            },
+            "Девятовка": {
+                "🚶‍♂️ Прогулка": ["Коробка", "Алми", "Рынок"],
+                "⚽ Футбол": ["Стадион школы №32", "Коробка Девятовка"],
+                "🏀 Баскетбол": ["Площадка Алми"],
+                "🏐 Волейбол": ["Спортплощадка"],
+                "🚲 Велик": ["Трасса Девятовка"],
+                "🎮 Гейминг": ["Компьютерный клуб"]
+            },
+            "Пышки (Парк)": {
+                "🚶‍♂️ Прогулка": ["Главный вход", "Тропа здоровья", "Пляж"],
+                "⚽ Футбол": ["Поляна в Пышках"],
+                "🏀 Баскетбол": ["Площадка в парке"],
+                "🏐 Волейбол": ["Пляж Пышки (сетка)"],
+                "🚲 Велик": ["Главный старт велодорожки"],
+                "🎮 Гейминг": ["Беседка с Wi-Fi"]
+            }
         };
 
         function updatePlaceTags() {
-            const districtElement = document.getElementById('create-district');
+            const districtSelect = document.getElementById('create-district');
             const container = document.getElementById('quick-places-container');
-            if (!container || !districtElement) return;
+            if (!container || !districtSelect) return;
             container.innerHTML = '';
             
-            const district = districtElement.value;
-            const places = districtQuickPlaces[district] || ["Центр", "Площадка"];
+            const district = districtSelect.value;
+            
+            // Получаем места строго под выбранный район и категорию
+            const districtObj = districtQuickPlaces[district] || {};
+            const places = districtObj[selectedCategory] || districtObj["🚶‍♂️ Прогулка"] || ["Центр", "Площадка"];
             
             places.forEach(place => {
                 const chip = document.createElement('span');
@@ -341,12 +391,20 @@
             if (info) {
                 info.innerHTML = `👤 @${myUsername} (${activeGender === 'guy' ? '🚹' : '🚺'} ${activeAge}л)`;
             }
+            
+            // Управление отображением вкладки куратора
+            const navAdmin = document.getElementById('nav-btn-admin');
+            if (navAdmin) {
+                navAdmin.style.display = isCurator ? 'flex' : 'none';
+            }
         }
 
         function setCategoryTag(btn) {
             document.querySelectorAll('#category-buttons-box .cyber-tag-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             selectedCategory = btn.getAttribute('data-cat');
+            
+            // Мгновенно обновляем быстрые места под новую категорию!
             updatePlaceTags();
         }
 
@@ -474,6 +532,9 @@
         document.querySelectorAll('.bottom-nav .nav-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const targetSub = btn.getAttribute('data-sub');
+                // Защита: если нажимают на куратора без прав
+                if (targetSub === 'sub-admin' && !isCurator) return;
+
                 document.querySelectorAll('.bottom-nav .nav-btn').forEach(b => b.classList.remove('active'));
                 document.querySelectorAll('.sub-screen').forEach(s => s.classList.remove('active'));
                 btn.classList.add('active');
