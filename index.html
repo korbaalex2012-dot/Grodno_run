@@ -756,53 +756,51 @@
                 });
             });
         });
-
-                        document.getElementById('btn-submit-auth')?.addEventListener('click', (e) => {
+        document.getElementById('btn-submit-auth')?.addEventListener('click', (e) => {
             e.preventDefault();
             
-            try {
-                const genderSelect = document.getElementById('auth-gender');
-                const ageInput = document.getElementById('auth-age');
-                
-                if (!genderSelect || !ageInput) {
-                    alert('Ошибка: элементы формы не найдены!');
-                    return;
-                }
+            const genderSelect = document.getElementById('auth-gender');
+            const ageInput = document.getElementById('auth-age');
+            
+            if (!genderSelect || !ageInput) return;
 
-                const gen = genderSelect.value;
-                const age = parseInt(ageInput.value);
+            const gen = genderSelect.value;
+            const age = parseInt(ageInput.value);
 
-                if (!gen || isNaN(age) || age < 12 || age > 35) {
-                    alert('Укажите корректный пол и возраст от 12 до 35 лет!');
-                    return;
-                }
-
-                localStorage.setItem('user_gender', gen);
-                localStorage.setItem('user_age', age);
-                localStorage.setItem('user_registered', 'true');
-                
-                activeGender = gen; 
-                activeAge = age;
-
-                const screenAuth = document.getElementById('screen-auth');
-                const screenMain = document.getElementById('screen-main');
-
-                if (screenAuth) screenAuth.classList.remove('active');
-                if (screenMain) screenMain.classList.add('active');
-                
-                updateStatusHeader(); 
-                renderAll();
-                
-                setTimeout(() => {
-                    if (typeof initLeafletMap === 'function') {
-                        initLeafletMap();
-                    }
-                }, 200);
-
-            } catch (err) {
-                console.error("Ошибка при авторизации:", err);
-                alert("Произошла ошибка: " + err.message);
+            if (!gen || isNaN(age) || age < 12 || age > 35) {
+                alert('Укажите корректный пол и возраст от 12 до 35 лет!');
+                return;
             }
+
+            // Сохраняем данные
+            localStorage.setItem('user_gender', gen);
+            localStorage.setItem('user_age', age);
+            localStorage.setItem('user_registered', 'true');
+            
+            activeGender = gen; 
+            activeAge = age;
+
+            // Жестко переключаем видимость через style.display (чтобы точно сработало независимо от CSS)
+            const authScreen = document.getElementById('screen-auth');
+            const mainScreen = document.getElementById('screen-main');
+
+            if (authScreen) {
+                authScreen.classList.remove('active');
+                authScreen.style.display = 'none'; // Принудительно скрываем
+            }
+            if (mainScreen) {
+                mainScreen.classList.add('active');
+                mainScreen.style.display = 'block'; // Принудительно показываем
+            }
+            
+            updateStatusHeader(); 
+            renderAll();
+            
+            setTimeout(() => {
+                if (typeof initLeafletMap === 'function') {
+                    initLeafletMap();
+                }
+            }, 200);
         });
 
         document.querySelectorAll('.bottom-nav .nav-btn').forEach(btn => {
