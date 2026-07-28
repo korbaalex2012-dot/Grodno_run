@@ -29,7 +29,6 @@
 
         .screen { display: none; padding: 15px; padding-bottom: 85px; box-sizing: border-box; min-height: 100vh; }
         .screen.active { display: block; }
-
         .sub-screen { display: none; }
         .sub-screen.active { display: block; }
 
@@ -64,7 +63,6 @@
         .btn-success { background: var(--accent-green); color: #0d0e15; }
         .btn-danger { background: var(--accent-red); color: #fff; }
 
-        /* Быстрые теги мест и категорий */
         .cyber-tag-btn {
             padding: 8px 12px; border: 1px solid rgba(0, 162, 255, 0.4); color: var(--text-main);
             border-radius: 8px; cursor: pointer; display: inline-block; font-size: 12px; font-weight: 600;
@@ -84,13 +82,10 @@
         }
         .quick-place-chip:active { background: rgba(0,162,255,0.2); }
 
-        /* Нижняя навигация */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0;
-            background: rgba(13, 14, 21, 0.95);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid var(--border);
-            display: flex; justify-content: space-around;
+            background: rgba(13, 14, 21, 0.95); backdrop-filter: blur(10px);
+            border-top: 1px solid var(--border); display: flex; justify-content: space-around;
             padding: 10px 0; z-index: 1000;
         }
         .nav-btn {
@@ -137,9 +132,7 @@
                 <span style="font-size: 16px;">📍</span>
                 <span id="header-location" style="font-size: 13px; font-weight: bold; color: var(--accent);">Гродно</span>
             </div>
-            <div style="font-size: 12px; color: var(--text-muted);" id="header-user-info">
-                Загрузка...
-            </div>
+            <div style="font-size: 12px; color: var(--text-muted);" id="header-user-info">Загрузка...</div>
         </div>
 
         <div id="sub-radar" class="sub-screen active">
@@ -185,24 +178,13 @@
 
                 <div class="form-group">
                     <label>🔥 Категория встреч:</label>
-                    <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 5px;">
-                        <input type="radio" id="tag-walk" name="radar-tag" value="🚶‍♂️ Прогулка" checked style="display:none;">
-                        <label for="tag-walk" class="cyber-tag-btn">🚶‍♂️ Прогулка</label>
-
-                        <input type="radio" id="tag-football" name="radar-tag" value="⚽ Футбол" style="display:none;">
-                        <label for="tag-football" class="cyber-tag-btn">⚽ Футбол</label>
-
-                        <input type="radio" id="tag-basketball" name="radar-tag" value="🏀 Баскетбол" style="display:none;">
-                        <label for="tag-basketball" class="cyber-tag-btn">🏀 Баскетбол</label>
-
-                        <input type="radio" id="tag-volleyball" name="radar-tag" value="🏐 Волейбол" style="display:none;">
-                        <label for="tag-volleyball" class="cyber-tag-btn">🏐 Волейбол</label>
-
-                        <input type="radio" id="tag-bike" name="radar-tag" value="🚲 Велик" style="display:none;">
-                        <label for="tag-bike" class="cyber-tag-btn">🚲 Велик</label>
-
-                        <input type="radio" id="tag-game" name="radar-tag" value="🎮 Гейминг" style="display:none;">
-                        <label for="tag-game" class="cyber-tag-btn">🎮 Гейминг</label>
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 5px;" id="category-buttons-box">
+                        <button type="button" class="cyber-tag-btn active" data-cat="🚶‍♂️ Прогулка" onclick="setCategoryTag(this)">🚶‍♂️ Прогулка</button>
+                        <button type="button" class="cyber-tag-btn" data-cat="⚽ Футбол" onclick="setCategoryTag(this)">⚽ Футбол</button>
+                        <button type="button" class="cyber-tag-btn" data-cat="🏀 Баскетбол" onclick="setCategoryTag(this)">🏀 Баскетбол</button>
+                        <button type="button" class="cyber-tag-btn" data-cat="🏐 Волейбол" onclick="setCategoryTag(this)">🏐 Волейбол</button>
+                        <button type="button" class="cyber-tag-btn" data-cat="🚲 Велик" onclick="setCategoryTag(this)">🚲 Велик</button>
+                        <button type="button" class="cyber-tag-btn" data-cat="🎮 Гейминг" onclick="setCategoryTag(this)">🎮 Гейминг</button>
                     </div>
                 </div>
 
@@ -233,8 +215,8 @@
 
                     <div id="composition-free-box" style="display: flex; gap: 6px; margin-top: 10px;">
                         <button type="button" class="cyber-tag-btn active" data-gender="any" onclick="setTargetGender(this, 'any')">🌍 Все равно</button>
-                        <button type="button" class="cyber-tag-btn" data-gender="only_guys" onclick="setTargetGender(this, 'only_guys')">🚹 Только пацаны</button>
-                        <button type="button" class="cyber-tag-btn" data-gender="only_girls" onclick="setTargetGender(this, 'only_girls')">🚺 Только девушки</button>
+                        <button type="button" class="cyber-tag-btn" data-gender="only_guys" onclick="setTargetGender(this, 'only_guys')">🚹 Пацаны</button>
+                        <button type="button" class="cyber-tag-btn" data-gender="only_girls" onclick="setTargetGender(this, 'only_girls')">🚺 Девчонки</button>
                     </div>
 
                     <div id="composition-exact-box" style="display: none; display: flex; gap: 10px; margin-top: 10px;">
@@ -282,7 +264,8 @@
                 Архив пока пуст.
             </div>
         </div>
-                <div id="sub-admin" class="sub-screen">
+
+        <div id="sub-admin" class="sub-screen">
             <h2>🚨 Панель куратора</h2>
             <p class="subtitle">Управление жалобами и модерация</p>
             <div id="violators-list"></div>
@@ -306,15 +289,15 @@
             <span>🚨</span>Куратор
         </button>
     </div>
-
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     
     <script>
         let mapInstance = null;
         let mapMarkers = [];
         let currentDistrictFilter = 'all';
         let selectedTargetGender = 'any';
-        let compositionMode = 'free'; // 'free' или 'exact'
+        let compositionMode = 'free';
+        let selectedCategory = '🚶‍♂️ Прогулка';
 
         let activeGender = localStorage.getItem('user_gender') || 'guy';
         let activeAge = parseInt(localStorage.getItem('user_age')) || 18;
@@ -358,6 +341,12 @@
             }
         }
 
+        function setCategoryTag(btn) {
+            document.querySelectorAll('#category-buttons-box .cyber-tag-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedCategory = btn.getAttribute('data-cat');
+        }
+
         function switchCompositionMode(mode) {
             compositionMode = mode;
             document.getElementById('btn-mode-free').classList.toggle('active', mode === 'free');
@@ -375,7 +364,7 @@
             } else {
                 freeBox.style.display = 'none';
                 exactBox.style.display = 'flex';
-                if (maxBlock) maxBlock.style.display = 'none'; // Лимит скрывается при точных цифрах
+                if (maxBlock) maxBlock.style.display = 'none';
                 selectedTargetGender = 'exact_numbers';
             }
         }
@@ -385,7 +374,8 @@
             btn.classList.add('active');
             selectedTargetGender = genderVal;
         }
-                function initLeafletMap() {
+
+        function initLeafletMap() {
             if (mapInstance) return;
             const grodnoBounds = L.latLngBounds([53.55, 23.65], [53.78, 24.00]);
 
@@ -444,8 +434,7 @@
                 mapMarkers.push(circleMarker);
             });
         }
-
-        document.addEventListener('DOMContentLoaded', async () => {
+                document.addEventListener('DOMContentLoaded', async () => {
             if (localStorage.getItem('user_registered') === 'true') {
                 document.getElementById('screen-auth')?.classList.remove('active');
                 document.getElementById('screen-main')?.classList.add('active');
@@ -518,11 +507,10 @@
 
             const timeType = document.querySelector('input[name="time-type"]:checked')?.value;
             const timeText = timeType === 'now' ? '⚡ СРОЧНО' : '📅 По расписанию';
-            const tag = document.querySelector('input[name="radar-tag"]:checked')?.value || '🚶‍♂️ Прогулка';
 
             const newMeeting = {
                 id: 'm_' + Date.now(),
-                district, exactPlace, time: timeText, category: tag,
+                district, exactPlace, time: timeText, category: selectedCategory,
                 description: desc, targetGender: selectedTargetGender,
                 ageMin, ageMax, girlsCount, guysCount, maxPeople,
                 creator: myUsername, members: [myUsername]
@@ -574,6 +562,7 @@
                         <strong style="color: var(--accent);">📍 ${m.district}</strong>
                         <span style="font-size: 11px; background: #1a1b26; padding: 3px 8px; border-radius: 8px; color: var(--text-muted);">${m.time}</span>
                     </div>
+                    <p style="margin: 0 0 5px 0; font-size: 14px;"><b>Категория:</b> ${m.category}</p>
                     <p style="margin: 0 0 5px 0; font-size: 14px;"><b>Где:</b> ${m.exactPlace}</p>
                     <p style="margin: 0 0 5px 0; font-size: 13px; color: var(--text-muted);">👥 Состав: <b>${составТекст}</b></p>
                     <p style="margin: 0 0 5px 0; font-size: 13px; color: var(--text-muted);">🔞 Возраст: <b>от ${m.ageMin} до ${m.ageMax} лет</b></p>
@@ -652,3 +641,4 @@
 </body>
 </html>
 
+    
