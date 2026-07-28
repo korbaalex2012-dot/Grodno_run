@@ -206,7 +206,7 @@
             <div id="empty-state-msg" class="empty-state">На радаре пока пусто... Запусти движ сам!</div>
             <div id="radar-list"></div>
         </div>
-                <div id="sub-create" class="sub-screen">
+                       <div id="sub-create" class="sub-screen">
             <h2>➕ Запустить сбор</h2>
             <p class="subtitle">Отметь локацию на общем радаре Гродно</p>
             <div class="card" style="border-top: 4px solid var(--accent);">
@@ -272,70 +272,60 @@
                     <input type="text" id="create-exact-place" placeholder="Например: Коробка на Ожешко, Скейт-парк">
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" style="margin-top: 15px;">
                     <label>⏱️ Когда собираемся?</label>
-                    <div style="display: flex; gap: 15px; margin-top: 5px; margin-bottom: 10px;">
-                        <label style="color: #ff3838; cursor: pointer; font-weight: bold;">
-                            <input type="radio" name="time-type" value="now" checked onclick="document.getElementById('custom-time-block').style.display='none';"> ⚡ СРОЧНО
+                    <div style="display: flex; gap: 15px; margin-top: 5px; align-items: center;">
+                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 13px; color: #ff3838; font-weight: bold;">
+                            <input type="radio" name="time-type" value="now" checked> ⚡ Срочно
                         </label>
-                        <label style="color: #00a2ff; cursor: pointer; font-weight: bold;">
-                            <input type="radio" name="time-type" value="custom" onclick="document.getElementById('custom-time-block').style.display='flex';"> 📅 Выбрать время
+                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 13px; color: #00a2ff; font-weight: bold;">
+                            <input type="radio" name="time-type" value="later"> 📅 Выбрать время
                         </label>
-                    </div>
-                    
-                    <div id="custom-time-block" style="display: none; gap: 10px; align-items: center;">
-                        <select id="create-hour" style="width: 80px; text-align: center;">
-                            <option value="12">12</option><option value="13">13</option><option value="14">14</option>
-                            <option value="15">15</option><option value="16">16</option><option value="17">17</option>
-                            <option value="18">18</option><option value="19">19</option><option value="20">20</option>
-                            <option value="21">21</option><option value="22">22</option>
-                        </select>
-                        <span style="color:#00a2ff; font-weight: bold;">:</span>
-                        <select id="create-minute" style="width: 80px; text-align: center;">
-                            <option value="00">00</option><option value="15">15</option>
-                            <option value="30">30</option><option value="45">45</option>
-                        </select>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label>📝 Короткое описание / Приметы:</label>
-                    <textarea id="create-desc" placeholder="Кто нужен? Что берём с собой? Сколько сидим?" style="height: 80px; resize: none;"></textarea>
+                <div class="form-group" style="margin-top: 15px;">
+                    <label>📝 Короткое описание / приметы:</label>
+                    <textarea id="create-desc" placeholder="Кто нужен? Что берём с собой? Сколько сидим?" style="width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; color: #fff; font-size: 13px; resize: none; height: 70px; box-sizing: border-box;"></textarea>
                 </div>
 
-                <div style="margin-bottom: 16px;">
-                    <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 8px;">👥 КТО НУЖЕН ПО СОСТАВУ?</label>
+                <div class="form-group" style="margin-top: 15px;">
+                    <label>👥 Кого ждём по составу?</label>
                     <style>
                         .tag-chip-comp {
                             background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: var(--text-muted);
-                            padding: 8px 12px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+                            padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;
                         }
-                        .tag-chip-comp.active { background: rgba(0, 162, 255, 0.15); color: var(--accent); border-color: var(--accent); }
+                        .tag-chip-comp.active { background: rgba(0, 162, 255, 0.2); color: var(--accent); border-color: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
                     </style>
-                    <div style="display: flex; gap: 6px; flex-wrap: wrap;" id="target-gender-selector">
+                    <div id="target-gender-selector" style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;">
                         <button type="button" class="tag-chip-comp active" data-gender="any" onclick="setTargetGender(this)">🌍 Все равно</button>
-                        <button type="button" class="tag-chip-comp" data-gender="guys" onclick="setTargetGender(this)">🚹 Пацаны</button>
-                        <button type="button" class="tag-chip-comp" data-gender="girls" onclick="setTargetGender(this)">🚺 Девчонки</button>
-                        <button type="button" class="tag-chip-comp" data-gender="mix" onclick="setTargetGender(this)">⚖️ 2 пац. / 2 дев.</button>
+                        <button type="button" class="tag-chip-comp" data-gender="only_guys" onclick="setTargetGender(this)">🚹 Только пацаны</button>
+                        <button type="button" class="tag-chip-comp" data-gender="only_girls" onclick="setTargetGender(this)">🚺 Только девушки</button>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; margin-top: 12px;">
+                        <div style="flex: 1;">
+                            <label style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Девушек:</label>
+                            <input type="number" id="count-girls" min="0" value="0" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px; padding: 10px; color: #fff; font-size: 14px; box-sizing: border-box;">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Пацанов:</label>
+                            <input type="number" id="count-guys" min="0" value="0" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px; padding: 10px; color: #fff; font-size: 14px; box-sizing: border-box;">
+                        </div>
                     </div>
                 </div>
 
-                <div style="margin-bottom: 20px;">
-                    <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 8px;">🔢 МАКСИМУМ ЧЕЛОВЕК</label>
-                    <select id="create-max-people" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 12px; font-size: 14px;">
-                        <option value="unlimited">Сколько соберётся (без лимита)</option>
-                        <option value="3">До 3 человек</option>
-                        <option value="5">Максимум 5 человек</option>
-                        <option value="10">Компания до 10 человек</option>
-                    </select>
+                <div class="form-group" id="max-people-block" style="margin-top: 15px;">
+                    <label>🔢 Максимум человек</label>
+                    <input type="text" id="create-max-people" placeholder="Например: 5 или Без лимита" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: #fff; font-size: 14px; box-sizing: border-box;">
                 </div>
 
-                <button type="button" id="btn-launch-radar" class="btn btn-primary">
+                <button class="btn btn-primary" id="btn-launch-radar" style="width: 100%; margin-top: 20px; padding: 14px; font-size: 15px; font-weight: bold;">
                     🚀 ЗАПУСТИТЬ РАДАР СБОРА
                 </button>
             </div>
         </div>
-
         <div id="sub-archive" class="sub-screen">
             <h2>📜 Архив сборов</h2>
             <p class="subtitle">История завершенных встреч</p>
