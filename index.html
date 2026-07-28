@@ -73,10 +73,6 @@
             position: relative;
         }
 
-        .card.status-planning { border-left: 4px solid var(--accent); }
-        .card.status-active-now { border-left: 4px solid var(--accent-green); box-shadow: 0 0 20px rgba(46, 204, 113, 0.15); }
-        .card.status-mega { border-left: 4px solid var(--accent-purple); box-shadow: 0 0 25px rgba(179, 55, 113, 0.25); }
-
         .alert {
             background: rgba(255, 56, 56, 0.07);
             border: 1px solid rgba(255, 56, 56, 0.3);
@@ -126,7 +122,6 @@
         .btn-primary { background: linear-gradient(135deg, var(--accent), #0066ff); color: #fff; box-shadow: 0 4px 15px rgba(0, 162, 255, 0.3); }
         .btn-success { background: linear-gradient(135deg, var(--accent-green), #27ae60); color: #fff; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3); }
         .btn-danger { background: linear-gradient(135deg, var(--accent-red), #c0392b); color: #fff; box-shadow: 0 4px 15px rgba(255, 56, 56, 0.3); }
-
         .hidden { display: none !important; }
     </style>
 </head>
@@ -147,7 +142,8 @@
             <button type="button" id="btn-music-toggle" style="background: var(--bg-input); border: 1px solid var(--border); color: var(--text-muted); padding: 7px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; font-weight: 800;">🎵 OFF</button>
         </div>
     </div>
-        <div id="screen-auth" class="screen active">
+
+    <div id="screen-auth" class="screen active">
         <div class="alert">
             ⚠ ВНИМАНИЕ: Все данные проверяются роботом. За ложный пол или возраст — моментальный бан на всех районах Гродно БЕЗ права разблокировки!
         </div>
@@ -170,9 +166,7 @@
     </div>
 
     <div id="screen-main" class="screen">
-        
         <div id="sub-radar" class="sub-screen active">
-            
             <div class="card" style="padding: 10px; margin-bottom: 16px;">
                 <div style="font-size: 11px; font-weight: 700; color: var(--accent); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">
                     🗺️ Интерактивная карта Гродно (Зум / Перетаскивание)
@@ -206,7 +200,7 @@
             <div id="empty-state-msg" class="empty-state">На радаре пока пусто... Запусти движ сам!</div>
             <div id="radar-list"></div>
         </div>
-                       <div id="sub-create" class="sub-screen">
+                <div id="sub-create" class="sub-screen">
             <h2>➕ Запустить сбор</h2>
             <p class="subtitle">Отметь локацию на общем радаре Гродно</p>
             <div class="card" style="border-top: 4px solid var(--accent);">
@@ -276,17 +270,38 @@
                     <label>⏱️ Когда собираемся?</label>
                     <div style="display: flex; gap: 15px; margin-top: 5px; align-items: center;">
                         <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 13px; color: #ff3838; font-weight: bold;">
-                            <input type="radio" name="time-type" value="now" checked> ⚡ Срочно
+                            <input type="radio" name="time-type" value="now" checked onchange="toggleTimeInputs()"> ⚡ Срочно
                         </label>
                         <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 13px; color: #00a2ff; font-weight: bold;">
-                            <input type="radio" name="time-type" value="later"> 📅 Выбрать время
+                            <input type="radio" name="time-type" value="later" onchange="toggleTimeInputs()"> 📅 Выбрать время
                         </label>
+                    </div>
+                    <div id="time-picker-block" class="hidden" style="display: flex; gap: 10px; margin-top: 12px;">
+                        <div style="flex: 1;">
+                            <label style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Часы:</label>
+                            <select id="create-hour">
+                                <option value="09">09:00</option><option value="10">10:00</option><option value="11">11:00</option>
+                                <option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option>
+                                <option value="15" selected>15:00</option><option value="16">16:00</option><option value="17">17:00</option>
+                                <option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option>
+                                <option value="21">21:00</option><option value="22">22:00</option>
+                            </select>
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Минуты:</label>
+                            <select id="create-minute">
+                                <option value="00" selected>00 мин</option>
+                                <option value="15">15 мин</option>
+                                <option value="30">30 мин</option>
+                                <option value="45">45 мин</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
                 <div class="form-group" style="margin-top: 15px;">
                     <label>📝 Короткое описание / приметы:</label>
-                    <textarea id="create-desc" placeholder="Кто нужен? Что берём с собой? Сколько сидим?" style="width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; color: #fff; font-size: 13px; resize: none; height: 70px; box-sizing: border-box;"></textarea>
+                    <textarea id="create-desc" placeholder="Кто нужен? Что берём с собой? Сколько сидим?" style="width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; color: #fff; font-size:13px; resize: none; height: 70px; box-sizing: border-box;"></textarea>
                 </div>
 
                 <div class="form-group" style="margin-top: 15px;">
@@ -299,12 +314,16 @@
                         .tag-chip-comp.active { background: rgba(0, 162, 255, 0.2); color: var(--accent); border-color: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
                     </style>
                     <div id="target-gender-selector" style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;">
-                        <button type="button" class="tag-chip-comp active" data-gender="any" onclick="setTargetGender(this)">🌍 Все равно</button>
-                        <button type="button" class="tag-chip-comp" data-gender="only_guys" onclick="setTargetGender(this)">🚹 Только пацаны</button>
-                        <button type="button" class="tag-chip-comp" data-gender="only_girls" onclick="setTargetGender(this)">🚺 Только девушки</button>
+                        <button type="button" class="tag-chip-comp active" data-mode="limit" onclick="setCompositionMode('limit')">🔢 По лимиту людей</button>
+                        <button type="button" class="tag-chip-comp" data-mode="gender" onclick="setCompositionMode('gender')">👥 Точный состав (М/Ж)</button>
                     </div>
 
-                    <div style="display: flex; gap: 10px; margin-top: 12px;">
+                    <div id="mode-limit-block" style="margin-top: 12px;">
+                        <label style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Максимум человек:</label>
+                        <input type="text" id="create-max-people" placeholder="Например: 5 или Без лимита" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px; padding: 10px; color: #fff; font-size: 14px; box-sizing: border-box;">
+                    </div>
+
+                    <div id="mode-gender-block" class="hidden" style="display: flex; gap: 10px; margin-top: 12px;">
                         <div style="flex: 1;">
                             <label style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Девушек:</label>
                             <input type="number" id="count-girls" min="0" value="0" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px; padding: 10px; color: #fff; font-size: 14px; box-sizing: border-box;">
@@ -316,16 +335,12 @@
                     </div>
                 </div>
 
-                <div class="form-group" id="max-people-block" style="margin-top: 15px;">
-                    <label>🔢 Максимум человек</label>
-                    <input type="text" id="create-max-people" placeholder="Например: 5 или Без лимита" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: #fff; font-size: 14px; box-sizing: border-box;">
-                </div>
-
                 <button class="btn btn-primary" id="btn-launch-radar" style="width: 100%; margin-top: 20px; padding: 14px; font-size: 15px; font-weight: bold;">
                     🚀 ЗАПУСТИТЬ РАДАР СБОРА
                 </button>
             </div>
         </div>
+        
         <div id="sub-archive" class="sub-screen">
             <h2>📜 Архив сборов</h2>
             <p class="subtitle">История завершенных встреч</p>
@@ -334,12 +349,21 @@
         </div>
 
         <div id="sub-admin" class="sub-screen">
-            <h2>🚨 Панель куратора</h2>
-            <p class="subtitle">Жалобы и нарушения в районе</p>
+            <h2>🚨 Админка</h2>
+            <p class="subtitle">Управление профилем и жалобами в районе</p>
+            
+            <div class="card" style="border-top: 4px solid var(--accent); margin-bottom: 20px;">
+                <h3 style="font-size: 14px; margin-bottom: 12px;">🛠️ Настройки профиля</h3>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-primary" style="padding: 10px; font-size: 12px;" onclick="toggleUserGender()">🔄 Сменить пол</button>
+                    <button class="btn btn-primary" style="padding: 10px; font-size: 12px;" onclick="changeUserAgePrompt()">✏️ Сменить возраст</button>
+                </div>
+            </div>
+
+            <h3 style="font-size: 14px; margin-bottom: 10px;">🚨 Жалобы и нарушения</h3>
             <div id="admin-empty-state" class="empty-state">Нарушений нет. Все чисто!</div>
             <div id="violators-list"></div>
         </div>
-
     </div>
         <style>
         .bottom-nav {
@@ -375,42 +399,47 @@
         const API_KEY = '$2a$10$fCuDEyphx80p7hlYAPd8C.W8S8fZv53sNq6UhpL8m/Oot7eVvdScu';
         const MY_TELEGRAM_ID = 6949963047;
 
-        // Координаты всех точек по районам Гродно для интерактивной карты Leaflet
+        // Расширенные точки для каждого района под конкретные категории
         const grodnoLocationsData = {
             'Центр (Советская)': [
-                { name: 'У Танка', coords: [53.6800, 23.8303], desc: 'Легендарное место сбора в центре' },
-                { name: 'Возле Фары', coords: [53.6785, 23.8340], desc: 'Территория у Фарного костела' },
-                { name: 'Драмтеатр', coords: [53.6748, 23.8290], desc: 'Смотровая площадка на Неман' },
-                { name: 'Парк Жилибера', coords: [53.6815, 23.8350], desc: 'Центральная аллея парка' }
+                { name: 'У Танка', category: '🚶‍♂️ Прогулка', coords: [53.6800, 23.8303], desc: 'Легендарное место сбора в центре' },
+                { name: 'Возле Фары', category: '🚶‍♂️ Прогулка', coords: [53.6785, 23.8340], desc: 'Территория у Фарного костела' },
+                { name: 'Драмтеатр', category: '🚶‍♂️ Прогулка', coords: [53.6748, 23.8290], desc: 'Смотровая площадка на Неман' },
+                { name: 'Коробка на Социалистической', category: '⚽ Футбол', coords: [53.6820, 23.8310], desc: 'Площадка для футбола' },
+                { name: 'Корт у Жилибера', category: '🏀 Баскетбол', coords: [53.6810, 23.8360], desc: 'Баскетбольная площадка' },
+                { name: 'Настольный теннис в парке', category: '🏓 Наст. теннис', coords: [53.6815, 23.8350], desc: 'Столы для тенниса' },
+                { name: 'Клуб настолок', category: '🎮 Гейминг', coords: [53.6790, 23.8320], desc: 'Место для геймеров' }
             ],
             'ТЦ Тринити': [
-                { name: 'Главный вход', coords: [53.6492, 23.8395], desc: 'Уличная площадка у входа в ТЦ' },
-                { name: 'Фуд-корт (3 этаж)', coords: [53.6492, 23.8395], desc: 'Зона отдыха и фастфуда' },
-                { name: 'Ледовая арена', coords: [53.6510, 23.8420], desc: 'Территория возле ледового дворца' }
+                { name: 'Главный вход', category: '🚶‍♂️ Прогулка', coords: [53.6492, 23.8395], desc: 'Уличная площадка у входа в ТЦ' },
+                { name: 'Фуд-корт (3 этаж)', category: '🎮 Гейминг', coords: [53.6492, 23.8395], desc: 'Зона отдыха и гейминга' },
+                { name: 'Ледовая арена', category: '🏋️‍♂️ Турники / Бег', coords: [53.6510, 23.8420], desc: 'Турники и воркаут' }
             ],
             'OldCity (Олд Сити)': [
-                { name: 'У Замка (атриум)', coords: [53.6912, 23.8490], desc: 'Главный атриум торгового центра' },
-                { name: 'Парковка у входа', coords: [53.6915, 23.8485], desc: 'Верхняя парковочная зона' }
+                { name: 'У Замка (атриум)', category: '🚶‍♂️ Прогулка', coords: [53.6912, 23.8490], desc: 'Главный атриум торгового центра' },
+                { name: 'Парковка у входа', category: '🚲 Велик', coords: [53.6915, 23.8485], desc: 'Сбор велосипедистов' }
             ],
             'Ольшанка': [
-                { name: 'ТЦ Стелла', coords: [53.6280, 23.7850], desc: 'Центр микрорайона' },
-                { name: 'Стадион 41-й школы', coords: [53.6265, 23.7890], desc: 'Спортивная коробка' }
+                { name: 'ТЦ Стелла', category: '🚶‍♂️ Прогулка', coords: [53.6280, 23.7850], desc: 'Центр микрорайона' },
+                { name: 'Стадион 41-й школы', category: '⚽ Футбол', coords: [53.6265, 23.7890], desc: 'Футбольная коробка' },
+                { name: 'Площадка у школы', category: '🏀 Баскетбол', coords: [53.6270, 23.7880], desc: 'Баскетбол' }
             ],
             'Девятовка': [
-                { name: 'ТЦ Лимож', coords: [53.7020, 23.8550], desc: 'Площадь у торгового центра' },
-                { name: 'Стадион 27-й школы', coords: [53.6980, 23.8600], desc: 'Спортивная площадка' }
+                { name: 'ТЦ Лимож', category: '🚶‍♂️ Прогулка', coords: [53.7020, 23.8550], desc: 'Площадь у торгового центра' },
+                { name: 'Стадион 27-й школы', category: '⚽ Футбол', coords: [53.6980, 23.8600], desc: 'Спортивная коробка для футбола' }
             ],
             'Грандичи': [
-                { name: 'Евроопт (Грандичи-3)', coords: [53.7150, 23.8680], desc: 'Главная точка сбора района' },
-                { name: 'Школа №42', coords: [53.7130, 23.8650], desc: 'Территория школы' }
+                { name: 'Евроопт (Грандичи-3)', category: '🚶‍♂️ Прогулка', coords: [53.7150, 23.8680], desc: 'Главная точка сбора района' },
+                { name: 'Школа №42', category: '⚽ Футбол', coords: [53.7130, 23.8650], desc: 'Футбольное поле' }
             ],
             'Пышки (Парк)': [
-                { name: 'Тропа здоровья (вход)', coords: [53.6850, 23.7950], desc: 'Начало лесопарковой зоны' },
-                { name: 'Смотровая у Немана', coords: [53.6820, 23.8010], desc: 'Вид на реку' }
+                { name: 'Тропа здоровья (вход)', category: '🏋️‍♂️ Турники / Бег', coords: [53.6850, 23.7950], desc: 'Начало для бега и турников' },
+                { name: 'Велодорожка Пышки', category: '🚲 Велик', coords: [53.6840, 23.7980], desc: 'Основной маршрут для велосипедистов' }
             ],
             'БЛК / Форты': [
-                { name: 'Мини-рынок Форты', coords: [53.6920, 23.8150], desc: 'Торговая площадка' },
-                { name: 'Стадион «Красное Знамя»', coords: [53.6950, 23.8100], desc: 'Спортивный стадион' }
+                { name: 'Мини-рынок Форты', category: '🚶‍♂️ Прогулка', coords: [53.6920, 23.8150], desc: 'Торговая площадка' },
+                { name: 'Стадион «Красное Знамя» (КЗ)', category: '⚽ Футбол', coords: [53.6950, 23.8100], desc: 'Легендарный стадион для футбола' },
+                { name: 'Турники на БЛК', category: '🏋️‍♂️ Турники / Бег', coords: [53.6930, 23.8120], desc: 'Воркаут площадка' }
             ]
         };
 
@@ -431,12 +460,12 @@
         let archive = JSON.parse(localStorage.getItem('gr_archive_2026')) || [];
         let complaints = JSON.parse(localStorage.getItem('gr_complaints_2026')) || [];
 
-        let activeGender = localStorage.getItem('user_gender') || "";
+        let activeGender = localStorage.getItem('user_gender'] || "";
         let activeAge = parseInt(localStorage.getItem('user_age')) || 0;
         let currentDistrictFilter = "all";
-        let selectedTargetGender = 'any';
         let mapInstance = null;
         let mapMarkers = [];
+        let currentCompositionMode = 'limit'; // 'limit' или 'gender'
 
         async function loadMeetingsFromServer() {
             try {
@@ -521,18 +550,10 @@
                 statusEl.innerText = `${activeGender}, ${activeAge} л. (@${myUsername}) 🛰 СЕТЬ`;
             }
         }
-        </script>
-               <script>
+
         function initLeafletMap() {
             if (mapInstance) return;
-            
-            // Жесткие границы Гродно, чтобы карту мира нельзя было прокрутить за пределы города
-            const grodnoBounds = L.latLngBounds(
-                [53.55, 23.65], // Юго-запад
-                [53.78, 24.00]  // Северо-восток
-            );
-
-            // Инициализируем карту строго по Гродно
+            const grodnoBounds = L.latLngBounds([53.55, 23.65], [53.78, 24.00]);
             mapInstance = L.map('grodno-leaflet-map', {
                 zoomControl: true,
                 attributionControl: false,
@@ -542,7 +563,6 @@
                 maxZoom: 17
             }).setView([53.6768, 23.8303], 13);
 
-            // Темная киберпанк-тема тайлов карты
             L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
                 maxZoom: 19,
                 subdomains: 'abcd'
@@ -556,19 +576,18 @@
             mapMarkers.forEach(m => mapInstance.removeLayer(m));
             mapMarkers = [];
 
-            const activeDistricts = meetings.map(m => m.district);
+            const activeCategory = document.querySelector('input[name="radar-tag"]:checked')?.value || '🚶‍♂️ Прогулка';
 
             Object.keys(grodnoLocationsData).forEach(districtName => {
                 const points = grodnoLocationsData[districtName];
-                const hasActiveMeetings = activeDistricts.includes(districtName);
 
                 points.forEach(pt => {
-                    const markerColor = hasActiveMeetings ? '#ff3838' : '#00a2ff';
-                    const markerRadius = hasActiveMeetings ? 8 : 6;
+                    // Фильтруем точки по выбранной категории в форме создания / фильтра
+                    if (pt.category !== activeCategory) return;
 
                     const circleMarker = L.circleMarker(pt.coords, {
-                        radius: markerRadius,
-                        fillColor: markerColor,
+                        radius: 7,
+                        fillColor: '#00a2ff',
                         color: '#fff',
                         weight: 1.5,
                         opacity: 1,
@@ -584,23 +603,20 @@
                     `);
 
                     circleMarker.on('click', () => {
-                        currentDistrictFilter = districtName;
-                        document.querySelectorAll('#radar-filter-bar .filter-chip').forEach(c => {
-                            if (c.getAttribute('data-filter') === districtName) {
-                                c.classList.add('active');
-                            } else {
-                                c.classList.remove('active');
-                            }
-                        });
-                        renderMeetingsList();
+                        const exactPlaceInput = document.getElementById('create-exact-place');
+                        const districtSelect = document.getElementById('create-district');
+                        if (exactPlaceInput) exactPlaceInput.value = pt.name;
+                        if (districtSelect) {
+                            districtSelect.value = districtName;
+                            updatePlaceTags();
+                        }
                     });
 
                     mapMarkers.push(circleMarker);
                 });
             });
         }
-
-        function updatePlaceTags() {
+                    function updatePlaceTags() {
             const districtSelect = document.getElementById('create-district');
             const activeTagInput = document.querySelector('input[name="radar-tag"]:checked');
             if (!districtSelect) return;
@@ -621,7 +637,15 @@
             tagsContainer.innerHTML = ''; 
             const districtPoints = grodnoLocationsData[currentDistrict] || [];
             
-            districtPoints.forEach(placeObj => {
+            // Фильтруем подсказки мест строго под выбранную категорию (например, Футбол, Наст. теннис и т.д.)
+            const filteredPoints = districtPoints.filter(pt => pt.category === currentTag);
+            
+            if (filteredPoints.length === 0) {
+                tagsContainer.innerHTML = '<span style="font-size: 11px; color: var(--text-muted);">Для этой категории в районе нет готовых точек. Введите место вручную.</span>';
+                return;
+            }
+
+            filteredPoints.forEach(placeObj => {
                 const tagBtn = document.createElement('button');
                 tagBtn.type = 'button';
                 tagBtn.innerText = placeObj.name;
@@ -633,28 +657,70 @@
             });
         }
 
-        window.setTargetGender = function(btn) {
-            document.querySelectorAll('#target-gender-selector .tag-chip-comp').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            selectedTargetGender = btn.getAttribute('data-gender');
-
-            const limitBlock = document.getElementById('max-people-block');
-            if (limitBlock) {
-                if (selectedTargetGender === 'only_guys' || selectedTargetGender === 'only_girls' || selectedTargetGender === 'any') {
-                    limitBlock.style.display = 'block';
-                } else {
-                    limitBlock.style.display = 'none';
-                }
+        // Переключение отображения выбора времени
+        window.toggleTimeInputs = function() {
+            const timeType = document.querySelector('input[name="time-type"]:checked')?.value;
+            const timePickerBlock = document.getElementById('time-picker-block');
+            if (!timePickerBlock) return;
+            
+            if (timeType === 'later') {
+                timePickerBlock.classList.remove('hidden');
+            } else {
+                timePickerBlock.classList.add('hidden');
             }
         };
-                           document.addEventListener('DOMContentLoaded', async () => {
+
+        // Переключение режимов состава участников
+        window.setCompositionMode = function(mode) {
+            currentCompositionMode = mode;
+            const limitBlock = document.getElementById('mode-limit-block');
+            const genderBlock = document.getElementById('mode-gender-block');
+            const buttons = document.querySelectorAll('#target-gender-selector .tag-chip-comp');
+            
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            if (mode === 'limit') {
+                document.querySelector('[data-mode="limit"]').classList.add('active');
+                if (limitBlock) limitBlock.classList.remove('hidden');
+                if (genderBlock) genderBlock.classList.add('hidden');
+            } else {
+                document.querySelector('[data-mode="gender"]').classList.add('active');
+                if (limitBlock) limitBlock.classList.add('hidden');
+                if (genderBlock) genderBlock.classList.remove('hidden');
+            }
+        };
+
+        // Админ-панель: смена пола
+        window.toggleUserGender = function() {
+            activeGender = activeGender === 'Парень' ? 'Девушка' : 'Парень';
+            localStorage.setItem('user_gender', activeGender);
+            updateStatusHeader();
+            alert(`Ваш пол успешно изменен на: ${activeGender}`);
+        };
+
+        // Админ-панель: смена возраста
+        window.changeUserAgePrompt = function() {
+            const newAge = prompt("Введите ваш новый возраст (от 12 до 35):", activeAge);
+            if (!newAge) return;
+            const parsedAge = parseInt(newAge);
+            if (isNaN(parsedAge) || parsedAge < 12 || parsedAge > 35) {
+                alert("Укажите корректный возраст от 12 до 35 лет!");
+                return;
+            }
+            activeAge = parsedAge;
+            localStorage.setItem('user_age', activeAge);
+            updateStatusHeader();
+            alert(`Возраст успешно обновлен: ${activeAge} лет`);
+        };
+
+        document.addEventListener('DOMContentLoaded', async () => {
             if (myId === 6949963047) {
                 const bottomNav = document.querySelector('.bottom-nav');
                 if (bottomNav) {
                     const adminNavBtn = document.createElement('button');
                     adminNavBtn.className = 'nav-btn';
                     adminNavBtn.setAttribute('data-sub', 'sub-admin');
-                    adminNavBtn.innerHTML = '<span style="font-size: 16px;">🚨</span>Куратор';
+                    adminNavBtn.innerHTML = '<span style="font-size: 16px;">🚨</span>Админка';
                     
                     adminNavBtn.addEventListener('click', () => {
                         document.querySelectorAll('.bottom-nav .nav-btn').forEach(b => b.classList.remove('active'));
@@ -684,7 +750,10 @@
 
             document.getElementById('create-district')?.addEventListener('change', updatePlaceTags);
             document.querySelectorAll('input[name="radar-tag"]').forEach(radio => {
-                radio.addEventListener('change', updatePlaceTags);
+                radio.addEventListener('change', () => {
+                    updatePlaceTags();
+                    renderMapMarkers();
+                });
             });
         });
 
@@ -737,9 +806,9 @@
             const exactPlace = document.getElementById('create-exact-place')?.value.trim();
             const desc = document.getElementById('create-desc')?.value.trim() || 'Без описания';
             
-            const girlsCount = document.getElementById('count-girls')?.value || '0';
-            const guysCount = document.getElementById('count-guys')?.value || '0';
-            const maxPeopleInput = document.getElementById('create-max-people')?.value || 'Без лимита';
+            const girlsCount = currentCompositionMode === 'gender' ? (document.getElementById('count-girls')?.value || '0') : '0';
+            const guysCount = currentCompositionMode === 'gender' ? (document.getElementById('count-guys')?.value || '0') : '0';
+            const maxPeopleInput = currentCompositionMode === 'limit' ? (document.getElementById('create-max-people')?.value || 'Без лимита') : 'По составу (М/Ж)';
 
             if (!exactPlace) {
                 alert('Пожалуйста, укажите точное место встречи!');
@@ -765,7 +834,7 @@
                 time: timeText,
                 category: tag,
                 description: desc,
-                targetGender: selectedTargetGender,
+                compositionMode: currentCompositionMode,
                 girlsCount: girlsCount,
                 guysCount: guysCount,
                 maxPeople: maxPeopleInput,
@@ -842,7 +911,7 @@
                     </div>
                     <p style="margin: 0 0 6px 0; font-size: 14px;"><b>Где:</b> ${m.exactPlace}</p>
                     <p style="margin: 0 0 6px 0; font-size: 14px;"><b>Категория:</b> ${m.category || 'Прогулка'}</p>
-                    <p style="margin: 0 0 6px 0; font-size: 12px; color: #a4b0be;">👥 Состав — Девушек: <b>${m.girlsCount || 0}</b> | Пацанов: <b>${m.guysCount || 0}</b> | Лимит: <b>${m.maxPeople || 'Без лимита'}</b></p>
+                    <p style="margin: 0 0 6px 0; font-size: 12px; color: #a4b0be;">👥 Состав: Девушек: <b>${m.girlsCount || 0}</b> | Пацанов: <b>${m.guysCount || 0}</b> | Лимит: <b>${m.maxPeople || 'Без лимита'}</b></p>
                     <p style="margin: 0 0 10px 0; font-size: 13px; color: #a4b0be;">${m.description || 'Описания нет.'}</p>
                     <p style="margin: 0 0 10px 0; font-size: 12px; color: var(--accent);">👤 Организатор: @${m.creator || 'Аноним'}</p>
                     <div style="display: flex; gap: 8px; flex-wrap: wrap;">
@@ -926,8 +995,8 @@
             });
         }
 
-        window.copyUltimatum = function(username) {
-            const text = `ВНИМАНИЕ! На твой профиль поступила официальная жалоба.\n\nУ тебя есть выбор (выбери ОДИН вариант):\n1. ВИДЕО-КРУЖОК с лицом и фразой: „Гродно 2026“.\n2. Ссылка на открытый Instagram с био: „Гродно 2026“.;`;
+                window.copyUltimatum = function(username) {
+            const text = `ВНИМАНИЕ! На твой профиль поступила официальная жалоба.\n\nУ тебя есть выбор (выбери ОДИН вариант):\n1. ВИДЕО-КРУЖОК с лицом и фразой: „Гродно 2026“.\n2. Ссылка на открытый Instagram с био: „Гродно 2026“.`;
             navigator.clipboard.writeText(text).then(() => alert(`Ультиматум для @${username} скопирован!`));
         };
 
@@ -941,10 +1010,3 @@
 </body>
 </html>
 
-
-         
-
-    
-    
-    
-    
