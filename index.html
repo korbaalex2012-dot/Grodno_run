@@ -999,7 +999,7 @@
             });
         }
 
-        window.joinMeeting = async function(id) {
+                window.joinMeeting = async function(id) {
             const m = meetings.find(item => item.id === id); 
             if (!m) return;
 
@@ -1011,14 +1011,20 @@
                 return;
             }
 
-            if (m.compositionMode === 'gender') {
+            // Если ты создатель этой сходки, тебе можно всё (включая управление своей компанией)
+            const isCreator = (m.creator === myUsername);
+
+            // Проверка пола работает ТОЛЬКО для тех, кто пытается вписаться со стороны (не для создателя)
+            if (!isCreator && m.compositionMode === 'gender') {
                 const targetGirls = parseInt(m.girlsCount) || 0;
                 const targetGuys = parseInt(m.guysCount) || 0;
                 
+                // Если парней в поиске 0, а девушек больше 0 -> постороннему парню вход закрыт
                 if (targetGuys === 0 && targetGirls > 0 && activeGender === 'Парень') {
                     alert("❌ Эта сходка создана только для девушек! Парням вход заблокирован.");
                     return;
                 }
+                // Если девушек в поиске 0, а парней больше 0 -> посторонней девушке вход закрыт
                 if (targetGirls === 0 && targetGuys > 0 && activeGender === 'Девушка') {
                     alert("❌ Эта сходка создана только для парней! Девушкам вход заблокирован.");
                     return;
@@ -1043,7 +1049,6 @@
             alert(`✅ Ты вписался в сходку! Создатель (@${m.creator}) видит твой ник.`);
             renderAll();
         };
-
                window.cancelMeeting = async function(id) {
             if (!confirm("Отменить и удалить этот сбор?")) return;
             
