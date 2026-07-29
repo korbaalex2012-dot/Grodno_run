@@ -916,7 +916,7 @@
             });
         }
 
-        function renderMeetingsList() {
+                function renderMeetingsList() {
             const container = document.getElementById('radar-list');
             const emptyMsg = document.getElementById('empty-state-msg');
             if (!container) return;
@@ -925,22 +925,40 @@
             const filtered = meetings.filter(m => {
                 if (currentDistrictFilter !== "all" && m.district !== currentDistrictFilter) return false;
                 
-                // Если карточка заполнена (участников больше или равно лимиту, либо создатель скрывает её для посторонних), 
-                // оставляем её видной ТОЛЬКО для тех, кто уже внутри, или для создателя.
-                const isMemberOrCreator = m.members.includes(myUsername) || m.creator === myUsername;
-                
-                // Проверим лимит по составу (М/Ж или числовой)
+                const isCreator = m.creator === myUsername;
+                const isMember = m.members.includes(myUsername);
+                const isMemberOrCreator = isMember || isCreator;
+
+                // ЖЕСТКАЯ ФИЛЬТРАЦИЯ ПО ПОЛУ НА РАДАРЕ:
+                if (m.compositionMode === 'gender' && !isMemberOrCreator) {
+                    const targetGirls = parseInt(m.girlsCount) || 0;
+                    const targetGuys = parseInt(m.guysCount) || 0;
+                    
+                    // Если ищут ТОЛЬКО девушек (пацанов 0), а смотрящий — парень -> скрываем карточку
+                    if (targetGuys === 0 && targetGirls > 0 && activeGender === 'Парень') {
+                        return false;
+                    }
+                    // Если ищут ТОЛЬКО пацанов (девушек 0), а смотрящая — девушка -> скрываем карточку
+                    if (targetGirls === 0 && targetGuys > 0 && activeGender === 'Девушка') {
+                        return false;
+                    }
+                }
+
+                // Считаем участников БЕЗ УЧЕТА создателя (если создатель находится в списке)
+                const realMembersCount = m.members.filter(user => user !== m.creator).length;
+
+                // Проверка лимитов для скрытия заполненных карточек от посторонних
                 if (m.compositionMode === 'limit') {
                     const maxP = parseInt(m.maxPeople);
-                    if (!isNaN(maxP) && m.members.length >= maxP && !isMemberOrCreator) {
-                        return false; // Скрываем от всех, кто не внутри
+                    if (!isNaN(maxP) && realMembersCount >= maxP && !isMemberOrCreator) {
+                        return false; 
                     }
                 } else if (m.compositionMode === 'gender') {
                     const reqG = parseInt(m.girlsCount) || 0;
                     const reqB = parseInt(m.guysCount) || 0;
                     const totalReq = reqG + reqB;
-                    if (totalReq > 0 && m.members.length >= totalReq && !isMemberOrCreator) {
-                        return false; // Скрываем от посторонних, если набрали полный состав
+                    if (totalReq > 0 && realMembersCount >= totalReq && !isMemberOrCreator) {
+                        return false; 
                     }
                 }
 
@@ -959,6 +977,9 @@
                 const isCreator = m.creator === myUsername || myUsername === "Grodno_User";
                 const isAlreadyJoined = m.members.includes(myUsername);
                 
+                // Делаем список участников кликабельными ссылками на Telegram-аккаунты
+                const membersLinks = m.members.map(user => `<a href="https://t.me/${user}" target="_blank" style="color: var(--accent); text-decoration: none;">@${user}</a>`).join(', ');
+
                 card.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                         <strong style="color: var(--accent); font-size: 15px;">📍 ${m.district}</strong>
@@ -970,8 +991,8 @@
                     <p style="margin: 0 0 6px 0; font-size: 12px; color: #a4b0be;">⚙️ Состав: Девушек: <b>${m.girlsCount || 0}</b> | Пацанов: <b>${m.guysCount || 0}</b></p>
                     <p style="margin: 0 0 6px 0; font-size: 12px; color: var(--accent-green);">🎯 Возраст: <b>${m.ageFrom || 11} - ${m.ageTo || 35} лет</b></p>
                     <p style="margin: 0 0 10px 0; font-size: 13px; color: #a4b0be;">${m.description || 'Описания нет.'}</p>
-                    <p style="margin: 0 0 10px 0; font-size: 12px; color: var(--accent);">👤 Организатор: @${m.creator || 'Аноним'}</p>
-                    <p style="margin: 0 0 10px 0; font-size: 11px; color: var(--text-muted);">👥 Вписались: ${m.members.join(', ')}</p>
+                    <p style="margin: 0 0 10px 0; font-size: 12px; color: var(--accent);">👤 Организатор: <a href="https://t.me/${m.creator}" target="_blank" style="color: var(--accent); text-decoration: none;">@${m.creator || 'Аноним'}</a></p>
+                    <p style="margin: 0 0 10px 0; font-size: 11px; color: var(--text-muted);">👥 Вписались: ${membersLinks}</p>
                     <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                         ${!isAlreadyJoined ? `<button class="btn btn-primary" style="padding: 10px; font-size: 13px; flex: 2;" onclick="joinMeeting('${m.id}')">⚡ Буду на месте</button>` : `<div style="flex: 2; text-align: center; color: var(--accent-green); font-weight: bold; font-size: 13px; padding: 10px; background: rgba(46,204,113,0.1); border-radius: 8px;">✅ Ты вписан в состав</div>`}
                         ${isCreator ? `<button class="btn btn-danger" style="padding: 10px; font-size: 13px; flex: 1.5; background: #8b0000;" onclick="cancelMeeting('${m.id}')">🚪 Отменить</button>` : ''}
@@ -981,15 +1002,6 @@
                 container.appendChild(card);
             });
         }
-
-        window.cancelMeeting = async function(id) {
-            if (!confirm("Отменить и удалить этот сбор?")) return;
-            meetings = meetings.filter(item => item.id !== id);
-            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
-            await saveMeetingsToServer();
-            alert("Сход успешно отменен!");
-            renderAll();
-        };
 
         window.joinMeeting = async function(id) {
             const m = meetings.find(item => item.id === id); 
@@ -1003,16 +1015,16 @@
                 return;
             }
 
-            // Жесткая проверка пола, исключающая обход со второго аккаунта
+            // Абсолютная блокировка входа для несовпадающего пола
             if (m.compositionMode === 'gender') {
                 const targetGirls = parseInt(m.girlsCount) || 0;
                 const targetGuys = parseInt(m.guysCount) || 0;
                 
-                if (activeGender === 'Парень' && targetGuys <= 0 && targetGirls > 0) {
+                if (activeGender === 'Парень' && targetGuys === 0 && targetGirls > 0) {
                     alert("❌ Эта сходка создана только для девушек! Парням вход заблокирован.");
                     return;
                 }
-                if (activeGender === 'Девушка' && targetGirls <= 0 && targetGuys > 0) {
+                if (activeGender === 'Девушка' && targetGirls === 0 && targetGuys > 0) {
                     alert("❌ Эта сходка создана только для парней! Девушкам вход заблокирован.");
                     return;
                 }
@@ -1033,21 +1045,7 @@
             localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
             await saveMeetingsToServer();
 
-            // Отправка уведомления создателю в Telegram (через WebApp sendData или имитацию)
-            if (window.Telegram?.WebApp) {
-                try {
-                    tg.sendData(JSON.stringify({
-                        action: 'joined_meeting',
-                        creator: m.creator,
-                        joinedUser: myUsername,
-                        place: m.exactPlace
-                    }));
-                } catch (err) {
-                    console.log("WebApp sendData error: ", err);
-                }
-            }
-
-            alert(`✅ Ты вписался в сходку! Создатель (@${m.creator}) получил уведомление и видит твой ник.`);
+            alert(`✅ Ты вписался в сходку! Создатель (@${m.creator}) видит твой ник.`);
             renderAll();
         };
 
