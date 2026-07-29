@@ -1044,14 +1044,35 @@
             renderAll();
         };
 
-        window.cancelMeeting = async function(id) {
+               window.cancelMeeting = async function(id) {
             if (!confirm("Отменить и удалить этот сбор?")) return;
+            
+            // 1. Сразу убираем из локального массива
             meetings = meetings.filter(item => item.id !== id);
+            
+            // 2. Обновляем localStorage
             localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
-            await saveMeetingsToServer();
-            alert("Сход успешно отменен!");
+            
+            // 3. Отправляем обновленный пустой/обрезанный список на сервер и ждем завершения
+            try {
+                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': API_KEY
+                    },
+                    body: JSON.stringify({ meetings: meetings })
+                });
+            } catch (e) {
+                console.error("Ошибка при удалении с сервера:", e);
+            }
+            
+            alert("Сход успешно отменен и удален!");
+            
+            // 4. Перерисовываем интерфейс
             renderAll();
-        };       
+        };
+
         window.reportDescription = function(username, meetingId) {
             const reason = prompt("Причина жалобы (Мат, неадекватность):");
             if (!reason) return;
