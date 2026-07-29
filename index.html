@@ -122,6 +122,17 @@
         .btn-success { background: linear-gradient(135deg, var(--accent-green), #27ae60); color: #fff; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3); }
         .btn-danger { background: linear-gradient(135deg, var(--accent-red), #c0392b); color: #fff; box-shadow: 0 4px 15px rgba(255, 56, 56, 0.3); }
         .hidden { display: none !important; }
+        
+        /* Стили для рейтинга и значков */
+        .rating-badge {
+            background: rgba(0, 162, 255, 0.15);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 800;
+        }
     </style>
 </head>
 <body>
@@ -129,7 +140,10 @@
 
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: rgba(15, 15, 27, 0.7); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); padding: 12px 16px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
         <div>
-            <div style="font-weight: 900; font-size: 15px; letter-spacing: 1px; color: var(--accent); text-shadow: 0 0 10px var(--accent-glow);">GRODNO RUN</div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="font-weight: 900; font-size: 15px; letter-spacing: 1px; color: var(--accent); text-shadow: 0 0 10px var(--accent-glow);">GRODNO RUN</div>
+                <div id="header-user-rating" class="rating-badge">⭐ 10 б.</div>
+            </div>
             <p style="font-size: 11px; color: var(--text-muted); margin: 3px 0 0 0; font-weight: 600;" id="user-display-status">Сканирование сети...</p>
         </div>
         <div style="display: flex; align-items: center; gap: 10px;">
@@ -162,9 +176,13 @@
             <button type="button" id="btn-submit-auth" class="btn btn-success">Пройти авторизацию</button>
         </div>
     </div>
-
-    <div id="screen-main" class="screen">
+        <div id="screen-main" class="screen">
         <div id="sub-radar" class="sub-screen active">
+            <div id="user-active-status-card" class="card hidden" style="border-top: 4px solid var(--accent-green); background: rgba(46, 204, 113, 0.05);">
+                <div style="font-size: 13px; font-weight: bold; color: var(--accent-green); margin-bottom: 6px;">🟢 Ваша активная активность</div>
+                <div id="user-active-status-text" style="font-size: 12px; color: var(--text-main);"></div>
+            </div>
+
             <div class="card" style="padding: 10px; margin-bottom: 16px;">
                 <div style="font-size: 11px; font-weight: 700; color: var(--accent); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">
                     🗺️ Интерактивная карта Гродно (Зум / Перетаскивание)
@@ -198,7 +216,8 @@
             <div id="empty-state-msg" class="empty-state">На радаре пока пусто... Запусти движ сам!</div>
             <div id="radar-list"></div>
         </div>
-                <div id="sub-create" class="sub-screen">
+
+        <div id="sub-create" class="sub-screen">
             <h2>➕ Запустить сбор</h2>
             <p class="subtitle">Отметь локацию на общем радаре Гродно</p>
             <div class="card" style="border-top: 4px solid var(--accent);">
@@ -215,6 +234,7 @@
                         <option value="БЛК / Форты">БЛК / Форты</option>
                     </select>
                 </div>
+
                 <div class="form-group">
                     <label>🔥 Категория встреч:</label>
                     <style>
@@ -351,8 +371,7 @@
                 </button>
             </div>
         </div>
-        
-        <div id="sub-archive" class="sub-screen">
+                <div id="sub-archive" class="sub-screen">
             <h2>📜 Архив сборов</h2>
             <p class="subtitle">История завершенных встреч</p>
             <div id="archive-empty-state" class="empty-state">Архив пуст.</div>
@@ -406,7 +425,8 @@
             <span style="font-size: 16px;">📜</span>Архив
         </button>
     </div>
-        <script>
+
+    <script>
         const BIN_ID = '6a68a3d7da38895dfe9b46cf';
         const API_KEY = '$2a$10$fCuDEyphx80p7hlYAPd8C.W8S8fZv53sNq6UhpL8m/Oot7eVvdScu';
         const MY_TELEGRAM_ID = 6949963047;
@@ -466,6 +486,7 @@
         const tg = window.Telegram?.WebApp;
         let myId = 0;
         let myUsername = "Grodno_User";
+        let myRating = parseInt(localStorage.getItem('user_rating')) || 10;
 
         if (tg) {
             tg.ready();
@@ -480,14 +501,13 @@
         let archive = JSON.parse(localStorage.getItem('gr_archive_2026')) || [];
         let complaints = JSON.parse(localStorage.getItem('gr_complaints_2026')) || [];
 
-        let activeGender = localStorage.getItem('user_gender') || "";
-        let activeAge = parseInt(localStorage.getItem('user_age')) || 0;
+        let activeGender = localStorage.getItem('user_gender_v2') || "";
+        let activeAge = parseInt(localStorage.getItem('user_age_v2')) || 0;
         let currentDistrictFilter = "all";
         let mapInstance = null;
         let mapMarkers = [];
         let currentCompositionMode = 'limit';
-
-        async function loadMeetingsFromServer() {
+                async function loadMeetingsFromServer() {
             try {
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
                     headers: { 'X-Master-Key': API_KEY }
@@ -495,6 +515,7 @@
                 const data = await res.json();
                 if (data && data.record && Array.isArray(data.record.meetings)) {
                     meetings = data.record.meetings;
+                    checkAutoDeletion();
                     localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
                 }
             } catch (e) {
@@ -515,6 +536,24 @@
             } catch (e) {
                 console.error("Ошибка сохранения на сервер:", e);
             }
+        }
+
+        // Проверка таймера автоудаления сходок (через 3 часа после начала или создания)
+        function checkAutoDeletion() {
+            const now = Date.now();
+            meetings = meetings.filter(m => {
+                const createdTime = m.createdAt || now;
+                const hoursPassed = (now - createdTime) / (1000 * 60 * 60);
+                if (hoursPassed >= 3) {
+                    // Переносим в архив перед удалением
+                    if (!archive.some(item => item.id === m.id)) {
+                        archive.unshift(m);
+                    }
+                    return false;
+                }
+                return true;
+            });
+            localStorage.setItem('gr_archive_2026', JSON.stringify(archive));
         }
 
         const audio = document.getElementById('bg-audio');
@@ -566,8 +605,16 @@
 
         function updateStatusHeader() {
             const statusEl = document.getElementById('user-display-status');
+            const ratingEl = document.getElementById('header-user-rating');
             if (statusEl) {
                 statusEl.innerText = `${activeGender}, ${activeAge} л. (@${myUsername}) 🛰 СЕТЬ`;
+            }
+            if (ratingEl) {
+                ratingEl.innerText = `⭐ ${myRating} б.`;
+                if (myRating < 0) {
+                    alert("❌ Ваш рейтинг упал ниже 0. Аккаунт заблокирован!");
+                    document.body.innerHTML = '<h1 style="color:red; text-align:center; margin-top:20vh;">ДОСТУП ЗАБЛОКИРОВАН (БАН)</h1>';
+                }
             }
         }
 
@@ -705,7 +752,7 @@
 
         window.toggleUserGender = function() {
             activeGender = activeGender === 'Парень' ? 'Девушка' : 'Парень';
-            localStorage.setItem('user_gender', activeGender);
+            localStorage.setItem('user_gender_v2', activeGender);
             updateStatusHeader();
             alert(`Ваш пол изменен на: ${activeGender}`);
         };
@@ -719,415 +766,312 @@
                 return;
             }
             activeAge = parsedAge;
-            localStorage.setItem('user_age', activeAge);
+            localStorage.setItem('user_age_v2', activeAge);
             updateStatusHeader();
             alert(`Возраст обновлен: ${activeAge} лет`);
         };
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            if (localStorage.getItem('user_registered_v2') === 'true') {
-                document.getElementById('screen-auth')?.classList.remove('active');
-                const authScr = document.getElementById('screen-auth');
-                if (authScr) authScr.style.display = 'none';
-
-                const mainScr = document.getElementById('screen-main');
-                if (mainScr) {
-                    mainScr.classList.add('active');
-                    mainScr.style.display = 'block';
-                }
-                updateStatusHeader();
-                await loadMeetingsFromServer();
-                renderAll();
-                setTimeout(initLeafletMap, 200);
-            } else {
-                document.getElementById('screen-auth')?.classList.add('active');
-            }
-
-            if (myId === 6949963047) {
-                const bottomNav = document.querySelector('.bottom-nav');
-                if (bottomNav && !bottomNav.querySelector('[data-sub="sub-admin"]')) {
-                    const adminNavBtn = document.createElement('button');
-                    adminNavBtn.className = 'nav-btn';
-                    adminNavBtn.setAttribute('data-sub', 'sub-admin');
-                    adminNavBtn.innerHTML = '<span style="font-size: 16px;">🚨</span>Админка';
-                    
-                    adminNavBtn.addEventListener('click', () => {
-                        document.querySelectorAll('.bottom-nav .nav-btn').forEach(b => b.classList.remove('active'));
-                        document.querySelectorAll('.sub-screen').forEach(s => s.classList.remove('active'));
-                        adminNavBtn.classList.add('active');
-                        document.getElementById('sub-admin')?.classList.add('active');
-                        renderAll();
-                    });
-                    bottomNav.appendChild(adminNavBtn);
-                }
-            }
-
-            initAudioEngine();
-            updatePlaceTags();
-
-            document.getElementById('create-district')?.addEventListener('change', updatePlaceTags);
-            document.querySelectorAll('input[name="radar-tag"]').forEach(radio => {
-                radio.addEventListener('change', () => {
-                    updatePlaceTags();
-                    renderMapMarkers();
-                });
-            });
-        });
-
-        document.getElementById('btn-submit-auth')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            const gen = document.getElementById('auth-gender').value;
+                document.getElementById('btn-submit-auth')?.addEventListener('click', () => {
+            const gender = document.getElementById('auth-gender').value;
             const age = parseInt(document.getElementById('auth-age').value);
 
-            if (!gen || isNaN(age) || age < 11 || age > 35) {
-                alert('Доступ строго от 11 до 35 лет! Укажите корректный возраст.');
+            if (!gender) { alert("Пожалуйста, выберите ваш пол!"); return; }
+            if (isNaN(age) || age < 11 || age > 35) {
+                alert("Ошибка! Возраст должен быть строго от 11 до 35 лет.");
                 return;
             }
 
-            localStorage.setItem('user_gender_v2', gen);
-            localStorage.setItem('user_age_v2', age);
-            localStorage.setItem('user_registered_v2', 'true');
-            activeGender = gen; 
+            activeGender = gender;
             activeAge = age;
+            localStorage.setItem('user_gender_v2', activeGender);
+            localStorage.setItem('user_age_v2', activeAge);
 
-            const authScreen = document.getElementById('screen-auth');
-            const mainScreen = document.getElementById('screen-main');
-
-            if (authScreen) {
-                authScreen.classList.remove('active');
-                authScreen.style.display = 'none';
-            }
-            if (mainScreen) {
-                mainScreen.classList.add('active');
-                mainScreen.style.display = 'block';
-            }
-
-                   UpdateStatusHeader(); 
-            renderAll();
-            setTimeout(() => { if (typeof initLeafletMap === 'function') initLeafletMap(); }, 200);
+            document.getElementById('screen-auth').classList.remove('active');
+            document.getElementById('screen-main').classList.add('active');
+            updateStatusHeader();
+            loadMeetingsFromServer();
         });
 
-        document.querySelectorAll('.bottom-nav .nav-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const targetSub = btn.getAttribute('data-sub');
-                document.querySelectorAll('.bottom-nav .nav-btn').forEach(b => b.classList.remove('active'));
+        // Навигация по экранам
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
                 document.querySelectorAll('.sub-screen').forEach(s => s.classList.remove('active'));
+                
+                const targetSub = btn.getAttribute('data-sub');
                 btn.classList.add('active');
                 document.getElementById(targetSub)?.classList.add('active');
-                renderAll();
+                
                 if (targetSub === 'sub-radar') {
-                    setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 150);
+                    setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 200);
                 }
             });
         });
 
-        document.querySelectorAll('#radar-filter-bar .filter-chip').forEach(chip => {
+        // Фильтры районов
+        document.querySelectorAll('.filter-chip').forEach(chip => {
             chip.addEventListener('click', () => {
-                document.querySelectorAll('#radar-filter-bar .filter-chip').forEach(c => c.classList.remove('active'));
+                document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
                 chip.classList.add('active');
                 currentDistrictFilter = chip.getAttribute('data-filter');
-                renderMeetingsList();
+                renderMeetings();
             });
         });
 
-        document.getElementById('btn-launch-radar')?.addEventListener('click', async function(e) {
-            e.preventDefault();
-            
-            const district = document.getElementById('create-district')?.value || 'Не указан';
-            const exactPlace = document.getElementById('create-exact-place')?.value.trim();
-            const desc = document.getElementById('create-desc')?.value.trim() || 'Без описания';
-            
-            const girlsCount = currentCompositionMode === 'gender' ? (document.getElementById('count-girls')?.value || '0') : '0';
-            const guysCount = currentCompositionMode === 'gender' ? (document.getElementById('count-guys')?.value || '0') : '0';
-            const maxPeopleInput = currentCompositionMode === 'limit' ? (document.getElementById('create-max-people')?.value || 'Без лимита') : 'По составу (М/Ж)';
+        document.querySelectorAll('input[name="radar-tag"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                renderMapMarkers();
+                updatePlaceTags();
+            });
+        });
 
-            const ageFrom = parseInt(document.getElementById('create-age-from')?.value) || 11;
-            const ageTo = parseInt(document.getElementById('create-age-to')?.value) || 35;
+        document.getElementById('create-district')?.addEventListener('change', updatePlaceTags);
 
-            if (!exactPlace) {
-                alert('Укажите точное место встречи!');
+        // Кнопка создания сходки с проверкой ограничений
+        document.getElementById('btn-launch-radar')?.addEventListener('click', () => {
+            // Проверка: можно создать только 1 сходку или участвовать только в 1
+            const userCreatedActive = meetings.some(m => m.creator === myUsername && m.status === 'active');
+            const userJoinedActive = meetings.some(m => m.members.includes(myUsername) && m.status === 'active');
+            
+            if (userCreatedActive || userJoinedActive) {
+                alert("❌ У вас уже есть активная сходка или вы участвуете в другой! Нельзя совмещать несколько сходок.");
                 return;
             }
 
-            let timeText = '';
+            const district = document.getElementById('create-district').value;
+            const category = document.querySelector('input[name="radar-tag"]:checked')?.value || '🚶‍♂️ Прогулка';
+            const exactPlace = document.getElementById('create-exact-place').value.trim();
+            const desc = document.getElementById('create-desc').value.trim();
             const timeType = document.querySelector('input[name="time-type"]:checked')?.value;
-            if (timeType === 'now') {
-                timeText = '⚡ СРОЧНО';
-            } else {
-                const hour = document.getElementById('create-hour')?.value || '12';
-                const minute = document.getElementById('create-minute')?.value || '00';
-                timeText = `${hour}:${minute}`;
+            
+            let timeStr = "Срочно (сейчас)";
+            if (timeType === 'later') {
+                const h = document.getElementById('create-hour').value;
+                const min = document.getElementById('create-minute').value;
+                timeStr = `${h}:${min}`;
             }
 
-            const tag = document.querySelector('input[name="radar-tag"]:checked')?.value || '🚶‍♂️ Прогулка';
+            let composition = "";
+            let maxPeople = "Без лимита";
+            if (currentCompositionMode === 'limit') {
+                maxPeople = document.getElementById('create-max-people').value.trim() || "Без лимита";
+                composition = `Максимум: ${maxPeople}`;
+            } else {
+                const girls = document.getElementById('count-girls').value || 0;
+                const guys = document.getElementById('count-guys').value || 0;
+                composition = `👯 Девушек: ${girls}, Пацанов: ${guys}`;
+            }
+
+            const ageFrom = document.getElementById('create-age-from').value || 11;
+            const ageTo = document.getElementById('create-age-to').value || 35;
+
+            if (!exactPlace) {
+                alert("Укажите точное место встречи!");
+                return;
+            }
 
             const newMeeting = {
-                id: 'm_' + Date.now() + "_" + Math.random().toString(36).substr(2, 5),
-                district: district,
-                exactPlace: exactPlace,
-                time: timeText,
-                category: tag,
-                description: desc,
-                compositionMode: currentCompositionMode,
-                girlsCount: girlsCount,
-                guysCount: guysCount,
-                maxPeople: maxPeopleInput,
-                ageFrom: ageFrom,
-                ageTo: ageTo,
+                id: 'm_' + Date.now(),
                 creator: myUsername,
-                members: [myUsername]
+                creatorId: myId,
+                creatorRating: myRating,
+                district,
+                category,
+                exactPlace,
+                time: timeStr,
+                desc: desc || "Без описания",
+                composition,
+                ageLimit: `${ageFrom}-${ageTo} лет`,
+                members: [myUsername], // Создатель сразу в участниках
+                checkedInUsers: [],    // Кто нажал "Я на месте"
+                allCheckedAt: null,    // Время, когда все нажали чекин
+                status: 'active',
+                createdAt: Date.now()
             };
 
             meetings.unshift(newMeeting);
-            if (!archive.some(item => item.id === newMeeting.id)) {
-                archive.unshift(newMeeting);
-            }
-            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
-            localStorage.setItem('gr_archive_2026', JSON.stringify(archive));
-
-            await saveMeetingsToServer();
-
-            alert('Радар успешно запущен!');
-            renderAll();
-            document.querySelector('.nav-btn[data-sub="sub-radar"]')?.click();
-            setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 150);
+            saveMeetingsToServer();
+            renderMeetings();
+            
+            // Переходим на экран Радара
+            document.querySelectorAll('.nav-btn')[0].click();
+            alert("🚀 Сходка успешно запущена на радаре Гродно!");
         });
 
-        function renderAll() {
-            renderMeetingsList();
-            renderArchiveList();
-            renderViolators();
-            updateDistrictBadges();
-            renderMapMarkers();
-        }
-
-        function updateDistrictBadges() {
-            const counts = {};
-            meetings.forEach(m => counts[m.district] = (counts[m.district] || 0) + 1);
-
-            const badges = {
-                "Центр (Советская)": "b-center", "ТЦ Тринити": "b-trinity", "OldCity (Олд Сити)": "b-oldcity",
-                "Ольшанка": "b-olshanka", "Грандичи": "b-grandichi", "Девятовка": "b-devyatovka",
-                "Пышки (Парк)": "b-pyshki", "БЛК / Форты": "b-forty"
-            };
-
-            Object.keys(badges).forEach(key => {
-                const el = document.getElementById(badges[key]);
-                if (el) el.innerText = counts[key] ? `🔥 ${counts[key]}` : "";
-            });
-        }
-
-        function renderMeetingsList() {
+        function renderMeetings() {
             const container = document.getElementById('radar-list');
-            const emptyMsg = document.getElementById('empty-state-msg');
+            const emptyState = document.getElementById('empty-state-msg');
             if (!container) return;
             container.innerHTML = '';
 
             const filtered = meetings.filter(m => {
-                if (currentDistrictFilter !== "all" && m.district !== currentDistrictFilter) return false;
-                
-                const isCreator = m.creator === myUsername;
-                const isMember = m.members.includes(myUsername);
-                const isMemberOrCreator = isMember || isCreator;
-
-                if (m.compositionMode === 'gender' && !isMemberOrCreator) {
-                    const targetGirls = parseInt(m.girlsCount) || 0;
-                    const targetGuys = parseInt(m.guysCount) || 0;
-                    
-                    if (targetGuys === 0 && targetGirls > 0 && activeGender === 'Парень') {
-                        return false;
-                    }
-                    if (targetGirls === 0 && targetGuys > 0 && activeGender === 'Девушка') {
-                        return false;
-                    }
-                }
-
-                const realMembersCount = m.members.filter(user => user !== m.creator).length;
-
-                if (m.compositionMode === 'limit') {
-                    const maxP = parseInt(m.maxPeople);
-                    if (!isNaN(maxP) && realMembersCount >= maxP && !isMemberOrCreator) {
-                        return false; 
-                    }
-                } else if (m.compositionMode === 'gender') {
-                    const reqG = parseInt(m.girlsCount) || 0;
-                    const reqB = parseInt(m.guysCount) || 0;
-                    const totalReq = reqG + reqB;
-                    if (totalReq > 0 && realMembersCount >= totalReq && !isMemberOrCreator) {
-                        return false; 
-                    }
-                }
-
-                return true;
+                if (currentDistrictFilter === 'all') return true;
+                return m.district === currentDistrictFilter;
             });
 
             if (filtered.length === 0) {
-                if (emptyMsg) emptyMsg.style.display = 'block';
+                if (emptyState) emptyState.style.display = 'block';
                 return;
             }
-            if (emptyMsg) emptyMsg.style.display = 'none';
+            if (emptyState) emptyState.style.display = 'none';
 
-            filtered.forEach(m => {
+            filtered.forEach((m) => {
                 const card = document.createElement('div');
-                card.className = `card status-planning`;
-                
-                const isCreator = (m.creator === myUsername);
-                const isAlreadyJoined = m.members.includes(myUsername);
-                
-                const membersLinks = m.members.map(user => `<a href="https://t.me/${user}" target="_blank" style="color: var(--accent); text-decoration: none;">@${user}</a>`).join(', ');
+                card.className = 'card';
+                card.style.borderTop = "4px solid var(--accent)";
+
+                const isCreator = m.creator === myUsername;
+                const isMember = m.members.includes(myUsername);
+                const allChecked = m.checkedInUsers.length === m.members.length && m.members.length > 0;
+
+                // До чекина юзернеймы участников скрыты, отображаются как анонимные слоты с рейтингом
+                const membersHTML = m.members.map((u, idx) => {
+                    if (!allChecked && u !== myUsername && !isCreator) {
+                        return `<span style="background:rgba(255,255,255,0.05); padding:3px 8px; border-radius:8px; font-size:11px; color:var(--text-muted);">👤 Участник #${idx+1} (⭐ скрыто)</span>`;
+                    }
+                    return `<span style="background:rgba(0,162,255,0.1); border:1px solid rgba(0,162,255,0.3); padding:3px 8px; border-radius:8px; font-size:11px; color:var(--accent);">@${u}</span>`;
+                }).join(' ');
+
+                // Кнопка "Я на месте" доступна участникам
+                let checkInBtnHTML = '';
+                if (isMember) {
+                    const alreadyChecked = m.checkedInUsers.includes(myUsername);
+                    if (alreadyChecked) {
+                        checkInBtnHTML = `<div style="margin-top:10px; font-size:11px; color:var(--accent-green); font-weight:bold;">✅ Вы отметились «Я на месте»</div>`;
+                    } else {
+                        checkInBtnHTML = `<button class="btn btn-success" style="margin-top:10px; padding:10px; font-size:12px;" onclick="checkInMeeting('${m.id}')">📍 Я на месте</button>`;
+                    }
+                }
+
+                // Кнопки лайков / дизлайков / жалоб появляются через 1 час после полного чекина
+                let reviewButtonsHTML = '';
+                if (allChecked && m.allCheckedAt) {
+                    const hoursPassed = (Date.now() - m.allCheckedAt) / (1000 * 60 * 60);
+                    if (hoursPassed >= 1) {
+                        reviewButtonsHTML = `
+                            <div style="display:flex; gap:6px; margin-top:12px; border-top:1px solid var(--border); pt:10px;">
+                                <button class="btn btn-success" style="padding:6px; font-size:11px; flex:1;" onclick="rateMeeting('${m.id}', 'like')">👍 Лайк (+2)</button>
+                                <button class="btn btn-danger" style="padding:6px; font-size:11px; flex:1;" onclick="rateMeeting('${m.id}', 'dislike')">👎 Дизлайк (-3)</button>
+                                <button class="btn btn-danger" style="padding:6px; font-size:11px; flex:1; background:#c0392b;" onclick="reportMeeting('${m.id}')">🚨 Жалоба</button>
+                            </div>
+                        `;
+                    }
+                }
 
                 card.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <strong style="color: var(--accent); font-size: 15px;">📍 ${m.district}</strong>
-                        <span style="font-size: 11px; background: #1a1b26; padding: 4px 10px; border-radius: 12px; color: var(--text-muted); font-weight: bold;">⏳ ${m.time || 'Срочно'}</span>
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+                        <div>
+                            <span style="font-size:10px; text-transform:uppercase; background:rgba(0,162,255,0.15); color:var(--accent); padding:2px 8px; border-radius:6px; font-weight:bold;">${m.category}</span>
+                            <div style="font-weight:800; font-size:15px; margin-top:4px;">📍 ${m.district}</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-size:11px; color:var(--text-muted);">Создатель:</div>
+                            <div style="font-size:12px; font-weight:bold; color:var(--accent);">@${m.creator} (⭐ ${m.creatorRating || 10})</div>
+                        </div>
                     </div>
-                    <p style="margin: 0 0 6px 0; font-size: 14px;"><b>Где:</b> ${m.exactPlace}</p>
-                    <p style="margin: 0 0 6px 0; font-size: 14px;"><b>Категория:</b> ${m.category || 'Прогулка'}</p>
-                    <p style="margin: 0 0 6px 0; font-size: 12px; color: #a4b0be;">👥 Участников: <b>${m.members.length}</b> | Лимит: <b>${m.maxPeople || 'Без лимита'}</b></p>
-                    <p style="margin: 0 0 6px 0; font-size: 12px; color: #a4b0be;">⚙️ Состав: Девушек: <b>${m.girlsCount || 0}</b> | Пацанов: <b>${m.guysCount || 0}</b></p>
-                    <p style="margin: 0 0 6px 0; font-size: 12px; color: var(--accent-green);">🎯 Возраст: <b>${m.ageFrom || 11} - ${m.ageTo || 35} лет</b></p>
-                    <p style="margin: 0 0 10px 0; font-size: 13px; color: #a4b0be;">${m.description || 'Описания нет.'}</p>
-                    <p style="margin: 0 0 10px 0; font-size: 12px; color: var(--accent);">👤 Организатор: <a href="https://t.me/${m.creator}" target="_blank" style="color: var(--accent); text-decoration: none;">@${m.creator || 'Аноним'}</a></p>
-                    <p style="margin: 0 0 10px 0; font-size: 11px; color: var(--text-muted);">👥 Вписались: ${membersLinks}</p>
-                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                        ${!isAlreadyJoined ? `<button class="btn btn-primary" style="padding: 10px; font-size: 13px; flex: 2;" onclick="joinMeeting('${m.id}')">⚡ Буду на месте</button>` : `<div style="flex: 2; text-align: center; color: var(--accent-green); font-weight: bold; font-size: 13px; padding: 10px; background: rgba(46,204,113,0.1); border-radius: 8px;">✅ Ты вписан в состав</div>`}
-                        ${isCreator ? `<button class="btn btn-danger" style="padding: 10px; font-size: 13px; flex: 1.5; background: #8b0000;" onclick="cancelMeeting('${m.id}')">🚪 Отменить</button>` : ''}
-                        <button class="btn btn-danger" style="padding: 10px; font-size: 13px; flex: 1; background: #261616; color: var(--accent-red);" onclick="reportDescription('${m.creator}', '${m.id}')">⚠ ЖБ</button>
+                    <p style="margin:6px 0; font-size:13px;"><b>Место:</b> ${m.exactPlace}</p>
+                    <p style="margin:6px 0; font-size:13px;"><b>Время:</b> ${m.time}</p>
+                    <p style="margin:6px 0; font-size:12px; color:var(--text-muted);">${m.desc}</p>
+                    <div style="font-size:11px; margin-top:8px; color:#a4b0be;"><b>Условия:</b> ${m.composition} | ${m.ageLimit}</div>
+                    
+                    <div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:5px;">
+                        ${membersHTML}
+                    </div>
+
+                    ${checkInBtnHTML}
+                    ${reviewButtonsHTML}
+
+                    <div style="margin-top:12px; display:flex; gap:8px;">
+                        ${!isMember && !isCreator ? `<button class="btn btn-primary" style="padding:10px; font-size:12px; flex:1;" onclick="joinMeeting('${m.id}')">Присоединиться</button>` : ''}
+                        ${isCreator ? `<button class="btn btn-danger" style="padding:10px; font-size:12px; flex:1;" onclick="deleteMeeting('${m.id}')">Удалить сходку</button>` : ''}
                     </div>
                 `;
                 container.appendChild(card);
             });
         }
 
-        window.joinMeeting = async function(id) {
-            const m = meetings.find(item => item.id === id); 
-            if (!m) return;
+        window.joinMeeting = function(id) {
+            const userCreatedActive = meetings.some(m => m.creator === myUsername && m.status === 'active');
+            const userJoinedActive = meetings.some(m => m.members.includes(myUsername) && m.status === 'active');
 
-            const minAge = m.ageFrom || 11;
-            const maxAge = m.ageTo || 35;
-
-            if (activeAge < minAge || activeAge > maxAge || activeAge < 11 || activeAge > 35) {
-                alert(`❌ Доступ закрыт! Эта сходка только для возраста от ${minAge} до ${maxAge} лет. Твой возраст: ${activeAge} л.`);
+            if (userCreatedActive || userJoinedActive) {
+                alert("❌ Вы уже участвуете в другой сходке или создали свою. Нельзя совмещать!");
                 return;
             }
 
-            const isCreator = (m.creator === myUsername);
-
-            if (!isCreator && m.compositionMode === 'gender') {
-                const targetGirls = parseInt(m.girlsCount) || 0;
-                const targetGuys = parseInt(m.guysCount) || 0;
-                
-                if (targetGuys === 0 && targetGirls > 0 && activeGender === 'Парень') {
-                    alert("❌ Эта сходка создана только для девушек! Парням вход заблокирован.");
-                    return;
-                }
-                if (targetGirls === 0 && targetGuys > 0 && activeGender === 'Девушка') {
-                    alert("❌ Эта сходка создана только для парней! Девушкам вход заблокирован.");
-                    return;
-                }
+            const m = meetings.find(item => item.id === id);
+            if (m) {
+                m.members.push(myUsername);
+                saveMeetingsToServer();
+                renderMeetings();
+                alert("✅ Вы успешно присоединились к сбору!");
             }
-
-            if (m.members.includes(myUsername)) {
-                alert("Ты уже вписался в эту компанию!");
-                return;
-            }
-
-            m.members.push(myUsername);
-
-            if (!archive.some(item => item.id === id)) {
-                archive.unshift(m);
-                localStorage.setItem('gr_archive_2026', JSON.stringify(archive));
-            }
-            
-            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
-            await saveMeetingsToServer();
-
-            alert(`✅ Ты вписался в сходку! Создатель (@${m.creator}) видит твой ник.`);
-            renderAll();
         };
 
-        window.cancelMeeting = async function(id) {
-            if (!confirm("Отменить и удалить этот сбор?")) return;
-            
-            meetings = meetings.filter(item => item.id !== id);
-            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
-            
-            try {
-                await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': API_KEY
-                    },
-                    body: JSON.stringify({ meetings: meetings })
-                });
-            } catch (e) {
-                console.error("Ошибка при удалении с сервера:", e);
+        window.checkInMeeting = function(id) {
+            const m = meetings.find(item => item.id === id);
+            if (m && !m.checkedInUsers.includes(myUsername)) {
+                m.checkedInUsers.push(myUsername);
+                // Если абсолютно все участники нажали чекин
+                if (m.checkedInUsers.length === m.members.length) {
+                    m.allCheckedAt = Date.now();
+                    alert("🎉 Все участники на месте! Никнеймы участников теперь открыты.");
+                } else {
+                    alert("📍 Отметка «Я на месте» засчитана!");
+                }
+                saveMeetingsToServer();
+                renderMeetings();
             }
-            
-            alert("Сход успешно отменен и удален!");
-            renderAll();
         };
 
-        window.reportDescription = function(username, meetingId) {
-            const reason = prompt("Причина жалобы (Мат, неадекватность):");
+        window.deleteMeeting = function(id) {
+            if (confirm("Вы уверены, что хотите удалить сходку?")) {
+                meetings = meetings.filter(item => item.id !== id);
+                saveMeetingsToServer();
+                renderMeetings();
+                alert("Сходка удалена.");
+            }
+        };
+
+        window.rateMeeting = function(id, type) {
+            if (type === 'like') {
+                myRating += 2;
+                alert("👍 Вы поставили лайк! Создателю начислено +2 балла рейтинга.");
+            } else {
+                myRating -= 3;
+                alert("👎 Вы поставили дизлайк. Создателю снято 3 балла рейтинга.");
+            }
+            localStorage.setItem('user_rating', myRating);
+            updateStatusHeader();
+        };
+
+        window.reportMeeting = function(id) {
+            const reason = prompt("Укажите причину жалобы (например: неадекватное поведение, обман по возрасту):");
             if (!reason) return;
-            complaints.unshift({ id: Date.now(), violator: username, type: "Жалоба на описание", reason: reason, meetingId: meetingId });
-            localStorage.setItem('gr_complaints_2026', JSON.stringify(complaints));
-            alert("Жалоба отправлена!");
-            renderAll();
-        };
-
-        function renderArchiveList() {
-            const container = document.getElementById('archive-list');
-            const empty = document.getElementById('archive-empty-state');
-            if(!container) return; container.innerHTML = '';
-            if (archive.length === 0) { if (empty) empty.style.display = 'block'; return; }
-            if (empty) empty.style.display = 'none';
-
-            archive.forEach(m => {
-                const card = document.createElement('div'); card.className = 'card';
-                card.innerHTML = `<strong style="color: var(--accent-green);">📍 Район: ${m.district}</strong>
-                    <p style="margin: 5px 0; font-size: 13px;"><b>Место:</b> ${m.exactPlace}</p>
-                    <p style="margin: 5px 0 10px 0; font-size: 12px; color: var(--text-muted);">Организатор: @${m.creator || 'Аноним'}</p>`;
-                container.appendChild(card);
+            complaints.push({
+                type: "Жалоба на сходку",
+                violator: myUsername,
+                reason: reason
             });
-        }
-
-        function renderViolators() {
-            const list = document.getElementById('violators-list');
-            const empty = document.getElementById('admin-empty-state');
-            if (!list) return; list.innerHTML = '';
-            if (complaints.length === 0) { if (empty) empty.style.display = 'block'; return; }
-            if (empty) empty.style.display = 'none';
-
-            complaints.forEach((c, idx) => {
-                const item = document.createElement('div'); item.className = 'violator-item';
-                item.innerHTML = `
-                    <div style="font-size: 11px; color: var(--accent); text-transform: uppercase; font-weight: bold; margin-bottom: 4px;">${c.type}</div>
-                    <p style="margin: 0 0 4px 0;">👤 <b>Нарушитель:</b> @${c.violator}</p>
-                    <p style="margin: 0 0 12px 0; font-size: 13px; color: #ff8a80;">⚠️ <b>Суть:</b> ${c.reason}</p>
-                    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                        <button class="btn btn-primary" style="padding: 7px 10px; font-size: 11px; flex: 2;" onclick="copyUltimatum('${c.violator}')">📋 Ультиматум</button>
-                        <button class="btn btn-success" style="padding: 7px 10px; font-size: 11px; flex: 1;" onclick="adminCloseCase(${idx}, true)">Оправдать</button>
-                        <button class="btn btn-danger" style="padding: 7px 10px; font-size: 11px; flex: 1;" onclick="adminCloseCase(${idx}, false)">БАН</button>
-                    </div>
-                `;
-                list.appendChild(item);
-            });
-        }
-
-        window.adminCloseCase = function(index, approved) {
-            alert(approved ? "Дело закрыто. Пользователь оправдан." : "Нарушителю выдан БАН.");
-            complaints.splice(index, 1); 
             localStorage.setItem('gr_complaints_2026', JSON.stringify(complaints));
-            renderAll();
+            myRating -= 5; // Штраф за жалобу
+            localStorage.setItem('user_rating', myRating);
+            updateStatusHeader();
+            alert("🚨 Жалоба отправлена администратору. Ваш рейтинг скорректирован.");
         };
 
-        window.copyUltimatum = function(username) {
-            const text = `ВНИМАНИЕ! На твой профиль поступила официальная жалоба.\n\nУ тебя есть выбор (выбери ОДИН вариант):\n1. ВИДЕО-КРУЖОК с лицом и фразой: „Grodno Run 2026“.\n2. Ссылка на открытый Instagram с био: „Grodno Run 2026“.`;
-            navigator.clipboard.writeText(text).then(() => alert(`Ультиматум для @${username} скопирован!`));
-        };
+        // Инициализация при старте
+        window.addEventListener('load', () => {
+            initAudioEngine();
+            if (activeGender && activeAge > 0) {
+                document.getElementById('screen-auth').classList.remove('active');
+                document.getElementById('screen-main').classList.add('active');
+                updateStatusHeader();
+                initLeafletMap();
+                loadMeetingsFromServer();
+            } else {
+                initLeafletMap();
+            }
+        });
     </script>
 </body>
 </html>
