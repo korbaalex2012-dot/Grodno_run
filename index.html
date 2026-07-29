@@ -916,7 +916,7 @@
             });
         }
 
-                function renderMeetingsList() {
+                       function renderMeetingsList() {
             const container = document.getElementById('radar-list');
             const emptyMsg = document.getElementById('empty-state-msg');
             if (!container) return;
@@ -929,25 +929,21 @@
                 const isMember = m.members.includes(myUsername);
                 const isMemberOrCreator = isMember || isCreator;
 
-                // ЖЕСТКАЯ ФИЛЬТРАЦИЯ ПО ПОЛУ НА РАДАРЕ:
+                // СТРОГАЯ ФИЛЬТРАЦИЯ НА РАДАРЕ ПО ПОЛУ
                 if (m.compositionMode === 'gender' && !isMemberOrCreator) {
                     const targetGirls = parseInt(m.girlsCount) || 0;
                     const targetGuys = parseInt(m.guysCount) || 0;
                     
-                    // Если ищут ТОЛЬКО девушек (пацанов 0), а смотрящий — парень -> скрываем карточку
                     if (targetGuys === 0 && targetGirls > 0 && activeGender === 'Парень') {
                         return false;
                     }
-                    // Если ищут ТОЛЬКО пацанов (девушек 0), а смотрящая — девушка -> скрываем карточку
                     if (targetGirls === 0 && targetGuys > 0 && activeGender === 'Девушка') {
                         return false;
                     }
                 }
 
-                // Считаем участников БЕЗ УЧЕТА создателя (если создатель находится в списке)
                 const realMembersCount = m.members.filter(user => user !== m.creator).length;
 
-                // Проверка лимитов для скрытия заполненных карточек от посторонних
                 if (m.compositionMode === 'limit') {
                     const maxP = parseInt(m.maxPeople);
                     if (!isNaN(maxP) && realMembersCount >= maxP && !isMemberOrCreator) {
@@ -974,10 +970,10 @@
             filtered.forEach(m => {
                 const card = document.createElement('div');
                 card.className = `card status-planning`;
-                const isCreator = m.creator === myUsername || myUsername === "Grodno_User";
+                
+                const isCreator = (m.creator === myUsername);
                 const isAlreadyJoined = m.members.includes(myUsername);
                 
-                // Делаем список участников кликабельными ссылками на Telegram-аккаунты
                 const membersLinks = m.members.map(user => `<a href="https://t.me/${user}" target="_blank" style="color: var(--accent); text-decoration: none;">@${user}</a>`).join(', ');
 
                 card.innerHTML = `
@@ -1015,16 +1011,15 @@
                 return;
             }
 
-            // Абсолютная блокировка входа для несовпадающего пола
             if (m.compositionMode === 'gender') {
                 const targetGirls = parseInt(m.girlsCount) || 0;
                 const targetGuys = parseInt(m.guysCount) || 0;
                 
-                if (activeGender === 'Парень' && targetGuys === 0 && targetGirls > 0) {
+                if (targetGuys === 0 && targetGirls > 0 && activeGender === 'Парень') {
                     alert("❌ Эта сходка создана только для девушек! Парням вход заблокирован.");
                     return;
                 }
-                if (activeGender === 'Девушка' && targetGirls === 0 && targetGuys > 0) {
+                if (targetGirls === 0 && targetGuys > 0 && activeGender === 'Девушка') {
                     alert("❌ Эта сходка создана только для парней! Девушкам вход заблокирован.");
                     return;
                 }
@@ -1049,6 +1044,14 @@
             renderAll();
         };
 
+        window.cancelMeeting = async function(id) {
+            if (!confirm("Отменить и удалить этот сбор?")) return;
+            meetings = meetings.filter(item => item.id !== id);
+            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
+            await saveMeetingsToServer();
+            alert("Сход успешно отменен!");
+            renderAll();
+        };       
         window.reportDescription = function(username, meetingId) {
             const reason = prompt("Причина жалобы (Мат, неадекватность):");
             if (!reason) return;
