@@ -125,7 +125,7 @@
     </style>
 </head>
 <body>
-        <audio id="bg-audio"></audio>
+    <audio id="bg-audio"></audio>
 
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: rgba(15, 15, 27, 0.7); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); padding: 12px 16px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
         <div>
@@ -198,8 +198,7 @@
             <div id="empty-state-msg" class="empty-state">На радаре пока пусто... Запусти движ сам!</div>
             <div id="radar-list"></div>
         </div>
-
-        <div id="sub-create" class="sub-screen">
+                <div id="sub-create" class="sub-screen">
             <h2>➕ Запустить сбор</h2>
             <p class="subtitle">Отметь локацию на общем радаре Гродно</p>
             <div class="card" style="border-top: 4px solid var(--accent);">
@@ -216,7 +215,7 @@
                         <option value="БЛК / Форты">БЛК / Форты</option>
                     </select>
                 </div>
-                                <div class="form-group">
+                <div class="form-group">
                     <label>🔥 Категория встреч:</label>
                     <style>
                         .cyber-tag-btn {
@@ -517,7 +516,8 @@
                 console.error("Ошибка сохранения на сервер:", e);
             }
         }
-                    const audio = document.getElementById('bg-audio');
+
+        const audio = document.getElementById('bg-audio');
         const musicBtn = document.getElementById('btn-music-toggle');
         const musicUpload = document.getElementById('music-upload');
         const badge = document.getElementById('track-queue-badge');
@@ -723,7 +723,8 @@
             updateStatusHeader();
             alert(`Возраст обновлен: ${activeAge} лет`);
         };
-                    document.addEventListener('DOMContentLoaded', async () => {
+
+        document.addEventListener('DOMContentLoaded', async () => {
             if (localStorage.getItem('user_registered_v2') === 'true') {
                 document.getElementById('screen-auth')?.classList.remove('active');
                 const authScr = document.getElementById('screen-auth');
@@ -801,7 +802,7 @@
                 mainScreen.style.display = 'block';
             }
 
-            updateStatusHeader(); 
+                   UpdateStatusHeader(); 
             renderAll();
             setTimeout(() => { if (typeof initLeafletMap === 'function') initLeafletMap(); }, 200);
         });
@@ -916,7 +917,7 @@
             });
         }
 
-                       function renderMeetingsList() {
+        function renderMeetingsList() {
             const container = document.getElementById('radar-list');
             const emptyMsg = document.getElementById('empty-state-msg');
             if (!container) return;
@@ -929,7 +930,6 @@
                 const isMember = m.members.includes(myUsername);
                 const isMemberOrCreator = isMember || isCreator;
 
-                // СТРОГАЯ ФИЛЬТРАЦИЯ НА РАДАРЕ ПО ПОЛУ
                 if (m.compositionMode === 'gender' && !isMemberOrCreator) {
                     const targetGirls = parseInt(m.girlsCount) || 0;
                     const targetGuys = parseInt(m.guysCount) || 0;
@@ -999,7 +999,7 @@
             });
         }
 
-                window.joinMeeting = async function(id) {
+        window.joinMeeting = async function(id) {
             const m = meetings.find(item => item.id === id); 
             if (!m) return;
 
@@ -1011,20 +1011,16 @@
                 return;
             }
 
-            // Если ты создатель этой сходки, тебе можно всё (включая управление своей компанией)
             const isCreator = (m.creator === myUsername);
 
-            // Проверка пола работает ТОЛЬКО для тех, кто пытается вписаться со стороны (не для создателя)
             if (!isCreator && m.compositionMode === 'gender') {
                 const targetGirls = parseInt(m.girlsCount) || 0;
                 const targetGuys = parseInt(m.guysCount) || 0;
                 
-                // Если парней в поиске 0, а девушек больше 0 -> постороннему парню вход закрыт
                 if (targetGuys === 0 && targetGirls > 0 && activeGender === 'Парень') {
                     alert("❌ Эта сходка создана только для девушек! Парням вход заблокирован.");
                     return;
                 }
-                // Если девушек в поиске 0, а парней больше 0 -> посторонней девушке вход закрыт
                 if (targetGirls === 0 && targetGuys > 0 && activeGender === 'Девушка') {
                     alert("❌ Эта сходка создана только для парней! Девушкам вход заблокирован.");
                     return;
@@ -1049,16 +1045,13 @@
             alert(`✅ Ты вписался в сходку! Создатель (@${m.creator}) видит твой ник.`);
             renderAll();
         };
-               window.cancelMeeting = async function(id) {
+
+        window.cancelMeeting = async function(id) {
             if (!confirm("Отменить и удалить этот сбор?")) return;
             
-            // 1. Сразу убираем из локального массива
             meetings = meetings.filter(item => item.id !== id);
-            
-            // 2. Обновляем localStorage
             localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
             
-            // 3. Отправляем обновленный пустой/обрезанный список на сервер и ждем завершения
             try {
                 await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                     method: 'PUT',
@@ -1073,8 +1066,6 @@
             }
             
             alert("Сход успешно отменен и удален!");
-            
-            // 4. Перерисовываем интерфейс
             renderAll();
         };
 
@@ -1126,12 +1117,7 @@
             });
         }
 
-        window.copyUltimatum = function(username) {
-            const text = `ВНИМАНИЕ! На твой профиль поступила официальная жалоба.\n\nУ тебя есть выбор (выбери ОДИН вариант):\n1. ВИДЕО-КРУЖОК с лицом и фразой: „Grodno Run 2026“.\n2. Ссылка на открытый Instagram с био: „Grodno Run 2026“.`;
-            navigator.clipboard.writeText(text).then(() => alert(`Ультиматум для @${username} скопирован!`));
-        };
-
-                window.adminCloseCase = function(index, approved) {
+        window.adminCloseCase = function(index, approved) {
             alert(approved ? "Дело закрыто. Пользователь оправдан." : "Нарушителю выдан БАН.");
             complaints.splice(index, 1); 
             localStorage.setItem('gr_complaints_2026', JSON.stringify(complaints));
