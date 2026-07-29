@@ -394,52 +394,94 @@
             <span style="font-size: 16px;">📜</span>Архив
         </button>
     </div>
-        <script>
+           <script>
         const BIN_ID = '6a68a3d7da38895dfe9b46cf';
         const API_KEY = '$2a$10$fCuDEyphx80p7hlYAPd8C.W8S8fZv53sNq6UhpL8m/Oot7eVvdScu';
         const MY_TELEGRAM_ID = 6949963047;
 
-        // Расширенные точки для каждого района под конкретные категории
+        // Точки под каждую категорию для каждого района Гродно
         const grodnoLocationsData = {
             'Центр (Советская)': [
-                { name: 'У Танка', category: '🚶‍♂️ Прогулка', coords: [53.6800, 23.8303], desc: 'Легендарное место сбора в центре' },
-                { name: 'Возле Фары', category: '🚶‍♂️ Прогулка', coords: [53.6785, 23.8340], desc: 'Территория у Фарного костела' },
-                { name: 'Драмтеатр', category: '🚶‍♂️ Прогулка', coords: [53.6748, 23.8290], desc: 'Смотровая площадка на Неман' },
-                { name: 'Коробка на Социалистической', category: '⚽ Футбол', coords: [53.6820, 23.8310], desc: 'Площадка для футбола' },
-                { name: 'Корт у Жилибера', category: '🏀 Баскетбол', coords: [53.6810, 23.8360], desc: 'Баскетбольная площадка' },
-                { name: 'Настольный теннис в парке', category: '🏓 Наст. теннис', coords: [53.6815, 23.8350], desc: 'Столы для тенниса' },
-                { name: 'Клуб настолок', category: '🎮 Гейминг', coords: [53.6790, 23.8320], desc: 'Место для геймеров' }
+                { name: 'У Танка', category: '🚶‍♂️ Прогулка', coords: [53.6800, 23.8303], desc: 'Легендарное место сбора' },
+                { name: 'Возле Фары', category: '🚶‍♂️ Прогулка', coords: [53.6785, 23.8340], desc: 'У Фарного костела' },
+                { name: 'Драмтеатр', category: '🚶‍♂️ Прогулка', coords: [53.6748, 23.8290], desc: 'Смотровая на Неман' },
+                { name: 'Коробка на Социалистической', category: '⚽ Футбол', coords: [53.6820, 23.8310], desc: 'Футбольная площадка' },
+                { name: 'Корт у Жилибера', category: '🏀 Баскетбол', coords: [53.6810, 23.8360], desc: 'Баскетбол' },
+                { name: 'Волейбольная площадка в парке', category: '🏐 Волейбол', coords: [53.6805, 23.8335], desc: 'Сетка' },
+                { name: 'Настольный теннис в парке', category: '🏓 Наст. теннис', coords: [53.6815, 23.8350], desc: 'Столы' },
+                { name: 'Воркаут у Коложи', category: '🏋️‍♂️ Турники / Бег', coords: [53.6760, 23.8240], desc: 'Турники' },
+                { name: 'Велостарт на Советской', category: '🚲 Велик', coords: [53.6780, 23.8320], desc: 'Велосипеды' },
+                { name: 'Клуб настолок в центре', category: '🎮 Гейминг', coords: [53.6790, 23.8320], desc: 'Гейминг' }
             ],
             'ТЦ Тринити': [
-                { name: 'Главный вход', category: '🚶‍♂️ Прогулка', coords: [53.6492, 23.8395], desc: 'Уличная площадка у входа в ТЦ' },
-                { name: 'Фуд-корт (3 этаж)', category: '🎮 Гейминг', coords: [53.6492, 23.8395], desc: 'Зона отдыха и гейминга' },
-                { name: 'Ледовая арена', category: '🏋️‍♂️ Турники / Бег', coords: [53.6510, 23.8420], desc: 'Турники и воркаут' }
+                { name: 'Главный вход Тринити', category: '🚶‍♂️ Прогулка', coords: [53.6492, 23.8395], desc: 'У входа' },
+                { name: 'Футбольное поле у Тринити', category: '⚽ Футбол', coords: [53.6500, 23.8410], desc: 'Мини-стадион' },
+                { name: 'Баскет зона Тринити', category: '🏀 Баскетбол', coords: [53.6505, 23.8385], desc: 'Кольцо' },
+                { name: 'Волейбол у арены', category: '🏐 Волейбол', coords: [53.6515, 23.8430], desc: 'Сетка' },
+                { name: 'Теннисный стол у ТЦ', category: '🏓 Наст. теннис', coords: [53.6495, 23.8400], desc: 'Стол' },
+                { name: 'Ледовая арена (воркаут)', category: '🏋️‍♂️ Турники / Бег', coords: [53.6510, 23.8420], desc: 'Турники' },
+                { name: 'Велопарковка ТЦ', category: '🚲 Велик', coords: [53.6490, 23.8390], desc: 'Вело-сбор' },
+                { name: 'Фуд-корт (гейминг)', category: '🎮 Гейминг', coords: [53.6492, 23.8395], desc: 'Гейминг' }
             ],
             'OldCity (Олд Сити)': [
-                { name: 'У Замка (атриум)', category: '🚶‍♂️ Прогулка', coords: [53.6912, 23.8490], desc: 'Главный атриум торгового центра' },
-                { name: 'Парковка у входа', category: '🚲 Велик', coords: [53.6915, 23.8485], desc: 'Сбор велосипедистов' }
+                { name: 'У Замка (атриум)', category: '🚶‍♂️ Прогулка', coords: [53.6912, 23.8490], desc: 'Атриум ТЦ' },
+                { name: 'Коробка ОлдСити', category: '⚽ Футбол', coords: [53.6920, 23.8505], desc: 'Футбол' },
+                { name: 'Баскетбол у ОлдСити', category: '🏀 Баскетбол', coords: [53.6905, 23.8475], desc: 'Кольцо' },
+                { name: 'Волейбол OldCity', category: '🏐 Волейбол', coords: [53.6925, 23.8480], desc: 'Волейбол' },
+                { name: 'Теннис возле ТЦ', category: '🏓 Наст. теннис', coords: [53.6910, 23.8495], desc: 'Стол' },
+                { name: 'Воркаут ОлдСити', category: '🏋️‍♂️ Турники / Бег', coords: [53.6930, 23.8510], desc: 'Турники' },
+                { name: 'Парковка у входа (велик)', category: '🚲 Велик', coords: [53.6915, 23.8485], desc: 'Велик' },
+                { name: 'Игровая зона ТЦ', category: '🎮 Гейминг', coords: [53.6912, 23.8490], desc: 'Гейминг' }
             ],
             'Ольшанка': [
-                { name: 'ТЦ Стелла', category: '🚶‍♂️ Прогулка', coords: [53.6280, 23.7850], desc: 'Центр микрорайона' },
-                { name: 'Стадион 41-й школы', category: '⚽ Футбол', coords: [53.6265, 23.7890], desc: 'Футбольная коробка' },
-                { name: 'Площадка у школы', category: '🏀 Баскетбол', coords: [53.6270, 23.7880], desc: 'Баскетбол' }
+                { name: 'ТЦ Стелла', category: '🚶‍♂️ Прогулка', coords: [53.6280, 23.7850], desc: 'Центр' },
+                { name: 'Стадион 41-й школы', category: '⚽ Футбол', coords: [53.6265, 23.7890], desc: 'Футбол' },
+                { name: 'Баскетбол Ольшанка', category: '🏀 Баскетбол', coords: [53.6270, 23.7880], desc: 'Баскетбол' },
+                { name: 'Волейбол Ольшанка', category: '🏐 Волейбол', coords: [53.6255, 23.7870], desc: 'Сетка' },
+                { name: 'Теннис Ольшанка', category: '🏓 Наст. теннис', coords: [53.6275, 23.7860], desc: 'Стол' },
+                { name: 'Воркаут Ольшанка', category: '🏋️‍♂️ Турники / Бег', coords: [53.6285, 23.7900], desc: 'Турники' },
+                { name: 'Велодорожка Ольшанка', category: '🚲 Велик', coords: [53.6260, 23.7840], desc: 'Велосипеды' },
+                { name: 'Гейминг Ольшанка', category: '🎮 Гейминг', coords: [53.6280, 23.7850], desc: 'Гейминг' }
             ],
             'Девятовка': [
-                { name: 'ТЦ Лимож', category: '🚶‍♂️ Прогулка', coords: [53.7020, 23.8550], desc: 'Площадь у торгового центра' },
-                { name: 'Стадион 27-й школы', category: '⚽ Футбол', coords: [53.6980, 23.8600], desc: 'Спортивная коробка для футбола' }
+                { name: 'ТЦ Лимож', category: '🚶‍♂️ Прогулка', coords: [53.7020, 23.8550], desc: 'Площадь' },
+                { name: 'Стадион 27-й школы', category: '⚽ Футбол', coords: [53.6980, 23.8600], desc: 'Футбол' },
+                { name: 'Баскетбол Девятовка', category: '🏀 Баскетбол', coords: [53.7010, 23.8570], desc: 'Кольца' },
+                { name: 'Волейбол Девятовка', category: '🏐 Волейбол', coords: [53.6995, 23.8585], desc: 'Волейбол' },
+                { name: 'Теннис Девятовка', category: '🏓 Наст. теннис', coords: [53.7025, 23.8540], desc: 'Теннис' },
+                { name: 'Турники Девятовка', category: '🏋️‍♂️ Турники / Бег', coords: [53.7030, 23.8560], desc: 'Воркаут' },
+                { name: 'Вело-сбор Лимож', category: '🚲 Велик', coords: [53.7020, 23.8550], desc: 'Велик' },
+                { name: 'Гейминг Девятовка', category: '🎮 Гейминг', coords: [53.7015, 23.8545], desc: 'Гейминг' }
             ],
             'Грандичи': [
-                { name: 'Евроопт (Грандичи-3)', category: '🚶‍♂️ Прогулка', coords: [53.7150, 23.8680], desc: 'Главная точка сбора района' },
-                { name: 'Школа №42', category: '⚽ Футбол', coords: [53.7130, 23.8650], desc: 'Футбольное поле' }
+                { name: 'Евроопт (Грандичи-3)', category: '🚶‍♂️ Прогулка', coords: [53.7150, 23.8680], desc: 'Сбор' },
+                { name: 'Школа №42 (футбол)', category: '⚽ Футбол', coords: [53.7130, 23.8650], desc: 'Футбол' },
+                { name: 'Баскетбол Грандичи', category: '🏀 Баскетбол', coords: [53.7140, 23.8670], desc: 'Баскетбол' },
+                { name: 'Волейбол Грандичи', category: '🏐 Волейбол', coords: [53.7160, 23.8660], desc: 'Волейбол' },
+                { name: 'Теннис Грандичи', category: '🏓 Наст. теннис', coords: [53.7145, 23.8690], desc: 'Теннис' },
+                { name: 'Воркаут Грандичи', category: '🏋️‍♂️ Турники / Бег', coords: [53.7135, 23.8640], desc: 'Турники' },
+                { name: 'Вело Грандичи', category: '🚲 Велик', coords: [53.7150, 23.8680], desc: 'Велик' },
+                { name: 'Гейминг Грандичи', category: '🎮 Гейминг', coords: [53.7155, 23.8675], desc: 'Гейминг' }
             ],
             'Пышки (Парк)': [
-                { name: 'Тропа здоровья (вход)', category: '🏋️‍♂️ Турники / Бег', coords: [53.6850, 23.7950], desc: 'Начало для бега и турников' },
-                { name: 'Велодорожка Пышки', category: '🚲 Велик', coords: [53.6840, 23.7980], desc: 'Основной маршрут для велосипедистов' }
+                { name: 'Тропа здоровья (вход)', category: '🚶‍♂️ Прогулка', coords: [53.6850, 23.7950], desc: 'Парк' },
+                { name: 'Поляна для футбола в Пышках', category: '⚽ Футбол', coords: [53.6860, 23.7930], desc: 'Футбол' },
+                { name: 'Баскет Пышки', category: '🏀 Баскетбол', coords: [53.6845, 23.7960], desc: 'Баскетбол' },
+                { name: 'Волейбол в Пышках', category: '🏐 Волейбол', coords: [53.6865, 23.7940], desc: 'Волейбол' },
+                { name: 'Теннисные столы Пышки', category: '🏓 Наст. теннис', coords: [53.6835, 23.7970], desc: 'Теннис' },
+                { name: 'Тропа здоровья (турники)', category: '🏋️‍♂️ Турники / Бег', coords: [53.6850, 23.7950], desc: 'Турники' },
+                { name: 'Велодорожка Пышки', category: '🚲 Велик', coords: [53.6840, 23.7980], desc: 'Велик' },
+                { name: 'Гейминг зона Пышки', category: '🎮 Гейминг', coords: [53.6855, 23.7955], desc: 'Гейминг' }
             ],
             'БЛК / Форты': [
-                { name: 'Мини-рынок Форты', category: '🚶‍♂️ Прогулка', coords: [53.6920, 23.8150], desc: 'Торговая площадка' },
-                { name: 'Стадион «Красное Знамя» (КЗ)', category: '⚽ Футбол', coords: [53.6950, 23.8100], desc: 'Легендарный стадион для футбола' },
-                { name: 'Турники на БЛК', category: '🏋️‍♂️ Турники / Бег', coords: [53.6930, 23.8120], desc: 'Воркаут площадка' }
+                { name: 'Мини-рынок Форты', category: '🚶‍♂️ Прогулка', coords: [53.6920, 23.8150], desc: 'Рынок' },
+                { name: 'Стадион «Красное Знамя» (КЗ)', category: '⚽ Футбол', coords: [53.6950, 23.8100], desc: 'Футбол' },
+                { name: 'Баскетбол БЛК', category: '🏀 Баскетбол', coords: [53.6910, 23.8130], desc: 'Кольца' },
+                { name: 'Волейбол Форты', category: '🏐 Волейбол', coords: [53.6935, 23.8140], desc: 'Волейбол' },
+                { name: 'Теннис БЛК', category: '🏓 Наст. теннис', coords: [53.6925, 23.8115], desc: 'Столы' },
+                { name: 'Турники на БЛК', category: '🏋️‍♂️ Турники / Бег', coords: [53.6930, 23.8120], desc: 'Воркаут' },
+                { name: 'Вело БЛК', category: '🚲 Велик', coords: [53.6940, 23.8105], desc: 'Велик' },
+                { name: 'Гейминг Форты', category: '🎮 Гейминг', coords: [53.6915, 23.8145], desc: 'Гейминг' }
             ]
         };
 
@@ -460,8 +502,17 @@
         let archive = JSON.parse(localStorage.getItem('gr_archive_2026')) || [];
         let complaints = JSON.parse(localStorage.getItem('gr_complaints_2026')) || [];
 
-        let activeGender = localStorage.getItem('user_gender') || "";
-        let activeAge = parseInt(localStorage.getItem('user_age')) || 0;
+        let activeGender = localStorage.getItem('user_gender');
+        let activeAge = parseInt(localStorage.getItem('user_age'));
+
+        if (!activeGender || isNaN(activeAge)) {
+            activeGender = "Парень";
+            activeAge = 13;
+            localStorage.setItem('user_gender', activeGender);
+            localStorage.setItem('user_age', activeAge);
+            localStorage.setItem('user_registered', 'true');
+        }
+
         let currentDistrictFilter = "all";
         let mapInstance = null;
         let mapMarkers = [];
@@ -477,24 +528,17 @@
                     meetings = data.record.meetings;
                     localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
                 }
-            } catch (e) {
-                console.error("Ошибка загрузки радара:", e);
-            }
+            } catch (e) { console.error(e); }
         }
 
         async function saveMeetingsToServer() {
             try {
                 await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                     method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': API_KEY
-                    },
+                    headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
                     body: JSON.stringify({ meetings: meetings })
                 });
-            } catch (e) {
-                console.error("Ошибка сохранения на сервер:", e);
-            }
+            } catch (e) { console.error(e); }
         }
 
         const audio = document.getElementById('bg-audio');
@@ -506,16 +550,9 @@
 
         function initAudioEngine() {
             musicBtn?.addEventListener('click', () => {
-                if (playlistUrls.length === 0) {
-                    alert("Добавь треки через кнопку '➕ ТРЕК'!");
-                    return;
-                }
+                if (playlistUrls.length === 0) { alert("Добавь треки!"); return; }
                 if (audio.paused) { playCurrentTrack(); } 
-                else {
-                    audio.pause();
-                    musicBtn.innerText = "🎵 OFF";
-                    musicBtn.style.color = "var(--text-muted)";
-                }
+                else { audio.pause(); musicBtn.innerText = "🎵 OFF"; musicBtn.style.color = "var(--text-muted)"; }
             });
 
             musicUpload?.addEventListener('change', (e) => {
@@ -546,28 +583,18 @@
 
         function updateStatusHeader() {
             const statusEl = document.getElementById('user-display-status');
-            if (statusEl) {
-                statusEl.innerText = `${activeGender}, ${activeAge} л. (@${myUsername}) 🛰 СЕТЬ`;
-            }
+            if (statusEl) statusEl.innerText = `${activeGender}, ${activeAge} л. (@${myUsername}) 🛰 СЕТЬ`;
         }
 
         function initLeafletMap() {
             if (mapInstance) return;
             const grodnoBounds = L.latLngBounds([53.55, 23.65], [53.78, 24.00]);
             mapInstance = L.map('grodno-leaflet-map', {
-                zoomControl: true,
-                attributionControl: false,
-                maxBounds: grodnoBounds,
-                maxBoundsViscosity: 1.0,
-                minZoom: 12,
-                maxZoom: 17
+                zoomControl: true, attributionControl: false,
+                maxBounds: grodnoBounds, maxBoundsViscosity: 1.0, minZoom: 12, maxZoom: 17
             }).setView([53.6768, 23.8303], 13);
 
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                maxZoom: 19,
-                subdomains: 'abcd'
-            }).addTo(mapInstance);
-
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 19, subdomains: 'abcd' }).addTo(mapInstance);
             renderMapMarkers();
         }
 
@@ -582,39 +609,21 @@
                 const points = grodnoLocationsData[districtName];
                 points.forEach(pt => {
                     if (pt.category !== activeCategory) return;
-
                     const circleMarker = L.circleMarker(pt.coords, {
-                        radius: 7,
-                        fillColor: '#00a2ff',
-                        color: '#fff',
-                        weight: 1.5,
-                        opacity: 1,
-                        fillOpacity: 0.85
+                        radius: 7, fillColor: '#00a2ff', color: '#fff', weight: 1.5, opacity: 1, fillOpacity: 0.85
                     }).addTo(mapInstance);
 
-                    circleMarker.bindPopup(`
-                        <div style="color: #000; font-family: sans-serif; font-size: 12px;">
-                            <b style="color: #00a2ff;">${districtName}</b><br>
-                            <b>${pt.name}</b><br>
-                            <span style="color: #555;">${pt.desc}</span>
-                        </div>
-                    `);
-
+                    circleMarker.bindPopup(`<div style="color: #000; font-size: 12px;"><b style="color: #00a2ff;">${districtName}</b><br><b>${pt.name}</b></div>`);
                     circleMarker.on('click', () => {
-                        const exactPlaceInput = document.getElementById('create-exact-place');
-                        const districtSelect = document.getElementById('create-district');
-                        if (exactPlaceInput) exactPlaceInput.value = pt.name;
-                        if (districtSelect) {
-                            districtSelect.value = districtName;
-                            updatePlaceTags();
-                        }
+                        document.getElementById('create-exact-place').value = pt.name;
+                        document.getElementById('create-district').value = districtName;
+                        updatePlaceTags();
                     });
-
                     mapMarkers.push(circleMarker);
                 });
             });
         }
-                    function updatePlaceTags() {
+                       function updatePlaceTags() {
             const districtSelect = document.getElementById('create-district');
             const activeTagInput = document.querySelector('input[name="radar-tag"]:checked');
             if (!districtSelect) return;
@@ -637,7 +646,7 @@
             const filteredPoints = districtPoints.filter(pt => pt.category === currentTag);
             
             if (filteredPoints.length === 0) {
-                tagsContainer.innerHTML = '<span style="font-size: 11px; color: var(--text-muted);">Для этой категории в районе нет точек. Введите вручную.</span>';
+                tagsContainer.innerHTML = '<span style="font-size: 11px; color: var(--text-muted);">Нет точек. Введите вручную.</span>';
                 return;
             }
 
@@ -646,9 +655,7 @@
                 tagBtn.type = 'button';
                 tagBtn.innerText = placeObj.name;
                 tagBtn.style.cssText = 'background:rgba(255,255,255,0.05); color:#00a2ff; border:1px solid rgba(0,162,255,0.3); padding:5px 10px; border-radius:15px; font-size:11px; cursor:pointer; font-weight:600;';
-                tagBtn.addEventListener('click', () => {
-                    exactPlaceInput.value = placeObj.name;
-                });
+                tagBtn.addEventListener('click', () => { exactPlaceInput.value = placeObj.name; });
                 tagsContainer.appendChild(tagBtn);
             });
         }
@@ -657,20 +664,15 @@
             const timeType = document.querySelector('input[name="time-type"]:checked')?.value;
             const timePickerBlock = document.getElementById('time-picker-block');
             if (!timePickerBlock) return;
-            if (timeType === 'later') {
-                timePickerBlock.classList.remove('hidden');
-            } else {
-                timePickerBlock.classList.add('hidden');
-            }
+            if (timeType === 'later') timePickerBlock.classList.remove('hidden');
+            else timePickerBlock.classList.add('hidden');
         };
 
         window.setCompositionMode = function(mode) {
             currentCompositionMode = mode;
             const limitBlock = document.getElementById('mode-limit-block');
             const genderBlock = document.getElementById('mode-gender-block');
-            const buttons = document.querySelectorAll('#target-gender-selector .tag-chip-comp');
-            
-            buttons.forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('#target-gender-selector .tag-chip-comp').forEach(btn => btn.classList.remove('active'));
             
             if (mode === 'limit') {
                 document.querySelector('[data-mode="limit"]').classList.add('active');
@@ -687,21 +689,21 @@
             activeGender = activeGender === 'Парень' ? 'Девушка' : 'Парень';
             localStorage.setItem('user_gender', activeGender);
             updateStatusHeader();
-            alert(`Ваш пол изменен на: ${activeGender}`);
+            alert(`Пол изменен на: ${activeGender}`);
         };
 
         window.changeUserAgePrompt = function() {
-            const newAge = prompt("Введите ваш новый возраст (строго от 12 до 14 лет):", activeAge);
+            const newAge = prompt("Новый возраст (12–14 лет):", activeAge);
             if (!newAge) return;
             const parsedAge = parseInt(newAge);
             if (isNaN(parsedAge) || parsedAge < 12 || parsedAge > 14) {
-                alert("Возраст должен быть от 12 до 14 лет!");
+                alert("Возраст строго от 12 до 14 лет!");
                 return;
             }
             activeAge = parsedAge;
             localStorage.setItem('user_age', activeAge);
             updateStatusHeader();
-            alert(`Возраст обновлен: ${activeAge} лет`);
+            alert(`Возраст: ${activeAge}`);
         };
 
         document.addEventListener('DOMContentLoaded', async () => {
@@ -711,10 +713,7 @@
                 if (authScr) authScr.style.display = 'none';
 
                 const mainScr = document.getElementById('screen-main');
-                if (mainScr) {
-                    mainScr.classList.add('active');
-                    mainScr.style.display = 'block';
-                }
+                if (mainScr) { mainScr.classList.add('active'); mainScr.style.display = 'block'; }
                 updateStatusHeader();
                 await loadMeetingsFromServer();
                 renderAll();
@@ -730,7 +729,6 @@
                     adminNavBtn.className = 'nav-btn';
                     adminNavBtn.setAttribute('data-sub', 'sub-admin');
                     adminNavBtn.innerHTML = '<span style="font-size: 16px;">🚨</span>Админка';
-                    
                     adminNavBtn.addEventListener('click', () => {
                         document.querySelectorAll('.bottom-nav .nav-btn').forEach(b => b.classList.remove('active'));
                         document.querySelectorAll('.sub-screen').forEach(s => s.classList.remove('active'));
@@ -747,252 +745,12 @@
 
             document.getElementById('create-district')?.addEventListener('change', updatePlaceTags);
             document.querySelectorAll('input[name="radar-tag"]').forEach(radio => {
-                radio.addEventListener('change', () => {
-                    updatePlaceTags();
-                    renderMapMarkers();
-                });
+                radio.addEventListener('change', () => { updatePlaceTags(); renderMapMarkers(); });
             });
         });
-
-        // Кнопка авторизации с жесткой проверкой возраста (12, 13, 14 лет)
-        document.getElementById('btn-submit-auth')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            const gen = document.getElementById('auth-gender').value;
-            const age = parseInt(document.getElementById('auth-age').value);
-
-            if (!gen || isNaN(age) || age < 12 || age > 14) {
-                alert('Доступ строго от 12 до 14 лет! Укажите корректный возраст.');
-                return;
-            }
-
-            localStorage.setItem('user_gender', gen);
-            localStorage.setItem('user_age', age);
-            localStorage.setItem('user_registered', 'true');
-            activeGender = gen; 
-            activeAge = age;
-
-            const authScreen = document.getElementById('screen-auth');
-            const mainScreen = document.getElementById('screen-main');
-
-            if (authScreen) {
-                authScreen.classList.remove('active');
-                authScreen.style.display = 'none';
-            }
-            if (mainScreen) {
-                mainScreen.classList.add('active');
-                mainScreen.style.display = 'block';
-            }
-
-            updateStatusHeader(); 
-            renderAll();
-            setTimeout(() => { if (typeof initLeafletMap === 'function') initLeafletMap(); }, 200);
-        });
-
-        document.querySelectorAll('.bottom-nav .nav-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const targetSub = btn.getAttribute('data-sub');
-                document.querySelectorAll('.bottom-nav .nav-btn').forEach(b => b.classList.remove('active'));
-                document.querySelectorAll('.sub-screen').forEach(s => s.classList.remove('active'));
-                btn.classList.add('active');
-                document.getElementById(targetSub)?.classList.add('active');
-                renderAll();
-                if (targetSub === 'sub-radar') {
-                    setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 150);
-                }
-            });
-        });
-
-        document.querySelectorAll('#radar-filter-bar .filter-chip').forEach(chip => {
-            chip.addEventListener('click', () => {
-                document.querySelectorAll('#radar-filter-bar .filter-chip').forEach(c => c.classList.remove('active'));
-                chip.classList.add('active');
-                currentDistrictFilter = chip.getAttribute('data-filter');
-                renderMeetingsList();
-            });
-        });
-
-        document.getElementById('btn-launch-radar')?.addEventListener('click', async function(e) {
-            e.preventDefault();
-            
-            const district = document.getElementById('create-district')?.value || 'Не указан';
-            const exactPlace = document.getElementById('create-exact-place')?.value.trim();
-            const desc = document.getElementById('create-desc')?.value.trim() || 'Без описания';
-            
-            const girlsCount = currentCompositionMode === 'gender' ? (document.getElementById('count-girls')?.value || '0') : '0';
-            const guysCount = currentCompositionMode === 'gender' ? (document.getElementById('count-guys')?.value || '0') : '0';
-            const maxPeopleInput = currentCompositionMode === 'limit' ? (document.getElementById('create-max-people')?.value || 'Без лимита') : 'По составу (М/Ж)';
-
-            if (!exactPlace) {
-                alert('Укажите точное место встречи!');
-                return;
-            }
-
-            let timeText = '';
-            const timeType = document.querySelector('input[name="time-type"]:checked')?.value;
-            if (timeType === 'now') {
-                timeText = '⚡ СРОЧНО';
-            } else {
-                const hour = document.getElementById('create-hour')?.value || '12';
-                const minute = document.getElementById('create-minute')?.value || '00';
-                timeText = `${hour}:${minute}`;
-            }
-
-            const tag = document.querySelector('input[name="radar-tag"]:checked')?.value || '🚶‍♂️ Прогулка';
-
-            const newMeeting = {
-                id: 'm_' + Date.now() + "_" + Math.random().toString(36).substr(2, 5),
-                district: district,
-                exactPlace: exactPlace,
-                time: timeText,
-                category: tag,
-                description: desc,
-                compositionMode: currentCompositionMode,
-                girlsCount: girlsCount,
-                guysCount: guysCount,
-                maxPeople: maxPeopleInput,
-                creator: myUsername,
-                members: [myUsername]
-            };
-
-            meetings.unshift(newMeeting);
-            if (!archive.some(item => item.id === newMeeting.id)) {
-                archive.unshift(newMeeting);
-            }
-            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
-            localStorage.setItem('gr_archive_2026', JSON.stringify(archive));
-
-            await saveMeetingsToServer();
-
-            alert('Радар успешно запущен!');
-            renderAll();
-            document.querySelector('.nav-btn[data-sub="sub-radar"]')?.click();
-            setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 150);
-        });
-
-        function renderAll() {
-            renderMeetingsList();
-            renderArchiveList();
-            renderViolators();
-            updateDistrictBadges();
-            renderMapMarkers();
-        }
-
-        function updateDistrictBadges() {
-            const counts = {};
-            meetings.forEach(m => counts[m.district] = (counts[m.district] || 0) + 1);
-
-            const badges = {
-                "Центр (Советская)": "b-center", "ТЦ Тринити": "b-trinity", "OldCity (Олд Сити)": "b-oldcity",
-                "Ольшанка": "b-olshanka", "Грандичи": "b-grandichi", "Девятовка": "b-devyatovka",
-                "Пышки (Парк)": "b-pyshki", "БЛК / Форты": "b-forty"
-            };
-
-            Object.keys(badges).forEach(key => {
-                const el = document.getElementById(badges[key]);
-                if (el) el.innerText = counts[key] ? `🔥 ${counts[key]}` : "";
-            });
-        }
-
-        function renderMeetingsList() {
-            const container = document.getElementById('radar-list');
-            const emptyMsg = document.getElementById('empty-state-msg');
-            if (!container) return;
-            container.innerHTML = '';
-
-            const filtered = meetings.filter(m => {
-                if (currentDistrictFilter !== "all" && m.district !== currentDistrictFilter) return false;
-                return true;
-            });
-
-            if (filtered.length === 0) {
-                if (emptyMsg) emptyMsg.style.display = 'block';
-                return;
-            }
-            if (emptyMsg) emptyMsg.style.display = 'none';
-
-            filtered.forEach(m => {
-                const card = document.createElement('div');
-                card.className = `card status-planning`;
-                const isCreator = m.creator === myUsername || myUsername === "Grodno_User";
-                
-                card.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <strong style="color: var(--accent); font-size: 15px;">📍 ${m.district}</strong>
-                        <span style="font-size: 11px; background: #1a1b26; padding: 4px 10px; border-radius: 12px; color: var(--text-muted); font-weight: bold;">⏳ ${m.time || 'Срочно'}</span>
-                    </div>
-                    <p style="margin: 0 0 6px 0; font-size: 14px;"><b>Где:</b> ${m.exactPlace}</p>
-                    <p style="margin: 0 0 6px 0; font-size: 14px;"><b>Категория:</b> ${m.category || 'Прогулка'}</p>
-                    <p style="margin: 0 0 6px 0; font-size: 12px; color: #a4b0be;">👥 Девушек: <b>${m.girlsCount || 0}</b> | Пацанов: <b>${m.guysCount || 0}</b> | Лимит: <b>${m.maxPeople || 'Без лимита'}</b></p>
-                    <p style="margin: 0 0 10px 0; font-size: 13px; color: #a4b0be;">${m.description || 'Описания нет.'}</p>
-                    <p style="margin: 0 0 10px 0; font-size: 12px; color: var(--accent);">👤 Организатор: @${m.creator || 'Аноним'}</p>
-                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                        <button class="btn btn-primary" style="padding: 10px; font-size: 13px; flex: 2;" onclick="joinMeeting('${m.id}')">⚡ Буду на месте</button>
-                        ${isCreator ? `<button class="btn btn-danger" style="padding: 10px; font-size: 13px; flex: 1.5; background: #8b0000;" onclick="cancelMeeting('${m.id}')">🚪 Отменить</button>` : ''}
-                        <button class="btn btn-danger" style="padding: 10px; font-size: 13px; flex: 1; background: #261616; color: var(--accent-red);" onclick="reportDescription('${m.creator}', '${m.id}')">⚠ ЖБ</button>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        window.cancelMeeting = async function(id) {
-            if (!confirm("Отменить и удалить этот сбор?")) return;
-            meetings = meetings.filter(item => item.id !== id);
-            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
-            await saveMeetingsToServer();
-            alert("Сход успешно отменен!");
-            renderAll();
-        };
-
-        window.joinMeeting = async function(id) {
-            const m = meetings.find(item => item.id === id); 
-            if (m && !archive.some(item => item.id === id)) {
-                archive.unshift(m);
-                localStorage.setItem('gr_archive_2026', JSON.stringify(archive));
-            }
-            if (m && !m.members.includes(myUsername)) {
-                m.members.push(myUsername);
-                await saveMeetingsToServer();
-            }
-            alert("Ты вписался в компанию!");
-            renderAll();
-        };
-
-        window.reportDescription = function(username, meetingId) {
-            const reason = prompt("Причина жалобы (Мат, неадекватность):");
-            if (!reason) return;
-            complaints.unshift({ id: Date.now(), violator: username, type: "Жалоба на описание", reason: reason, meetingId: meetingId });
-            localStorage.setItem('gr_complaints_2026', JSON.stringify(complaints));
-            alert("Жалоба отправлена!");
-            renderAll();
-        };
-
-        function renderArchiveList() {
-            const container = document.getElementById('archive-list');
-            const empty = document.getElementById('archive-empty-state');
-            if(!container) return; container.innerHTML = '';
-            if (archive.length === 0) { if (empty) empty.style.display = 'block'; return; }
-            if (empty) empty.style.display = 'none';
-
-            archive.forEach(m => {
-                const card = document.createElement('div'); card.className = 'card';
-                card.innerHTML = `<strong style="color: var(--accent-green);">📍 Район: ${m.district}</strong>
-                    <p style="margin: 5px 0; font-size: 13px;"><b>Место:</b> ${m.exactPlace}</p>
-                    <p style="margin: 5px 0 10px 0; font-size: 12px; color: var(--text-muted);">Организатор: @${m.creator || 'Аноним'}</p>`;
-                container.appendChild(card);
-            });
-        }
-
-        function renderViolators() {
-            const list = document.getElementById('violators-list');
-            const empty = document.getElementById('admin-empty-state');
-            if (!list) return; list.innerHTML = '';
-            if (complaints.length === 0) { if (empty) empty.style.display = 'block'; return; }
-            if (empty) empty.style.display = 'none';
-
-            complaints.forEach((c, idx) => {
+               complaints.forEach((c, idx) => {
                 const item = document.createElement('div'); item.className = 'violator-item';
-                item.innerHTML = `
+                item.innerHTML = 
                     <div style="font-size: 11px; color: var(--accent); text-transform: uppercase; font-weight: bold; margin-bottom: 4px;">${c.type}</div>
                     <p style="margin: 0 0 4px 0;">👤 <b>Нарушитель:</b> @${c.violator}</p>
                     <p style="margin: 0 0 12px 0; font-size: 13px; color: #ff8a80;">⚠️ <b>Суть:</b> ${c.reason}</p>
@@ -1001,18 +759,18 @@
                         <button class="btn btn-success" style="padding: 7px 10px; font-size: 11px; flex: 1;" onclick="adminCloseCase(${idx}, true)">Оправдать</button>
                         <button class="btn btn-danger" style="padding: 7px 10px; font-size: 11px; flex: 1;" onclick="adminCloseCase(${idx}, false)">БАН</button>
                     </div>
-                `;
+                ;
                 list.appendChild(item);
             });
         }
 
-                window.copyUltimatum = function(username) {
-            const text = `ВНИМАНИЕ! На твой профиль поступила официальная жалоба.\n\nУ тебя есть выбор (выбери ОДИН вариант):\n1. ВИДЕО-КРУЖОК с лицом и фразой: „Гродно 2026“.\n2. Ссылка на открытый Instagram с био: „Гродно 2026“.`;
-            navigator.clipboard.writeText(text).then(() => alert(`Ультиматум для @${username} скопирован!`));
+        window.copyUltimatum = function(username) {
+            const text = ВНИМАНИЕ! На твой профиль поступила официальная жалоба.\n\nУ тебя есть выбор (выбери ОДИН вариант):\n1. ВИДЕО-КРУЖОК с лицом и фразой: „Гродно 2026“.\n2. Ссылка на открытый Instagram с био: „Гродно 2026“.;
+            navigator.clipboard.writeText(text).then(() => alert(Ультиматум для @${username} скопирован!));
         };
 
         window.adminCloseCase = function(index, approved) {
-            alert(approved ? "Дело закрыто. Пользователь оправдан." : "Нарушителю выдан БАН.");
+            alert(approved ? "Дело закрыто." : "Бан выдан.");
             complaints.splice(index, 1); 
             localStorage.setItem('gr_complaints_2026', JSON.stringify(complaints));
             renderAll();
@@ -1020,5 +778,12 @@
     </script>
 </body>
 </html>
+               
+               
+               
+        
+               
+               
+                      
 
     
