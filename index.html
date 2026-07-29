@@ -374,10 +374,28 @@
                 <div id="sub-archive" class="sub-screen">
             <h2>📜 Архив сборов</h2>
             <p class="subtitle">История завершенных встреч</p>
-            <div id="archive-empty-state" class="empty-state">Архив пуст.</div>
+                       <div id="archive-empty-state" class="empty-state">Архив пуст.</div>
             <div id="archive-list"></div>
         </div>
 
+        <div id="sub-admin" class="sub-screen">
+            <h2>🚨 Панель Администратора</h2>
+            <p class="subtitle">Управление жалобами и блокировками</p>
+            
+            <div class="card" style="border-top: 4px solid var(--accent); margin-bottom: 20px;">
+                <h3 style="font-size: 14px; margin-bottom: 12px;">🛠️ Настройки профиля</h3>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-primary" style="padding: 10px; font-size: 12px;" onclick="toggleUserGender()">🔄 Сменить пол</button>
+                    <button class="btn btn-primary" style="padding: 10px; font-size: 12px;" onclick="changeUserAgePrompt()">✏️ Сменить возраст</button>
+                </div>
+            </div>
+
+            <h3 style="font-size: 14px; margin-bottom: 10px;">⚠️ Активные жалобы</h3>
+            <div id="admin-empty-state" class="empty-state">Нарушений нет. Всё чисто!</div>
+            <div id="violators-list"></div>
+        </div>
+
+    </div> ```   
         <div id="sub-admin" class="sub-screen">
             <h2>🚨 Админка</h2>
             <p class="subtitle">Управление профилем и жалобами</p>
@@ -1072,6 +1090,64 @@
                 initLeafletMap();
             }
         });
+           window.reportMeeting = function(id) {
+            const reason = prompt("Укажите причину жалобы (например: неадекватное поведение):");
+            if (!reason) return;
+            complaints.push({
+                type: "Жалоба на сходку",
+                violator: myUsername,
+                reason: reason
+            });
+            localStorage.setItem('gr_complaints_2026', JSON.stringify(complaints));
+            alert("🚨 Жалоба отправлена администратору.");
+            renderViolators();
+        };
+
+        // === ВСТАВЛЯЙ СЮДА ФУНКЦИИ АДМИНКИ ===
+        function renderViolators() {
+            const list = document.getElementById('violators-list');
+            const empty = document.getElementById('admin-empty-state');
+            if (!list) return; 
+            list.innerHTML = '';
+            
+            if (complaints.length === 0) { 
+                if (empty) empty.style.display = 'block'; 
+                return; 
+            }
+            if (empty) empty.style.display = 'none';
+
+            complaints.forEach((c, idx) => {
+                const item = document.createElement('div'); 
+                item.className = 'violator-item';
+                item.style.cssText = 'background: rgba(255, 56, 56, 0.05); border: 1px solid rgba(255, 56, 56, 0.2); padding: 14px; border-radius: 12px; margin-bottom: 10px;';
+                item.innerHTML = `
+                    <div style="font-size: 11px; color: #ff3838; text-transform: uppercase; font-weight: bold; margin-bottom: 4px;">${c.type}</div>
+                    <p style="margin: 0 0 4px 0; font-size: 13px;">👤 <b>Нарушитель:</b> @${c.violator}</p>
+                    <p style="margin: 0 0 10px 0; font-size: 13px; color: #ff8a80;">⚠️ <b>Причина:</b> ${c.reason}</p>
+                    <div style="display: flex; gap: 6px;">
+                        <button class="btn btn-primary" style="padding: 7px 10px; font-size: 11px; flex: 2;" onclick="copyUltimatum('${c.violator}')">📋 Ультиматум</button>
+                        <button class="btn btn-success" style="padding: 7px 10px; font-size: 11px; flex: 1;" onclick="adminCloseCase(${idx}, true)">Оправдать</button>
+                        <button class="btn btn-danger" style="padding: 7px 10px; font-size: 11px; flex: 1;" onclick="adminCloseCase(${idx}, false)">БАН</button>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        window.adminCloseCase = function(index, approved) {
+            alert(approved ? "Дело закрыто. Пользователь оправдан." : "Нарушителю выписан бан.");
+            complaints.splice(index, 1); 
+            localStorage.setItem('gr_complaints_2026', JSON.stringify(complaints));
+            renderViolators();
+        };
+
+        window.copyUltimatum = function(username) {
+            const text = `ВНИМАНИЕ! На твой профиль поступила официальная жалоба.\n\nУ тебя есть выбор:\n1. ВИДЕО-КРУЖОК с лицом и фразой: „Grodno Run 2026“.\n2. Ссылка на открытый Instagram с био: „Grodno Run 2026“.`;
+            navigator.clipboard.writeText(text).then(() => alert(`Ультиматум скопирован!`));
+        };
+        // ======================================
+
     </script>
 </body>
 </html>
+
