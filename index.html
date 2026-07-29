@@ -724,7 +724,7 @@
             alert(`Возраст обновлен: ${activeAge} лет`);
         };
                     document.addEventListener('DOMContentLoaded', async () => {
-            if (localStorage.getItem('user_registered') === 'true') {
+            if (localStorage.getItem('user_registered_v2') === 'true') {
                 document.getElementById('screen-auth')?.classList.remove('active');
                 const authScr = document.getElementById('screen-auth');
                 if (authScr) authScr.style.display = 'none';
