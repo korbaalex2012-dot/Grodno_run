@@ -480,8 +480,8 @@
         let archive = JSON.parse(localStorage.getItem('gr_archive_2026')) || [];
         let complaints = JSON.parse(localStorage.getItem('gr_complaints_2026')) || [];
 
-        let activeGender = localStorage.getItem('user_gender') || "";
-        let activeAge = parseInt(localStorage.getItem('user_age')) || 0;
+        let activeGender = localStorage.getItem('user_gender_v2') || localStorage.getItem('user_gender') || "";
+        let activeAge = parseInt(localStorage.getItem('user_age_v2') || localStorage.getItem('user_age')) || 0;
         let currentDistrictFilter = "all";
         let mapInstance = null;
         let mapMarkers = [];
@@ -705,9 +705,11 @@
 
         window.toggleUserGender = function() {
             activeGender = activeGender === 'Парень' ? 'Девушка' : 'Парень';
+            localStorage.setItem('user_gender_v2', activeGender);
             localStorage.setItem('user_gender', activeGender);
             updateStatusHeader();
             alert(`Ваш пол изменен на: ${activeGender}`);
+            renderAll();
         };
 
         window.changeUserAgePrompt = function() {
@@ -719,9 +721,11 @@
                 return;
             }
             activeAge = parsedAge;
+            localStorage.setItem('user_age_v2', activeAge);
             localStorage.setItem('user_age', activeAge);
             updateStatusHeader();
             alert(`Возраст обновлен: ${activeAge} лет`);
+            renderAll();
         };
 
         document.addEventListener('DOMContentLoaded', async () => {
@@ -793,7 +797,7 @@
             const authScreen = document.getElementById('screen-auth');
             const mainScreen = document.getElementById('screen-main');
 
-            if (authScreen) {
+                       if (authScreen) {
                 authScreen.classList.remove('active');
                 authScreen.style.display = 'none';
             }
@@ -802,7 +806,7 @@
                 mainScreen.style.display = 'block';
             }
 
-                   UpdateStatusHeader(); 
+            updateStatusHeader(); 
             renderAll();
             setTimeout(() => { if (typeof initLeafletMap === 'function') initLeafletMap(); }, 200);
         });
@@ -837,8 +841,8 @@
             const exactPlace = document.getElementById('create-exact-place')?.value.trim();
             const desc = document.getElementById('create-desc')?.value.trim() || 'Без описания';
             
-            const girlsCount = currentCompositionMode === 'gender' ? (document.getElementById('count-girls')?.value || '0') : '0';
-            const guysCount = currentCompositionMode === 'gender' ? (document.getElementById('count-guys')?.value || '0') : '0';
+            const girlsCount = currentCompositionMode === 'gender' ? (parseInt(document.getElementById('count-girls')?.value) || 0) : 0;
+            const guysCount = currentCompositionMode === 'gender' ? (parseInt(document.getElementById('count-guys')?.value) || 0) : 0;
             const maxPeopleInput = currentCompositionMode === 'limit' ? (document.getElementById('create-max-people')?.value || 'Без лимита') : 'По составу (М/Ж)';
 
             const ageFrom = parseInt(document.getElementById('create-age-from')?.value) || 11;
@@ -930,18 +934,6 @@
                 const isMember = m.members.includes(myUsername);
                 const isMemberOrCreator = isMember || isCreator;
 
-                if (m.compositionMode === 'gender' && !isMemberOrCreator) {
-                    const targetGirls = parseInt(m.girlsCount) || 0;
-                    const targetGuys = parseInt(m.guysCount) || 0;
-                    
-                    if (targetGuys === 0 && targetGirls > 0 && activeGender === 'Парень') {
-                        return false;
-                    }
-                    if (targetGirls === 0 && targetGuys > 0 && activeGender === 'Девушка') {
-                        return false;
-                    }
-                }
-
                 const realMembersCount = m.members.filter(user => user !== m.creator).length;
 
                 if (m.compositionMode === 'limit') {
@@ -1013,17 +1005,37 @@
 
             const isCreator = (m.creator === myUsername);
 
-            if (!isCreator && m.compositionMode === 'gender') {
-                const targetGirls = parseInt(m.girlsCount) || 0;
-                const targetGuys = parseInt(m.guysCount) || 0;
-                
-                if (targetGuys === 0 && targetGirls > 0 && activeGender === 'Парень') {
-                    alert("❌ Эта сходка создана только для девушек! Парням вход заблокирован.");
-                    return;
+            if (!isCreator) {
+                if (m.compositionMode === 'gender') {
+                    const targetGirls = parseInt(m.girlsCount) || 0;
+                    const targetGuys = parseInt(m.guysCount) || 0;
+                    
+                    if (targetGuys === 0 && targetGirls > 0 && activeGender === 'Парень') {
+                        alert("❌ Эта сходка создана только для девушек! Парням вход заблокирован.");
+                        return;
+                    }
+                    if (targetGirls === 0 && targetGuys > 0 && activeGender === 'Девушка') {
+                        alert("❌ Эта сходка создана только для парней! Девушкам вход заблокирован.");
+                        return;
+                    }
                 }
-                if (targetGirls === 0 && targetGuys > 0 && activeGender === 'Девушка') {
-                    alert("❌ Эта сходка создана только для парней! Девушкам вход заблокирован.");
-                    return;
+
+                const realMembersCount = m.members.filter(user => user !== m.creator).length;
+
+                if (m.compositionMode === 'limit') {
+                    const maxP = parseInt(m.maxPeople);
+                    if (!isNaN(maxP) && realMembersCount >= maxP) {
+                        alert("❌ Сходка уже заполнена! Мест больше нет.");
+                        return;
+                    }
+                } else if (m.compositionMode === 'gender') {
+                    const reqG = parseInt(m.girlsCount) || 0;
+                    const reqB = parseInt(m.guysCount) || 0;
+                    const totalReq = reqG + reqB;
+                    if (totalReq > 0 && realMembersCount >= totalReq) {
+                        alert("❌ Точный состав участников уже полностью укомплектован!");
+                        return;
+                    }
                 }
             }
 
