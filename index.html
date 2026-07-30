@@ -14,6 +14,11 @@
             --bg-input: #111125;
             --accent-cyan: #00f2fe;
             --accent-purple: #7f00ff;
+            --accent-pink: #ff0055;
+            --accent-green: #2ecc71;
+            --accent-orange: #ff6600;
+            --accent-yellow: #ffd700;
+            --accent-blue: #00a2ff;
             --text-main: #ffffff;
             --text-muted: #9393b5;
             --border: rgba(255, 255, 255, 0.12);
@@ -120,26 +125,42 @@
         .btn-danger { background: linear-gradient(135deg, #ff3860, #ff1493); color: #fff; box-shadow: 0 4px 15px rgba(255, 56, 96, 0.4); }
         .hidden { display: none !important; }
 
-        /* Продвинутая пульсация точек на карте для разных уровней срочности */
+        /* Цветные стилизованные кнопки фильтров и чипов */
+        .filter-chip {
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.15), rgba(127, 0, 255, 0.15)) !important;
+            border: 1px solid var(--accent-cyan) !important;
+            color: #fff !important;
+            font-weight: 700 !important;
+        }
+        .filter-chip.active {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)) !important;
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.5);
+        }
+
+        /* Умная пульсация точек на карте с разной скоростью */
         @keyframes cyber-pulse-fast {
-            0% { transform: scale(0.9); opacity: 1; box-shadow: 0 0 0 0 rgba(255, 56, 96, 0.9); }
-            70% { transform: scale(1.6); opacity: 0.5; box-shadow: 0 0 0 14px rgba(255, 56, 96, 0); }
-            100% { transform: scale(0.9); opacity: 1; box-shadow: 0 0 0 0 rgba(255, 56, 96, 0); }
+            0% { transform: scale(0.85); opacity: 1; box-shadow: 0 0 0 0 rgba(255, 56, 96, 1); }
+            70% { transform: scale(1.8); opacity: 0.3; box-shadow: 0 0 0 16px rgba(255, 56, 96, 0); }
+            100% { transform: scale(0.85); opacity: 1; box-shadow: 0 0 0 0 rgba(255, 56, 96, 0); }
         }
         @keyframes cyber-pulse-medium {
-            0% { transform: scale(0.95); opacity: 1; box-shadow: 0 0 0 0 rgba(255, 170, 0, 0.8); }
-            70% { transform: scale(1.35); opacity: 0.6; box-shadow: 0 0 0 10px rgba(255, 170, 0, 0); }
-            100% { transform: scale(0.95); opacity: 1; box-shadow: 0 0 0 0 rgba(255, 170, 0, 0); }
+            0% { transform: scale(0.9); opacity: 1; box-shadow: 0 0 0 0 rgba(255, 170, 0, 0.9); }
+            70% { transform: scale(1.45); opacity: 0.5; box-shadow: 0 0 0 10px rgba(255, 170, 0, 0); }
+            100% { transform: scale(0.9); opacity: 1; box-shadow: 0 0 0 0 rgba(255, 170, 0, 0); }
         }
         @keyframes cyber-pulse-slow {
-            0% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.15); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.8; }
+            0% { transform: scale(0.95); opacity: 0.7; box-shadow: 0 0 0 0 rgba(0, 242, 254, 0.7); }
+            50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 0 6px rgba(0, 242, 254, 0); }
+            100% { transform: scale(0.95); opacity: 0.7; box-shadow: 0 0 0 0 rgba(0, 242, 254, 0); }
         }
+
+        .pulse-fast { animation: cyber-pulse-fast 0.9s infinite ease-in-out !important; }
+        .pulse-medium { animation: cyber-pulse-medium 2s infinite ease-in-out !important; }
+        .pulse-slow { animation: cyber-pulse-slow 4s infinite ease-in-out !important; }
     </style>
 </head>
-    <body>
-    <div id="auth-screen" class="screen active">
+<body>
+        <div id="auth-screen" class="screen active">
         <div style="text-align: center; margin-top: 35px; margin-bottom: 25px;">
             <h1 style="font-size: 26px; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0;">GRODNO RUN 2026</h1>
             <p class="subtitle" style="margin-top: 6px;">Кибернетическая система сбора и координации</p>
@@ -187,15 +208,15 @@
             </div>
 
             <div id="radar-filter-bar" style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 10px; scrollbar-width: none;">
-                <button class="btn filter-chip active" data-filter="all" style="padding: 7px 12px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">🔥 Все районы</button>
-                <button class="btn filter-chip" data-filter="Центр (Советская)" style="padding: 7px 12px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">Центр <span id="b-center" style="color: var(--accent-cyan);"></span></button>
-                <button class="btn filter-chip" data-filter="ТЦ Тринити" style="padding: 7px 12px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">Тринити <span id="b-trinity" style="color: var(--accent-cyan);"></span></button>
-                <button class="btn filter-chip" data-filter="OldCity (Олд Сити)" style="padding: 7px 12px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">OldCity <span id="b-oldcity" style="color: var(--accent-cyan);"></span></button>
-                <button class="btn filter-chip" data-filter="Ольшанка" style="padding: 7px 12px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">Ольшанка <span id="b-olshanka" style="color: var(--accent-cyan);"></span></button>
-                <button class="btn filter-chip" data-filter="Грандичи" style="padding: 7px 12px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">Грандичи <span id="b-grandichi" style="color: var(--accent-cyan);"></span></button>
-                <button class="btn filter-chip" data-filter="Девятовка" style="padding: 7px 12px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">Девятовка <span id="b-devyatovka" style="color: var(--accent-cyan);"></span></button>
-                <button class="btn filter-chip" data-filter="Пышки (Парк)" style="padding: 7px 12px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">Пышки <span id="b-pyshki" style="color: var(--accent-cyan);"></span></button>
-                <button class="btn filter-chip" data-filter="БЛК / Форты" style="padding: 7px 12px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">Форты <span id="b-forty" style="color: var(--accent-cyan);"></span></button>
+                <button class="btn filter-chip active" data-filter="all" style="padding: 7px 12px; font-size: 11px; width: auto;">🔥 Все районы</button>
+                <button class="btn filter-chip" data-filter="Центр (Советская)" style="padding: 7px 12px; font-size: 11px; width: auto;">Центр <span id="b-center" style="color: var(--accent-cyan);"></span></button>
+                <button class="btn filter-chip" data-filter="ТЦ Тринити" style="padding: 7px 12px; font-size: 11px; width: auto;">Тринити <span id="b-trinity" style="color: var(--accent-cyan);"></span></button>
+                <button class="btn filter-chip" data-filter="OldCity (Олд Сити)" style="padding: 7px 12px; font-size: 11px; width: auto;">OldCity <span id="b-oldcity" style="color: var(--accent-cyan);"></span></button>
+                <button class="btn filter-chip" data-filter="Ольшанка" style="padding: 7px 12px; font-size: 11px; width: auto;">Ольшанка <span id="b-olshanka" style="color: var(--accent-cyan);"></span></button>
+                <button class="btn filter-chip" data-filter="Грандичи" style="padding: 7px 12px; font-size: 11px; width: auto;">Грандичи <span id="b-grandichi" style="color: var(--accent-cyan);"></span></button>
+                <button class="btn filter-chip" data-filter="Девятовка" style="padding: 7px 12px; font-size: 11px; width: auto;">Девятовка <span id="b-devyatovka" style="color: var(--accent-cyan);"></span></button>
+                <button class="btn filter-chip" data-filter="Пышки (Парк)" style="padding: 7px 12px; font-size: 11px; width: auto;">Пышки <span id="b-pyshki" style="color: var(--accent-cyan);"></span></button>
+                <button class="btn filter-chip" data-filter="БЛК / Форты" style="padding: 7px 12px; font-size: 11px; width: auto;">Форты <span id="b-forty" style="color: var(--accent-cyan);"></span></button>
             </div>
 
             <div id="radar-list"></div>
@@ -204,146 +225,146 @@
                 <p style="font-size: 12px;">Создай свой первый сбор во вкладке «Собрать»!</p>
             </div>
         </div>
-
-    <div style="position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: rgba(10, 10, 22, 0.92); backdrop-filter: var(--glass-blur); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-around; padding: 0 4px; z-index: 999; box-sizing: border-box;">
-        <button class="btn nav-btn active" data-sub="sub-radar" style="flex: 1; height: 100%; background: transparent; border: none; color: var(--text-muted); font-size: 10px; font-weight: 800; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-transform: uppercase; letter-spacing: 0.5px;">📡 Радар</button>
+            <div style="position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: rgba(10, 10, 22, 0.92); backdrop-filter: var(--glass-blur); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-around; padding: 0 4px; z-index: 999; box-sizing: border-box;">
+        <button class="btn nav-btn active" data-sub="sub-radar" style="flex: 1; height: 100%; background: transparent; border: none; color: var(--accent-cyan); font-size: 10px; font-weight: 800; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-transform: uppercase; letter-spacing: 0.5px;">📡 Радар</button>
         <button class="btn nav-btn" data-sub="sub-create" style="flex: 1; height: 100%; background: transparent; border: none; color: var(--text-muted); font-size: 10px; font-weight: 800; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-transform: uppercase; letter-spacing: 0.5px;">⚡ Собрать</button>
         <button class="btn nav-btn" data-sub="sub-archive" style="flex: 1; height: 100%; background: transparent; border: none; color: var(--text-muted); font-size: 10px; font-weight: 800; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-transform: uppercase; letter-spacing: 0.5px;">📜 Архив</button>
         <button class="btn nav-btn" data-sub="sub-admin" style="flex: 1; height: 100%; background: transparent; border: none; color: var(--text-muted); font-size: 10px; font-weight: 800; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-transform: uppercase; letter-spacing: 0.5px;">🚨 Куратор</button>
     </div>
-                <div id="sub-create" class="sub-screen screen">
-            <div class="card">
-                <h3>⚡ Запустить новый сбор</h3>
-                <div class="subtitle">Отметь локацию на общем радаре Гродно</div>
 
-                <div class="form-group">
-                    <label>📍 Выберите район</label>
-                    <select id="create-district">
-                        <option value="Центр (Советская)">Центр (Советская)</option>
-                        <option value="ТЦ Тринити">ТЦ Тринити</option>
-                        <option value="OldCity (Олд Сити)">OldCity (Олд Сити)</option>
-                        <option value="Ольшанка">Ольшанка</option>
-                        <option value="Девятовка">Девятовка</option>
-                        <option value="Грандичи">Грандичи</option>
-                        <option value="Пышки (Парк)">Пышки (Парк)</option>
-                        <option value="БЛК / Форты">БЛК / Форты</option>
-                    </select>
-                </div>
+    <div id="sub-create" class="sub-screen screen">
+        <div class="card">
+            <h3>⚡ Запустить новый сбор</h3>
+            <div class="subtitle">Отметь локацию на общем радаре Гродно</div>
 
-                <div class="form-group">
-                    <label>🔥 Категория активности:</label>
-                    <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px;">
-                        <input type="radio" id="tag-walk" name="radar-tag" value="🚶‍♂️ Прогулка" checked style="display:none;">
-                        <label for="tag-walk" class="btn" style="padding: 8px 10px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border); margin:0;">🚶‍♂️ Прогулка</label>
-
-                        <input type="radio" id="tag-football" name="radar-tag" value="⚽ Футбол" style="display:none;">
-                        <label for="tag-football" class="btn" style="padding: 8px 10px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border); margin:0;">⚽ Футбол</label>
-
-                        <input type="radio" id="tag-basketball" name="radar-tag" value="🏀 Баскетбол" style="display:none;">
-                        <label for="tag-basketball" class="btn" style="padding: 8px 10px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border); margin:0;">🏀 Баскетбол</label>
-
-                        <input type="radio" id="tag-volleyball" name="radar-tag" value="🏐 Волейбол" style="display:none;">
-                        <label for="tag-volleyball" class="btn" style="padding: 8px 10px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border); margin:0;">🏐 Волейбол</label>
-
-                        <input type="radio" id="tag-pingpong" name="radar-tag" value="🏓 Наст. теннис" style="display:none;">
-                        <label for="tag-pingpong" class="btn" style="padding: 8px 10px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border); margin:0;">🏓 Наст. теннис</label>
-
-                        <input type="radio" id="tag-workout" name="radar-tag" value="🏋️‍♂️ Турники / Бег" style="display:none;">
-                        <label for="tag-workout" class="btn" style="padding: 8px 10px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border); margin:0;">🏋️‍♂️ Турники</label>
-
-                        <input type="radio" id="tag-bike" name="radar-tag" value="🚲 Велик" style="display:none;">
-                        <label for="tag-bike" class="btn" style="padding: 8px 10px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border); margin:0;">🚲 Велик</label>
-
-                        <input type="radio" id="tag-game" name="radar-tag" value="🎮 Гейминг" style="display:none;">
-                        <label for="tag-game" class="btn" style="padding: 8px 10px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border); margin:0;">🎮 Гейминг</label>
-                    </div>
-                </div>
-
-                <div class="form-group" style="margin-top: 14px;">
-                    <label>🎯 Точное место встречи:</label>
-                    <input type="text" id="create-exact-place" placeholder="Например: Коробка на Ожешко, Скейт-парк">
-                    <div id="quick-places-container" style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px;"></div>
-                </div>
-
-                <div class="form-group" style="margin-top: 14px;">
-                    <label>⏱️ Когда собираемся?</label>
-                    <div style="display: flex; gap: 15px; margin-top: 4px; align-items: center;">
-                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 12px; color: #ff3860; font-weight: bold;">
-                            <input type="radio" name="time-type" value="now" checked onchange="toggleTimeInputs()"> ⚡ Срочно
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 12px; color: var(--accent-cyan); font-weight: bold;">
-                            <input type="radio" name="time-type" value="later" onchange="toggleTimeInputs()"> 📅 Выбрать время
-                        </label>
-                    </div>
-                    <div id="time-picker-block" class="hidden" style="display: flex; gap: 10px; margin-top: 10px;">
-                        <div style="flex: 1;">
-                            <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">Часы:</label>
-                            <select id="create-hour">
-                                <option value="09">09:00</option><option value="10">10:00</option><option value="11">11:00</option>
-                                <option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option>
-                                <option value="15" selected>15:00</option><option value="16">16:00</option><option value="17">17:00</option>
-                                <option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option>
-                                <option value="21">21:00</option><option value="22">22:00</option>
-                            </select>
-                        </div>
-                        <div style="flex: 1;">
-                            <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">Минуты:</label>
-                            <select id="create-minute">
-                                <option value="00" selected>00 мин</option><option value="15">15 мин</option>
-                                <option value="30">30 мин</option><option value="45">45 мин</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group" style="margin-top: 14px;">
-                    <label>📝 Короткое описание / приметы:</label>
-                    <textarea id="create-desc" placeholder="Кто нужен? Что берём с собой? Сколько сидим?" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; padding: 12px; color: #fff; font-size:13px; resize: none; height: 65px; box-sizing: border-box; outline: none;"></textarea>
-                </div>
-
-                <div class="form-group" style="margin-top: 14px;">
-                    <label>👥 Состав участников:</label>
-                    <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px;">
-                        <button type="button" class="btn tag-chip-comp active" data-mode="limit" onclick="setCompositionMode('limit')" style="padding: 7px 10px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">👥 Максимум человек</button>
-                        <button type="button" class="btn tag-chip-comp" data-mode="gender" onclick="setCompositionMode('gender')" style="padding: 7px 10px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">⚙️ Точный состав (М/Ж)</button>
-                    </div>
-
-                    <div id="mode-limit-block" style="margin-top: 10px;">
-                        <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">Сколько максимум человек:</label>
-                        <input type="text" id="create-max-people" placeholder="Например: 5 или Без лимита">
-                    </div>
-
-                    <div id="mode-gender-block" class="hidden" style="display: flex; gap: 10px; margin-top: 10px;">
-                        <div style="flex: 1;">
-                            <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">Девушек:</label>
-                            <input type="number" id="count-girls" min="0" value="0">
-                        </div>
-                        <div style="flex: 1;">
-                            <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">Пацанов:</label>
-                            <input type="number" id="count-guys" min="0" value="0">
-                        </div>
-                    </div>
-                </div>
-
-                <button class="btn btn-primary" id="btn-launch-radar" style="margin-top: 18px;">🚀 ЗАПУСТИТЬ РАДАР СБОРА</button>
+            <div class="form-group">
+                <label>📍 Выберите район</label>
+                <select id="create-district">
+                    <option value="Центр (Советская)">Центр (Советская)</option>
+                    <option value="ТЦ Тринити">ТЦ Тринити</option>
+                    <option value="OldCity (Олд Сити)">OldCity (Олд Сити)</option>
+                    <option value="Ольшанка">Ольшанка</option>
+                    <option value="Девятовка">Девятовка</option>
+                    <option value="Грандичи">Грандичи</option>
+                    <option value="Пышки (Парк)">Пышки (Парк)</option>
+                    <option value="БЛК / Форты">БЛК / Форты</option>
+                </select>
             </div>
-        </div>
 
-        <div id="sub-archive" class="sub-screen screen">
-            <h2>📜 Архив сборов</h2>
-            <p class="subtitle">История завершенных и прошлых встреч</p>
-            <div id="archive-empty" style="text-align: center; color: var(--text-muted); padding: 30px 0;">Архив пуст.</div>
-            <div id="archive-list"></div>
-        </div>
+            <div class="form-group">
+                <label>🔥 Категория активности:</label>
+                <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px;">
+                    <input type="radio" id="tag-walk" name="radar-tag" value="🚶‍♂️ Прогулка" checked style="display:none;">
+                    <label for="tag-walk" class="btn filter-chip" style="padding: 8px 10px; font-size: 11px; width: auto; margin:0;">🚶‍♂️ Прогулка</label>
 
-        <div id="sub-admin" class="sub-screen screen">
-            <h2>🚨 Панель Куратора</h2>
-            <p class="subtitle">Управление жалобами и модерация</p>
-            <div id="admin-empty" style="text-align: center; color: var(--text-muted); padding: 30px 0;">Нарушений нет. Всё чисто!</div>
-            <div id="violators-list"></div>
+                    <input type="radio" id="tag-football" name="radar-tag" value="⚽ Футбол" style="display:none;">
+                    <label for="tag-football" class="btn filter-chip" style="padding: 8px 10px; font-size: 11px; width: auto; margin:0;">⚽ Футбол</label>
+
+                    <input type="radio" id="tag-basketball" name="radar-tag" value="🏀 Баскетбол" style="display:none;">
+                    <label for="tag-basketball" class="btn filter-chip" style="padding: 8px 10px; font-size: 11px; width: auto; margin:0;">🏀 Баскетбол</label>
+
+                    <input type="radio" id="tag-volleyball" name="radar-tag" value="🏐 Волейбол" style="display:none;">
+                    <label for="tag-volleyball" class="btn filter-chip" style="padding: 8px 10px; font-size: 11px; width: auto; margin:0;">🏐 Волейбол</label>
+
+                    <input type="radio" id="tag-pingpong" name="radar-tag" value="🏓 Наст. теннис" style="display:none;">
+                    <label for="tag-pingpong" class="btn filter-chip" style="padding: 8px 10px; font-size: 11px; width: auto; margin:0;">🏓 Наст. теннис</label>
+
+                    <input type="radio" id="tag-workout" name="radar-tag" value="🏋️‍♂️ Турники / Бег" style="display:none;">
+                    <label for="tag-workout" class="btn filter-chip" style="padding: 8px 10px; font-size: 11px; width: auto; margin:0;">🏋️‍♂️ Турники</label>
+
+                    <input type="radio" id="tag-bike" name="radar-tag" value="🚲 Велик" style="display:none;">
+                    <label for="tag-bike" class="btn filter-chip" style="padding: 8px 10px; font-size: 11px; width: auto; margin:0;">🚲 Велик</label>
+
+                    <input type="radio" id="tag-game" name="radar-tag" value="🎮 Гейминг" style="display:none;">
+                    <label for="tag-game" class="btn filter-chip" style="padding: 8px 10px; font-size: 11px; width: auto; margin:0;">🎮 Гейминг</label>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 14px;">
+                <label>🎯 Точное место встречи:</label>
+                <input type="text" id="create-exact-place" placeholder="Например: Коробка на Ожешко, Скейт-парк">
+                <div id="quick-places-container" style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px;"></div>
+            </div>
+
+            <div class="form-group" style="margin-top: 14px;">
+                <label>⏱️ Когда собираемся?</label>
+                <div style="display: flex; gap: 15px; margin-top: 4px; align-items: center;">
+                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 12px; color: #ff3860; font-weight: bold;">
+                        <input type="radio" name="time-type" value="now" checked onchange="toggleTimeInputs()"> ⚡ Срочно
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 12px; color: var(--accent-cyan); font-weight: bold;">
+                        <input type="radio" name="time-type" value="later" onchange="toggleTimeInputs()"> 📅 Выбрать время
+                    </label>
+                </div>
+                <div id="time-picker-block" class="hidden" style="display: flex; gap: 10px; margin-top: 10px;">
+                    <div style="flex: 1;">
+                        <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">Часы:</label>
+                        <select id="create-hour">
+                            <option value="09">09:00</option><option value="10">10:00</option><option value="11">11:00</option>
+                            <option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option>
+                            <option value="15" selected>15:00</option><option value="16">16:00</option><option value="17">17:00</option>
+                            <option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option>
+                            <option value="21">21:00</option><option value="22">22:00</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">Минуты:</label>
+                        <select id="create-minute">
+                            <option value="00" selected>00 мин</option><option value="15">15 мин</option>
+                            <option value="30">30 мин</option><option value="45">45 мин</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 14px;">
+                <label>📝 Короткое описание / приметы:</label>
+                <textarea id="create-desc" placeholder="Кто нужен? Что берём с собой? Сколько сидим?" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; padding: 12px; color: #fff; font-size:13px; resize: none; height: 65px; box-sizing: border-box; outline: none;"></textarea>
+            </div>
+
+            <div class="form-group" style="margin-top: 14px;">
+                <label>👥 Состав участников:</label>
+                <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px;">
+                    <button type="button" class="btn filter-chip tag-chip-comp active" data-mode="limit" onclick="setCompositionMode('limit')" style="padding: 7px 10px; font-size: 11px; width: auto;">👥 Максимум человек</button>
+                    <button type="button" class="btn filter-chip tag-chip-comp" data-mode="gender" onclick="setCompositionMode('gender')" style="padding: 7px 10px; font-size: 11px; width: auto;">⚙️ Точный состав (М/Ж)</button>
+                </div>
+
+                <div id="mode-limit-block" style="margin-top: 10px;">
+                    <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">Сколько максимум человек:</label>
+                    <input type="text" id="create-max-people" placeholder="Например: 5 или Без лимита">
+                </div>
+
+                <div id="mode-gender-block" class="hidden" style="display: flex; gap: 10px; margin-top: 10px;">
+                    <div style="flex: 1;">
+                        <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">Девушек:</label>
+                        <input type="number" id="count-girls" min="0" value="0">
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">Пацанов:</label>
+                        <input type="number" id="count-guys" min="0" value="0">
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" id="btn-launch-radar" style="margin-top: 18px;">🚀 ЗАПУСТИТЬ РАДАР СБОРА</button>
         </div>
     </div>
-            <script>
+
+    <div id="sub-archive" class="sub-screen screen">
+        <h2>📜 Архив сборов</h2>
+        <p class="subtitle">История завершенных и прошлых встреч</p>
+        <div id="archive-empty" style="text-align: center; color: var(--text-muted); padding: 30px 0;">Архив пуст.</div>
+        <div id="archive-list"></div>
+    </div>
+
+    <div id="sub-admin" class="sub-screen screen">
+        <h2>🚨 Панель Куратора</h2>
+        <p class="subtitle">Управление жалобами и модерация</p>
+        <div id="admin-empty" style="text-align: center; color: var(--text-muted); padding: 30px 0;">Нарушений нет. Всё чисто!</div>
+        <div id="violators-list"></div>
+    </div>
+    </div>
+        <script>
         const BIN_ID = '6a68a3d7da38895dfe9b46cf';
         const API_KEY = '$2a$10$fCuDEyphx80p7hlYAPd8C.W8S8fZv53sNq6UhpL8m/Oot7eVvdScu';
 
@@ -360,7 +381,9 @@
                 { name: 'Настольный теннис в парке', category: '🏓 Наст. теннис', coords: [53.6815, 23.8350], desc: 'Столы для тенниса' },
                 { name: 'Турники у Драмтеатра', category: '🏋️‍♂️ Турники / Бег', coords: [53.6750, 23.8285], desc: 'Воркаут зона и турники' },
                 { name: 'Велопарковка Советская', category: '🚲 Велик', coords: [53.6802, 23.8315], desc: 'Сбор велосипедистов' },
-                { name: 'Клуб настолок / Кибер-центр', category: '🎮 Гейминг', coords: [53.6790, 23.8320], desc: 'Место для геймеров' }
+                { name: 'Клуб настолок / Кибер-центр', category: '🎮 Гейминг', coords: [53.6790, 23.8320], desc: 'Место для геймеров' },
+                { name: 'Сквер на Ожешко', category: '🚶‍♂️ Прогулка', coords: [53.6835, 23.8400], desc: 'Тихая зона у аллеи' },
+                { name: 'Пляж на Немане (Центр)', category: '🚶‍♂️ Прогулка', coords: [53.6710, 23.8220], desc: 'Городской пляж у воды' }
             ],
             'ТЦ Тринити': [
                 { name: 'Главный вход Тринити', category: '🚶‍♂️ Прогулка', coords: [53.6492, 23.8395], desc: 'Уличная площадка у входа' },
@@ -370,47 +393,54 @@
                 { name: 'Теннисные столы Тринити', category: '🏓 Наст. теннис', coords: [53.6490, 23.8405], desc: 'Столы для пинг-понга' },
                 { name: 'Ледовая арена (воркаут)', category: '🏋️‍♂️ Турники / Бег', coords: [53.6510, 23.8420], desc: 'Турники и беговая дорожка' },
                 { name: 'Велопаркинг ТЦ Тринити', category: '🚲 Велик', coords: [53.6493, 23.8398], desc: 'Сбор велосипедистов' },
-                { name: 'Кибер-зона Фуд-корта', category: '🎮 Гейминг', coords: [53.6492, 23.8395], desc: 'Гейминг и консоли' }
+                { name: 'Кибер-зона Фуд-корта', category: '🎮 Гейминг', coords: [53.6492, 23.8395], desc: 'Гейминг и консоли' },
+                { name: 'Западный паркинг Тринити', category: '🚶‍♂️ Прогулка', coords: [53.6475, 23.8370], desc: 'Свободная площадка' }
             ],
             'OldCity (Олд Сити)': [
                 { name: 'У Замка (атриум)', category: '🚶‍♂️ Прогулка', coords: [53.6912, 23.8490], desc: 'Главный атриум ТЦ' },
                 { name: 'Коробка OldCity', category: '⚽ Футбол', coords: [53.6898, 23.8465], desc: 'Футбольная площадка' },
                 { name: 'Спорт-зона OldCity', category: '🏀 Баскетбол', coords: [53.6905, 23.8470], desc: 'Площадка под баскетбол' },
                 { name: 'Турники у ОлдСити', category: '🏋️‍♂️ Турники / Бег', coords: [53.6910, 23.8500], desc: 'Воркаут комплекс' },
-                { name: 'Парковка у входа (Вело)', category: '🚲 Велик', coords: [53.6915, 23.8485], desc: 'Сбор велосипедистов' }
+                { name: 'Парковка у входа (Вело)', category: '🚲 Велик', coords: [53.6915, 23.8485], desc: 'Сбор велосипедистов' },
+                { name: 'Восточный сквер OldCity', category: '🚶‍♂️ Прогулка', coords: [53.6925, 23.8520], desc: 'Место отдыха' }
             ],
             'Ольшанка': [
                 { name: 'ТЦ Стелла', category: '🚶‍♂️ Прогулка', coords: [53.6280, 23.7850], desc: 'Центр микрорайона' },
                 { name: 'Стадион 41-й школы', category: '⚽ Футбол', coords: [53.6265, 23.7890], desc: 'Футбольная коробка' },
                 { name: 'Площадка у школы Ольшанка', category: '🏀 Баскетбол', coords: [53.6270, 23.7880], desc: 'Баскетбол' },
                 { name: 'Турники Ольшанка', category: '🏋️‍♂️ Турники / Бег', coords: [53.6250, 23.7860], desc: 'Воркаут площадка' },
-                { name: 'Велодорожка Ольшанка', category: '🚲 Велик', coords: [53.6275, 23.7845], desc: 'Маршрут для байков' }
+                { name: 'Велодорожка Ольшанка', category: '🚲 Велик', coords: [53.6275, 23.7845], desc: 'Маршрут для байков' },
+                { name: 'Колесо обозрения / Парк Ольшанка', category: '🚶‍♂️ Прогулка', coords: [53.6300, 23.7820], desc: 'Зона отдыха' }
             ],
             'Девятовка': [
                 { name: 'ТЦ Лимож', category: '🚶‍♂️ Прогулка', coords: [53.7020, 23.8550], desc: 'Площадь у Лиможа' },
                 { name: 'Стадион 27-й школы', category: '⚽ Футбол', coords: [53.6980, 23.8600], desc: 'Спортивная коробка' },
                 { name: 'Коробка Девятовка', category: '🏀 Баскетбол', coords: [53.7010, 23.8580], desc: 'Баскетбол' },
-                { name: 'Воркаут Девятовка', category: '🏋️‍♂️ Турники / Бег', coords: [53.6995, 23.8540], desc: 'Турники и брусья' }
+                { name: 'Воркаут Девятовка', category: '🏋️‍♂️ Турники / Бег', coords: [53.6995, 23.8540], desc: 'Турники и брусья' },
+                { name: 'Бульвар Девятовка', category: '🚶‍♂️ Прогулка', coords: [53.7040, 23.8520], desc: 'Прогулочная аллея' }
             ],
             'Грандичи': [
                 { name: 'Евроопт (Грандичи-3)', category: '🚶‍♂️ Прогулка', coords: [53.7150, 23.8680], desc: 'Главная точка сбора' },
                 { name: 'Школа №42', category: '⚽ Футбол', coords: [53.7130, 23.8650], desc: 'Футбольное поле' },
                 { name: 'Площадка Грандичи', category: '🏀 Баскетбол', coords: [53.7140, 23.8660], desc: 'Баскет площадка' },
-                { name: 'Воркаут Грандичи', category: '🏋️‍♂️ Турники / Бег', coords: [53.7160, 23.8690], desc: 'Турники нового района' }
+                { name: 'Воркаут Грандичи', category: '🏋️‍♂️ Турники / Бег', coords: [53.7160, 23.8690], desc: 'Турники нового района' },
+                { name: 'Центральный сквер Грандичи', category: '🚶‍♂️ Прогулка', coords: [53.7180, 23.8710], desc: 'Новый парк' }
             ],
             'Пышки (Парк)': [
                 { name: 'Главный вход в Пышки', category: '🚶‍♂️ Прогулка', coords: [53.6830, 23.7930], desc: 'Начало парка' },
                 { name: 'Мини-поле Пышки', category: '⚽ Футбол', coords: [53.6845, 23.7940], desc: 'Лесная мини-коробка' },
                 { name: 'Волейбольная площадка в Пышках', category: '🏐 Волейбол', coords: [53.6860, 23.7920], desc: 'Сетка для волейбола' },
                 { name: 'Тропа здоровья (вход)', category: '🏋️‍♂️ Турники / Бег', coords: [53.6850, 23.7950], desc: 'Начало для бега и турников' },
-                { name: 'Велодорожка Пышки', category: '🚲 Велик', coords: [53.6840, 23.7980], desc: 'Основной маршрут для байков' }
+                { name: 'Велодорожка Пышки', category: '🚲 Велик', coords: [53.6840, 23.7980], desc: 'Основной маршрут для байков' },
+                { name: 'Беседка у Немана (Пышки)', category: '🚶‍♂️ Прогулка', coords: [53.6890, 23.7850], desc: 'Живописный берег' }
             ],
             'БЛК / Форты': [
                 { name: 'Универмаг / БЛК', category: '🚶‍♂️ Прогулка', coords: [53.6900, 23.8200], desc: 'Центр БЛК' },
                 { name: 'Стадион «Красное Знамя» (КЗ)', category: '⚽ Футбол', coords: [53.6950, 23.8100], desc: 'Легендарный стадион КЗ' },
                 { name: 'Коробка Форты (Баскетбол)', category: '🏀 Баскетбол', coords: [53.6940, 23.8130], desc: 'Баскетбольная площадка' },
                 { name: 'Столы у ГрГУ', category: '🏓 Наст. теннис', coords: [53.6910, 23.8180], desc: 'Теннисные столы' },
-                { name: 'Турники на БЛК', category: '🏋️‍♂️ Турники / Бег', coords: [53.6930, 23.8120], desc: 'Воркаут площадка' }
+                { name: 'Турники на БЛК', category: '🏋️‍♂️ Турники / Бег', coords: [53.6930, 23.8120], desc: 'Воркаут площадка' },
+                { name: 'Сквер на Горького', category: '🚶‍♂️ Прогулка', coords: [53.6870, 23.8250], desc: 'Аллея для прогулок' }
             ]
         };
 
@@ -494,17 +524,51 @@
 
         // Уникальные яркие неоновые цвета для каждой категории активности
         function getCategoryColor(category) {
-            if (category.includes('Футбол')) return '#ffd700';     // Золотой / Желтый
-            if (category.includes('Баскетбол')) return '#ff6600';  // Оранжевый
-            if (category.includes('Волейбол')) return '#00ffcc';   // Бирюзовый
-            if (category.includes('Наст. теннис')) return '#bf00ff'; // Пурпурный
-            if (category.includes('Турники')) return '#2ecc71';    // Ярко-зеленый
-            if (category.includes('Велик')) return '#00a2ff';      // Синий
-            if (category.includes('Гейминг')) return '#ff0055';    // Розовый неон
-            return '#00f2fe';                                      // Прогулка (Небесно-голубой)
+            if (category.includes('Футбол')) return '#ffd700';     
+            if (category.includes('Баскетбол')) return '#ff6600';  
+            if (category.includes('Волейбол')) return '#00ffcc';   
+            if (category.includes('Наст. теннис')) return '#bf00ff'; 
+            if (category.includes('Турники')) return '#2ecc71';    
+            if (category.includes('Велик')) return '#00a2ff';      
+            if (category.includes('Гейминг')) return '#ff0055';    
+            return '#00f2fe';                                      
         }
 
-        // Динамическая пульсация точек в зависимости от срочности и времени до сходки
+        // Интеллектуальный расчет пульсации на основе времени до сходки или флага СРОЧНО
+        function getPulseClass(meetingTimeText) {
+            if (!meetingTimeText || meetingTimeText === '⚡ СРОЧНО') {
+                return 'pulse-fast';
+            }
+            
+            // Если указано конкретное время (например, "18:30")
+            const parts = meetingTimeText.split(':');
+            if (parts.length === 2) {
+                const now = new Date();
+                const targetHours = parseInt(parts[0], 10);
+                const targetMinutes = parseInt(parts[1], 10);
+                
+                const targetDate = new Date();
+                targetDate.setHours(targetHours, targetMinutes, 0, 0);
+                
+                const diffMs = targetDate - now;
+                const diffMins = diffMs / (1000 * 60);
+                
+                // Менее 40 минут до сходки -> быстро мигает
+                if (diffMins < 40) {
+                    return 'pulse-fast';
+                }
+                // От 40 минут до 2 часов -> средне мигает
+                else if (diffMins >= 40 && diffMins <= 120) {
+                    return 'pulse-medium';
+                }
+                // Более 2 часов -> медленно мигает
+                else {
+                    return 'pulse-slow';
+                }
+            }
+            return 'pulse-medium';
+        }
+
         function renderMapMarkers() {
             if (!mapInstance) return;
             mapMarkers.forEach(m => mapInstance.removeLayer(m));
@@ -519,26 +583,20 @@
 
                     const activeMeeting = meetings.find(m => m.district === districtName && m.exactPlace === pt.name);
 
-                    let markerColor = '#3a3a55'; 
-                    let pulseAnimationClass = '';
+                    let markerColor = '#4a4a6a'; 
+                    let pulseAnimationClass = 'pulse-slow'; // Базовая фоновая пульсация для всех точек
                     let radiusSize = 6;
 
                     if (activeMeeting) {
                         markerColor = getCategoryColor(pt.category);
                         radiusSize = 9;
-                        
-                        // Логика скорости пульсации на основе времени сходки
-                        if (activeMeeting.time === '⚡ СРОЧНО') {
-                            pulseAnimationClass = 'cyber-pulse-fast'; // Быстрая пульсация
-                        } else {
-                            pulseAnimationClass = 'cyber-pulse-medium'; // Средняя пульсация для запланированного времени
-                        }
+                        pulseAnimationClass = getPulseClass(activeMeeting.time);
                     }
 
                     const circleMarker = L.circleMarker(pt.coords, {
                         radius: radiusSize,
                         fillColor: markerColor,
-                        color: activeMeeting ? '#ffffff' : '#555577',
+                        color: activeMeeting ? '#ffffff' : '#777799',
                         weight: activeMeeting ? 2 : 1,
                         opacity: 1,
                         fillOpacity: 0.95,
@@ -568,7 +626,7 @@
                 });
             });
         }
-                        function updateQuickPlaces() {
+                    function updateQuickPlaces() {
             const districtSelect = document.getElementById('create-district');
             const activeTagInput = document.querySelector('input[name="radar-tag"]:checked');
             if (!districtSelect) return;
@@ -935,3 +993,4 @@
 </body>
 </html>
 
+    
