@@ -9,25 +9,23 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         :root {
-            --bg-main: #0a0a12;
-            --bg-card: rgba(20, 20, 35, 0.65);
-            --bg-input: #121224;
-            --accent: #00a2ff;
-            --accent-glow: rgba(0, 162, 255, 0.4);
-            --accent-green: #2ecc71;
-            --accent-red: #ff3838;
-            --text-main: #f5f6fa;
-            --text-muted: #8e8ea0;
-            --border: rgba(255, 255, 255, 0.08);
-            --glass-blur: blur(12px);
+            --bg-main: #070710;
+            --bg-card: rgba(18, 18, 35, 0.75);
+            --bg-input: #111125;
+            --accent-cyan: #00f2fe;
+            --accent-purple: #7f00ff;
+            --text-main: #ffffff;
+            --text-muted: #9393b5;
+            --border: rgba(255, 255, 255, 0.12);
+            --glass-blur: blur(16px);
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: radial-gradient(circle at top right, #13132b, var(--bg-main) 70%);
+            background: radial-gradient(circle at 50% 0%, #1c133a, var(--bg-main) 75%);
             color: var(--text-main);
             margin: 0;
-            padding: 15px 15px 100px 15px;
+            padding: 12px 12px 90px 12px;
             box-sizing: border-box;
             user-select: none;
             -webkit-user-select: none;
@@ -35,28 +33,28 @@
         }
 
         h2, h3 {
-            margin: 0 0 10px 0;
+            margin: 0 0 8px 0;
             font-weight: 800;
             letter-spacing: -0.5px;
             text-transform: uppercase;
-            background: linear-gradient(90deg, #fff, var(--text-muted));
+            background: linear-gradient(90deg, #fff, var(--accent-cyan));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .subtitle {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-muted);
-            margin-top: -6px;
-            margin-bottom: 20px;
+            margin-top: -4px;
+            margin-bottom: 16px;
             font-weight: 500;
         }
 
         .screen { display: none; }
-        .screen.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+        .screen.active { display: block; animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
+            from { opacity: 0; transform: translateY(6px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -64,88 +62,87 @@
             background: var(--bg-card);
             backdrop-filter: var(--glass-blur);
             -webkit-backdrop-filter: var(--glass-blur);
-            padding: 18px;
-            border-radius: 16px;
-            margin-bottom: 16px;
+            padding: 16px;
+            border-radius: 18px;
+            margin-bottom: 14px;
             border: 1px solid var(--border);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             position: relative;
         }
 
         .alert {
-            background: rgba(255, 56, 56, 0.07);
-            border: 1px solid rgba(255, 56, 56, 0.3);
-            color: #ff6b6b;
-            padding: 14px;
+            background: rgba(255, 56, 96, 0.08);
+            border: 1px solid rgba(255, 56, 96, 0.3);
+            color: #ff809a;
+            padding: 12px;
             border-radius: 12px;
-            font-size: 13px;
+            font-size: 12px;
             line-height: 1.4;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
-        .form-group { margin-bottom: 18px; }
+        .form-group { margin-bottom: 16px; }
 
         label {
             display: block;
             font-size: 11px;
             font-weight: 700;
-            margin-bottom: 8px;
-            color: #a4b0be;
+            margin-bottom: 6px;
+            color: #b0c4de;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.8px;
         }
 
         input[type="text"], input[type="number"], select, textarea {
             width: 100%;
-            padding: 14px;
+            padding: 13px;
             background: var(--bg-input);
             border: 1px solid var(--border);
             border-radius: 12px;
             color: #fff;
-            font-size: 15px;
+            font-size: 14px;
             box-sizing: border-box;
             outline: none;
             transition: all 0.25s ease;
         }
 
         input:focus, select:focus, textarea:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 12px var(--accent-glow);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.35);
         }
 
         .btn {
-            display: block; width: 100%; padding: 15px; border-radius: 12px; border: none;
-            font-size: 15px; font-weight: 700; cursor: pointer; text-align: center; box-sizing: border-box;
+            display: block; width: 100%; padding: 14px; border-radius: 12px; border: none;
+            font-size: 14px; font-weight: 700; cursor: pointer; text-align: center; box-sizing: border-box;
             transition: all 0.2s ease; text-transform: uppercase; letter-spacing: 0.5px;
         }
-        .btn-primary { background: linear-gradient(135deg, var(--accent), #0066ff); color: #fff; box-shadow: 0 4px 15px rgba(0, 162, 255, 0.3); }
-        .btn-success { background: linear-gradient(135deg, var(--accent-green), #27ae60); color: #fff; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3); }
-        .btn-danger { background: linear-gradient(135deg, var(--accent-red), #c0392b); color: #fff; box-shadow: 0 4px 15px rgba(255, 56, 56, 0.3); }
+        .btn-primary { background: linear-gradient(135deg, var(--accent-cyan), #0072ff); color: #fff; box-shadow: 0 4px 15px rgba(0, 114, 255, 0.4); }
+        .btn-danger { background: linear-gradient(135deg, #ff3860, #ff1493); color: #fff; box-shadow: 0 4px 15px rgba(255, 56, 96, 0.4); }
         .hidden { display: none !important; }
 
-        /* Динамические пульсирующие маркеры на карте */
-        @keyframes pulse-fast {
-            0% { transform: scale(0.95); opacity: 1; box-shadow: 0 0 0 0 rgba(255, 56, 56, 0.7); }
-            70% { transform: scale(1.3); opacity: 0.6; box-shadow: 0 0 0 10px rgba(255, 56, 56, 0); }
-            100% { transform: scale(0.95); opacity: 1; box-shadow: 0 0 0 0 rgba(255, 56, 56, 0); }
+        /* Продвинутая пульсация точек на карте для разных уровней срочности */
+        @keyframes cyber-pulse-fast {
+            0% { transform: scale(0.9); opacity: 1; box-shadow: 0 0 0 0 rgba(255, 56, 96, 0.9); }
+            70% { transform: scale(1.6); opacity: 0.5; box-shadow: 0 0 0 14px rgba(255, 56, 96, 0); }
+            100% { transform: scale(0.9); opacity: 1; box-shadow: 0 0 0 0 rgba(255, 56, 96, 0); }
         }
-        @keyframes pulse-medium {
-            0% { transform: scale(0.95); opacity: 1; box-shadow: 0 0 0 0 rgba(0, 162, 255, 0.7); }
-            70% { transform: scale(1.2); opacity: 0.7; box-shadow: 0 0 0 8px rgba(0, 162, 255, 0); }
-            100% { transform: scale(0.95); opacity: 1; box-shadow: 0 0 0 0 rgba(0, 162, 255, 0); }
+        @keyframes cyber-pulse-medium {
+            0% { transform: scale(0.95); opacity: 1; box-shadow: 0 0 0 0 rgba(255, 170, 0, 0.8); }
+            70% { transform: scale(1.35); opacity: 0.6; box-shadow: 0 0 0 10px rgba(255, 170, 0, 0); }
+            100% { transform: scale(0.95); opacity: 1; box-shadow: 0 0 0 0 rgba(255, 170, 0, 0); }
         }
-        @keyframes pulse-slow {
-            0% { transform: scale(1); opacity: 0.9; }
-            50% { transform: scale(1.1); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.9; }
+        @keyframes cyber-pulse-slow {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.15); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
         }
     </style>
 </head>
-<body>
+    <body>
     <div id="auth-screen" class="screen active">
-        <div style="text-align: center; margin-top: 40px; margin-bottom: 30px;">
-            <h1 style="font-size: 28px; background: linear-gradient(90deg, var(--accent), #00ffcc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0;">GRODNO RUN 2026</h1>
-            <p class="subtitle" style="margin-top: 8px;">Кибернетическая система сбора и координации</p>
+        <div style="text-align: center; margin-top: 35px; margin-bottom: 25px;">
+            <h1 style="font-size: 26px; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0;">GRODNO RUN 2026</h1>
+            <p class="subtitle" style="margin-top: 6px;">Кибернетическая система сбора и координации</p>
         </div>
 
         <div class="card">
@@ -171,42 +168,49 @@
                 </select>
             </div>
 
-            <button class="btn btn-primary" id="btn-save-auth" style="margin-top: 10px;">Войти в систему</button>
+            <button class="btn btn-primary" id="btn-save-auth" style="margin-top: 8px;">Войти в систему</button>
         </div>
     </div>
 
     <div id="main-screen" class="screen">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
             <div>
-                <h2 style="margin: 0; font-size: 20px;">Grodno Run</h2>
-                <div id="user-status-header" style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Профиль: Загрузка...</div>
+                <h2 style="margin: 0; font-size: 19px;">Grodno Run</h2>
+                <div id="user-status-header" style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Профиль: Загрузка...</div>
             </div>
             <div id="admin-badge-container"></div>
         </div>
 
         <div id="sub-radar" class="sub-screen screen active">
-            <div class="card" style="padding: 12px; margin-bottom: 15px;">
-                <div id="cyber-map" style="width: 100%; height: 260px; border-radius: 12px; border: 1px solid var(--border); background: #0c0c16;"></div>
+            <div class="card" style="padding: 10px; margin-bottom: 14px;">
+                <div id="cyber-map" style="width: 100%; height: 250px; border-radius: 14px; border: 1px solid var(--border); background: #05050f;"></div>
             </div>
 
-            <div id="radar-filter-bar" style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 10px; scrollbar-width: none;">
-                <button class="btn filter-chip active" data-filter="all" style="padding: 8px 14px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">🔥 Все районы</button>
-                <button class="btn filter-chip" data-filter="Центр (Советская)" style="padding: 8px 14px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">Центр <span id="b-center" style="color: var(--accent);"></span></button>
-                <button class="btn filter-chip" data-filter="ТЦ Тринити" style="padding: 8px 14px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">Тринити <span id="b-trinity" style="color: var(--accent);"></span></button>
-                <button class="btn filter-chip" data-filter="OldCity (Олд Сити)" style="padding: 8px 14px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">OldCity <span id="b-oldcity" style="color: var(--accent);"></span></button>
-                <button class="btn filter-chip" data-filter="Ольшанка" style="padding: 8px 14px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">Ольшанка <span id="b-olshanka" style="color: var(--accent);"></span></button>
-                <button class="btn filter-chip" data-filter="Грандичи" style="padding: 8px 14px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">Грандичи <span id="b-grandichi" style="color: var(--accent);"></span></button>
-                <button class="btn filter-chip" data-filter="Девятовка" style="padding: 8px 14px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">Девятовка <span id="b-devyatovka" style="color: var(--accent);"></span></button>
-                <button class="btn filter-chip" data-filter="Пышки (Парк)" style="padding: 8px 14px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">Пышки <span id="b-pyshki" style="color: var(--accent);"></span></button>
-                <button class="btn filter-chip" data-filter="БЛК / Форты" style="padding: 8px 14px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">Форты <span id="b-forty" style="color: var(--accent);"></span></button>
+            <div id="radar-filter-bar" style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 10px; scrollbar-width: none;">
+                <button class="btn filter-chip active" data-filter="all" style="padding: 7px 12px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">🔥 Все районы</button>
+                <button class="btn filter-chip" data-filter="Центр (Советская)" style="padding: 7px 12px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">Центр <span id="b-center" style="color: var(--accent-cyan);"></span></button>
+                <button class="btn filter-chip" data-filter="ТЦ Тринити" style="padding: 7px 12px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">Тринити <span id="b-trinity" style="color: var(--accent-cyan);"></span></button>
+                <button class="btn filter-chip" data-filter="OldCity (Олд Сити)" style="padding: 7px 12px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">OldCity <span id="b-oldcity" style="color: var(--accent-cyan);"></span></button>
+                <button class="btn filter-chip" data-filter="Ольшанка" style="padding: 7px 12px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">Ольшанка <span id="b-olshanka" style="color: var(--accent-cyan);"></span></button>
+                <button class="btn filter-chip" data-filter="Грандичи" style="padding: 7px 12px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">Грандичи <span id="b-grandichi" style="color: var(--accent-cyan);"></span></button>
+                <button class="btn filter-chip" data-filter="Девятовка" style="padding: 7px 12px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">Девятовка <span id="b-devyatovka" style="color: var(--accent-cyan);"></span></button>
+                <button class="btn filter-chip" data-filter="Пышки (Парк)" style="padding: 7px 12px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">Пышки <span id="b-pyshki" style="color: var(--accent-cyan);"></span></button>
+                <button class="btn filter-chip" data-filter="БЛК / Форты" style="padding: 7px 12px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">Форты <span id="b-forty" style="color: var(--accent-cyan);"></span></button>
             </div>
 
             <div id="radar-list"></div>
-            <div id="empty-state-msg" style="text-align: center; color: var(--text-muted); padding: 40px 0; display: none;">
-                <p style="font-size: 15px;">📭 В выбранном районе пока нет активных сборов.</p>
-                <p style="font-size: 13px;">Создай свой первый сбор во вкладке «Собрать»!</p>
+            <div id="empty-state-msg" style="text-align: center; color: var(--text-muted); padding: 35px 0; display: none;">
+                <p style="font-size: 14px;">📭 В выбранном районе пока нет активных сборов.</p>
+                <p style="font-size: 12px;">Создай свой первый сбор во вкладке «Собрать»!</p>
             </div>
         </div>
+
+    <div style="position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: rgba(10, 10, 22, 0.92); backdrop-filter: var(--glass-blur); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-around; padding: 0 4px; z-index: 999; box-sizing: border-box;">
+        <button class="btn nav-btn active" data-sub="sub-radar" style="flex: 1; height: 100%; background: transparent; border: none; color: var(--text-muted); font-size: 10px; font-weight: 800; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-transform: uppercase; letter-spacing: 0.5px;">📡 Радар</button>
+        <button class="btn nav-btn" data-sub="sub-create" style="flex: 1; height: 100%; background: transparent; border: none; color: var(--text-muted); font-size: 10px; font-weight: 800; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-transform: uppercase; letter-spacing: 0.5px;">⚡ Собрать</button>
+        <button class="btn nav-btn" data-sub="sub-archive" style="flex: 1; height: 100%; background: transparent; border: none; color: var(--text-muted); font-size: 10px; font-weight: 800; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-transform: uppercase; letter-spacing: 0.5px;">📜 Архив</button>
+        <button class="btn nav-btn" data-sub="sub-admin" style="flex: 1; height: 100%; background: transparent; border: none; color: var(--text-muted); font-size: 10px; font-weight: 800; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-transform: uppercase; letter-spacing: 0.5px;">🚨 Куратор</button>
+    </div>
                 <div id="sub-create" class="sub-screen screen">
             <div class="card">
                 <h3>⚡ Запустить новый сбор</h3>
@@ -228,52 +232,52 @@
 
                 <div class="form-group">
                     <label>🔥 Категория активности:</label>
-                    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 5px;">
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px;">
                         <input type="radio" id="tag-walk" name="radar-tag" value="🚶‍♂️ Прогулка" checked style="display:none;">
-                        <label for="tag-walk" class="btn" style="padding: 9px 12px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border); margin:0;">🚶‍♂️ Прогулка</label>
+                        <label for="tag-walk" class="btn" style="padding: 8px 10px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border); margin:0;">🚶‍♂️ Прогулка</label>
 
                         <input type="radio" id="tag-football" name="radar-tag" value="⚽ Футбол" style="display:none;">
-                        <label for="tag-football" class="btn" style="padding: 9px 12px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border); margin:0;">⚽ Футбол</label>
+                        <label for="tag-football" class="btn" style="padding: 8px 10px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border); margin:0;">⚽ Футбол</label>
 
                         <input type="radio" id="tag-basketball" name="radar-tag" value="🏀 Баскетбол" style="display:none;">
-                        <label for="tag-basketball" class="btn" style="padding: 9px 12px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border); margin:0;">🏀 Баскетбол</label>
+                        <label for="tag-basketball" class="btn" style="padding: 8px 10px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border); margin:0;">🏀 Баскетбол</label>
 
                         <input type="radio" id="tag-volleyball" name="radar-tag" value="🏐 Волейбол" style="display:none;">
-                        <label for="tag-volleyball" class="btn" style="padding: 9px 12px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border); margin:0;">🏐 Волейбол</label>
+                        <label for="tag-volleyball" class="btn" style="padding: 8px 10px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border); margin:0;">🏐 Волейбол</label>
 
                         <input type="radio" id="tag-pingpong" name="radar-tag" value="🏓 Наст. теннис" style="display:none;">
-                        <label for="tag-pingpong" class="btn" style="padding: 9px 12px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border); margin:0;">🏓 Наст. теннис</label>
+                        <label for="tag-pingpong" class="btn" style="padding: 8px 10px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border); margin:0;">🏓 Наст. теннис</label>
 
                         <input type="radio" id="tag-workout" name="radar-tag" value="🏋️‍♂️ Турники / Бег" style="display:none;">
-                        <label for="tag-workout" class="btn" style="padding: 9px 12px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border); margin:0;">🏋️‍♂️ Турники</label>
+                        <label for="tag-workout" class="btn" style="padding: 8px 10px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border); margin:0;">🏋️‍♂️ Турники</label>
 
                         <input type="radio" id="tag-bike" name="radar-tag" value="🚲 Велик" style="display:none;">
-                        <label for="tag-bike" class="btn" style="padding: 9px 12px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border); margin:0;">🚲 Велик</label>
+                        <label for="tag-bike" class="btn" style="padding: 8px 10px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border); margin:0;">🚲 Велик</label>
 
                         <input type="radio" id="tag-game" name="radar-tag" value="🎮 Гейминг" style="display:none;">
-                        <label for="tag-game" class="btn" style="padding: 9px 12px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border); margin:0;">🎮 Гейминг</label>
+                        <label for="tag-game" class="btn" style="padding: 8px 10px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border); margin:0;">🎮 Гейминг</label>
                     </div>
                 </div>
 
-                <div class="form-group" style="margin-top: 15px;">
+                <div class="form-group" style="margin-top: 14px;">
                     <label>🎯 Точное место встречи:</label>
                     <input type="text" id="create-exact-place" placeholder="Например: Коробка на Ожешко, Скейт-парк">
                     <div id="quick-places-container" style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px;"></div>
                 </div>
 
-                <div class="form-group" style="margin-top: 15px;">
+                <div class="form-group" style="margin-top: 14px;">
                     <label>⏱️ Когда собираемся?</label>
-                    <div style="display: flex; gap: 15px; margin-top: 5px; align-items: center;">
-                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 13px; color: var(--accent-red); font-weight: bold;">
+                    <div style="display: flex; gap: 15px; margin-top: 4px; align-items: center;">
+                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 12px; color: #ff3860; font-weight: bold;">
                             <input type="radio" name="time-type" value="now" checked onchange="toggleTimeInputs()"> ⚡ Срочно
                         </label>
-                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 13px; color: var(--accent); font-weight: bold;">
+                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 12px; color: var(--accent-cyan); font-weight: bold;">
                             <input type="radio" name="time-type" value="later" onchange="toggleTimeInputs()"> 📅 Выбрать время
                         </label>
                     </div>
-                    <div id="time-picker-block" class="hidden" style="display: flex; gap: 10px; margin-top: 12px;">
+                    <div id="time-picker-block" class="hidden" style="display: flex; gap: 10px; margin-top: 10px;">
                         <div style="flex: 1;">
-                            <label style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Часы:</label>
+                            <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">Часы:</label>
                             <select id="create-hour">
                                 <option value="09">09:00</option><option value="10">10:00</option><option value="11">11:00</option>
                                 <option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option>
@@ -283,7 +287,7 @@
                             </select>
                         </div>
                         <div style="flex: 1;">
-                            <label style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Минуты:</label>
+                            <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">Минуты:</label>
                             <select id="create-minute">
                                 <option value="00" selected>00 мин</option><option value="15">15 мин</option>
                                 <option value="30">30 мин</option><option value="45">45 мин</option>
@@ -292,36 +296,36 @@
                     </div>
                 </div>
 
-                <div class="form-group" style="margin-top: 15px;">
+                <div class="form-group" style="margin-top: 14px;">
                     <label>📝 Короткое описание / приметы:</label>
-                    <textarea id="create-desc" placeholder="Кто нужен? Что берём с собой? Сколько сидим?" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; padding: 12px; color: #fff; font-size:13px; resize: none; height: 70px; box-sizing: border-box; outline: none;"></textarea>
+                    <textarea id="create-desc" placeholder="Кто нужен? Что берём с собой? Сколько сидим?" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; padding: 12px; color: #fff; font-size:13px; resize: none; height: 65px; box-sizing: border-box; outline: none;"></textarea>
                 </div>
 
-                <div class="form-group" style="margin-top: 15px;">
+                <div class="form-group" style="margin-top: 14px;">
                     <label>👥 Состав участников:</label>
-                    <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;">
-                        <button type="button" class="btn tag-chip-comp active" data-mode="limit" onclick="setCompositionMode('limit')" style="padding: 8px 12px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">👥 Максимум человек</button>
-                        <button type="button" class="btn tag-chip-comp" data-mode="gender" onclick="setCompositionMode('gender')" style="padding: 8px 12px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">⚙️ Точный состав (М/Ж)</button>
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px;">
+                        <button type="button" class="btn tag-chip-comp active" data-mode="limit" onclick="setCompositionMode('limit')" style="padding: 7px 10px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">👥 Максимум человек</button>
+                        <button type="button" class="btn tag-chip-comp" data-mode="gender" onclick="setCompositionMode('gender')" style="padding: 7px 10px; font-size: 11px; width: auto; background: var(--bg-input); border: 1px solid var(--border);">⚙️ Точный состав (М/Ж)</button>
                     </div>
 
-                    <div id="mode-limit-block" style="margin-top: 12px;">
-                        <label style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Сколько максимум человек:</label>
+                    <div id="mode-limit-block" style="margin-top: 10px;">
+                        <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">Сколько максимум человек:</label>
                         <input type="text" id="create-max-people" placeholder="Например: 5 или Без лимита">
                     </div>
 
-                    <div id="mode-gender-block" class="hidden" style="display: flex; gap: 10px; margin-top: 12px;">
+                    <div id="mode-gender-block" class="hidden" style="display: flex; gap: 10px; margin-top: 10px;">
                         <div style="flex: 1;">
-                            <label style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Девушек:</label>
+                            <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">Девушек:</label>
                             <input type="number" id="count-girls" min="0" value="0">
                         </div>
                         <div style="flex: 1;">
-                            <label style="font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Пацанов:</label>
+                            <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">Пацанов:</label>
                             <input type="number" id="count-guys" min="0" value="0">
                         </div>
                     </div>
                 </div>
 
-                <button class="btn btn-primary" id="btn-launch-radar" style="margin-top: 20px;">🚀 ЗАПУСТИТЬ РАДАР СБОРА</button>
+                <button class="btn btn-primary" id="btn-launch-radar" style="margin-top: 18px;">🚀 ЗАПУСТИТЬ РАДАР СБОРА</button>
             </div>
         </div>
 
@@ -339,18 +343,11 @@
             <div id="violators-list"></div>
         </div>
     </div>
-
-    <div style="position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10, 10, 18, 0.9); backdrop-filter: var(--glass-blur); border-top: 1px solid var(--border); display: flex; padding: 10px 6px; z-index: 999;">
-        <button class="btn nav-btn active" data-sub="sub-radar" style="flex: 1; background: transparent; border: none; color: var(--text-muted); font-size: 11px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; text-transform: uppercase;">📡 Радар</button>
-        <button class="btn nav-btn" data-sub="sub-create" style="flex: 1; background: transparent; border: none; color: var(--text-muted); font-size: 11px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; text-transform: uppercase;">⚡ Собрать</button>
-        <button class="btn nav-btn" data-sub="sub-archive" style="flex: 1; background: transparent; border: none; color: var(--text-muted); font-size: 11px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; text-transform: uppercase;">📜 Архив</button>
-        <button class="btn nav-btn" data-sub="sub-admin" style="flex: 1; background: transparent; border: none; color: var(--text-muted); font-size: 11px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; text-transform: uppercase;">🚨 Куратор</button>
-    </div>
-        <script>
+            <script>
         const BIN_ID = '6a68a3d7da38895dfe9b46cf';
         const API_KEY = '$2a$10$fCuDEyphx80p7hlYAPd8C.W8S8fZv53sNq6UhpL8m/Oot7eVvdScu';
 
-        // Расширенная база локаций Гродно по всем категориям
+        // Расширенная база локаций Гродно по всем категориям с детальными координатами
         const grodnoLocationsData = {
             'Центр (Советская)': [
                 { name: 'У Танка', category: '🚶‍♂️ Прогулка', coords: [53.6800, 23.8303], desc: 'Легендарное место сбора в центре' },
@@ -359,7 +356,6 @@
                 { name: 'Коробка на Социалистической', category: '⚽ Футбол', coords: [53.6820, 23.8310], desc: 'Площадка для футбола' },
                 { name: 'Стадион Неман (Запад)', category: '⚽ Футбол', coords: [53.6730, 23.8250], desc: 'Футбольная мини-зона' },
                 { name: 'Корт у Жилибера', category: '🏀 Баскетбол', coords: [53.6810, 23.8360], desc: 'Баскетбольная площадка' },
-                { name: 'Площадка у Гродножилстрой', category: '🏀 Баскетбол', coords: [53.6795, 23.8280], desc: 'Стритбол в центре' },
                 { name: 'Сетка в парке Жилибера', category: '🏐 Волейбол', coords: [53.6805, 23.8350], desc: 'Волейбольный корт' },
                 { name: 'Настольный теннис в парке', category: '🏓 Наст. теннис', coords: [53.6815, 23.8350], desc: 'Столы для тенниса' },
                 { name: 'Турники у Драмтеатра', category: '🏋️‍♂️ Турники / Бег', coords: [53.6750, 23.8285], desc: 'Воркаут зона и турники' },
@@ -368,11 +364,8 @@
             ],
             'ТЦ Тринити': [
                 { name: 'Главный вход Тринити', category: '🚶‍♂️ Прогулка', coords: [53.6492, 23.8395], desc: 'Уличная площадка у входа' },
-                { name: 'Зона фонтана у ТЦ', category: '🚶‍♂️ Прогулка', coords: [53.6488, 23.8390], desc: 'Место отдыха' },
                 { name: 'Коробка у Тринити', category: '⚽ Футбол', coords: [53.6480, 23.8380], desc: 'Поле для футбола' },
-                { name: 'Спортивное поле за ареной', category: '⚽ Футбол', coords: [53.6515, 23.8430], desc: 'Большое поле' },
                 { name: 'Баскет площадка Тринити', category: '🏀 Баскетбол', coords: [53.6485, 23.8410], desc: 'Баскетбол у ТЦ' },
-                { name: 'Стрит-корты Тринити', category: '🏀 Баскетбол', coords: [53.6500, 23.8415], desc: 'Дополнительные кольца' },
                 { name: 'Волейбольная зона Тринити', category: '🏐 Волейбол', coords: [53.6495, 23.8375], desc: 'Открытая сетка' },
                 { name: 'Теннисные столы Тринити', category: '🏓 Наст. теннис', coords: [53.6490, 23.8405], desc: 'Столы для пинг-понга' },
                 { name: 'Ледовая арена (воркаут)', category: '🏋️‍♂️ Турники / Бег', coords: [53.6510, 23.8420], desc: 'Турники и беговая дорожка' },
@@ -381,7 +374,6 @@
             ],
             'OldCity (Олд Сити)': [
                 { name: 'У Замка (атриум)', category: '🚶‍♂️ Прогулка', coords: [53.6912, 23.8490], desc: 'Главный атриум ТЦ' },
-                { name: 'Площадка со стороны парковки', category: '🚶‍♂️ Прогулка', coords: [53.6918, 23.8480], desc: 'Сбор у входа' },
                 { name: 'Коробка OldCity', category: '⚽ Футбол', coords: [53.6898, 23.8465], desc: 'Футбольная площадка' },
                 { name: 'Спорт-зона OldCity', category: '🏀 Баскетбол', coords: [53.6905, 23.8470], desc: 'Площадка под баскетбол' },
                 { name: 'Турники у ОлдСити', category: '🏋️‍♂️ Турники / Бег', coords: [53.6910, 23.8500], desc: 'Воркаут комплекс' },
@@ -389,19 +381,14 @@
             ],
             'Ольшанка': [
                 { name: 'ТЦ Стелла', category: '🚶‍♂️ Прогулка', coords: [53.6280, 23.7850], desc: 'Центр микрорайона' },
-                { name: 'Аллея Ольшанка', category: '🚶‍♂️ Прогулка', coords: [53.6260, 23.7830], desc: 'Прогулочная зона' },
                 { name: 'Стадион 41-й школы', category: '⚽ Футбол', coords: [53.6265, 23.7890], desc: 'Футбольная коробка' },
-                { name: 'Поле у 39-й школы', category: '⚽ Футбол', coords: [53.6295, 23.7870], desc: 'Футбольное поле' },
                 { name: 'Площадка у школы Ольшанка', category: '🏀 Баскетбол', coords: [53.6270, 23.7880], desc: 'Баскетбол' },
-                { name: 'Баскет-корт Ольшанка-2', category: '🏀 Баскетбол', coords: [53.6255, 23.7840], desc: 'Стритбол площадка' },
                 { name: 'Турники Ольшанка', category: '🏋️‍♂️ Турники / Бег', coords: [53.6250, 23.7860], desc: 'Воркаут площадка' },
                 { name: 'Велодорожка Ольшанка', category: '🚲 Велик', coords: [53.6275, 23.7845], desc: 'Маршрут для байков' }
             ],
             'Девятовка': [
                 { name: 'ТЦ Лимож', category: '🚶‍♂️ Прогулка', coords: [53.7020, 23.8550], desc: 'Площадь у Лиможа' },
-                { name: 'Кольцо Девятовка', category: '🚶‍♂️ Прогулка', coords: [53.7005, 23.8520], desc: 'Место сбора' },
                 { name: 'Стадион 27-й школы', category: '⚽ Футбол', coords: [53.6980, 23.8600], desc: 'Спортивная коробка' },
-                { name: 'Поле у гимназии №10', category: '⚽ Футбол', coords: [53.7040, 23.8570], desc: 'Футбольное поле' },
                 { name: 'Коробка Девятовка', category: '🏀 Баскетбол', coords: [53.7010, 23.8580], desc: 'Баскетбол' },
                 { name: 'Воркаут Девятовка', category: '🏋️‍♂️ Турники / Бег', coords: [53.6995, 23.8540], desc: 'Турники и брусья' }
             ],
@@ -413,17 +400,14 @@
             ],
             'Пышки (Парк)': [
                 { name: 'Главный вход в Пышки', category: '🚶‍♂️ Прогулка', coords: [53.6830, 23.7930], desc: 'Начало парка' },
-                { name: 'Поляна у Немана (Пышки)', category: '🚶‍♂️ Прогулка', coords: [53.6870, 23.7900], desc: 'Зона отдыха' },
                 { name: 'Мини-поле Пышки', category: '⚽ Футбол', coords: [53.6845, 23.7940], desc: 'Лесная мини-коробка' },
                 { name: 'Волейбольная площадка в Пышках', category: '🏐 Волейбол', coords: [53.6860, 23.7920], desc: 'Сетка для волейбола' },
                 { name: 'Тропа здоровья (вход)', category: '🏋️‍♂️ Турники / Бег', coords: [53.6850, 23.7950], desc: 'Начало для бега и турников' },
                 { name: 'Велодорожка Пышки', category: '🚲 Велик', coords: [53.6840, 23.7980], desc: 'Основной маршрут для байков' }
             ],
             'БЛК / Форты': [
-                { name: 'Мини-рынок Форты', category: '🚶‍♂️ Прогулка', coords: [53.6920, 23.8150], desc: 'Торговая площадка' },
                 { name: 'Универмаг / БЛК', category: '🚶‍♂️ Прогулка', coords: [53.6900, 23.8200], desc: 'Центр БЛК' },
                 { name: 'Стадион «Красное Знамя» (КЗ)', category: '⚽ Футбол', coords: [53.6950, 23.8100], desc: 'Легендарный стадион КЗ' },
-                { name: 'Коробка Форты', category: '⚽ Футбол', coords: [53.6935, 23.8140], desc: 'Футбольное поле' },
                 { name: 'Коробка Форты (Баскетбол)', category: '🏀 Баскетбол', coords: [53.6940, 23.8130], desc: 'Баскетбольная площадка' },
                 { name: 'Столы у ГрГУ', category: '🏓 Наст. теннис', coords: [53.6910, 23.8180], desc: 'Теннисные столы' },
                 { name: 'Турники на БЛК', category: '🏋️‍♂️ Турники / Бег', coords: [53.6930, 23.8120], desc: 'Воркаут площадка' }
@@ -450,7 +434,8 @@
         let mapInstance = null;
         let mapMarkers = [];
         let currentCompositionMode = 'limit';
-                    async function loadMeetingsFromServer() {
+
+        async function loadMeetingsFromServer() {
             try {
                 const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
                     headers: { 'X-Master-Key': API_KEY }
@@ -507,17 +492,19 @@
             renderMapMarkers();
         }
 
+        // Уникальные яркие неоновые цвета для каждой категории активности
         function getCategoryColor(category) {
-            if (category.includes('Футбол')) return '#ffaa00'; // Желтый
-            if (category.includes('Баскетбол')) return '#ff5500'; // Оранжевый
-            if (category.includes('Волейбол')) return '#00ffcc'; // Бирюзовый
-            if (category.includes('Наст. теннис')) return '#aa00ff'; // Фиолетовый
-            if (category.includes('Турники')) return '#2ecc71'; // Зеленый
-            if (category.includes('Велик')) return '#00a2ff'; // Синий
-            if (category.includes('Гейминг')) return '#ff0055'; // Розовый
-            return '#ffffff'; // Прогулка / По умолчанию
+            if (category.includes('Футбол')) return '#ffd700';     // Золотой / Желтый
+            if (category.includes('Баскетбол')) return '#ff6600';  // Оранжевый
+            if (category.includes('Волейбол')) return '#00ffcc';   // Бирюзовый
+            if (category.includes('Наст. теннис')) return '#bf00ff'; // Пурпурный
+            if (category.includes('Турники')) return '#2ecc71';    // Ярко-зеленый
+            if (category.includes('Велик')) return '#00a2ff';      // Синий
+            if (category.includes('Гейминг')) return '#ff0055';    // Розовый неон
+            return '#00f2fe';                                      // Прогулка (Небесно-голубой)
         }
 
+        // Динамическая пульсация точек в зависимости от срочности и времени до сходки
         function renderMapMarkers() {
             if (!mapInstance) return;
             mapMarkers.forEach(m => mapInstance.removeLayer(m));
@@ -532,36 +519,38 @@
 
                     const activeMeeting = meetings.find(m => m.district === districtName && m.exactPlace === pt.name);
 
-                    let markerColor = '#444455'; 
+                    let markerColor = '#3a3a55'; 
                     let pulseAnimationClass = '';
                     let radiusSize = 6;
 
                     if (activeMeeting) {
                         markerColor = getCategoryColor(pt.category);
                         radiusSize = 9;
+                        
+                        // Логика скорости пульсации на основе времени сходки
                         if (activeMeeting.time === '⚡ СРОЧНО') {
-                            pulseAnimationClass = 'pulse-fast';
+                            pulseAnimationClass = 'cyber-pulse-fast'; // Быстрая пульсация
                         } else {
-                            pulseAnimationClass = 'pulse-medium';
+                            pulseAnimationClass = 'cyber-pulse-medium'; // Средняя пульсация для запланированного времени
                         }
                     }
 
                     const circleMarker = L.circleMarker(pt.coords, {
                         radius: radiusSize,
                         fillColor: markerColor,
-                        color: activeMeeting ? '#ffffff' : '#555566',
+                        color: activeMeeting ? '#ffffff' : '#555577',
                         weight: activeMeeting ? 2 : 1,
                         opacity: 1,
-                        fillOpacity: 0.9,
+                        fillOpacity: 0.95,
                         className: pulseAnimationClass
                     }).addTo(mapInstance);
 
                     circleMarker.bindPopup(`
                         <div style="color: #000; font-family: sans-serif; font-size: 12px;">
-                            <b style="color: var(--accent);">${districtName}</b><br>
+                            <b style="color: #0072ff;">${districtName}</b><br>
                             <b>${pt.name}</b><br>
                             <span style="color: #555;">${pt.desc}</span>
-                            ${activeMeeting ? `<br><b style="color: #ff3838;">🔥 СХОДКА: ${activeMeeting.time}</b>` : '<br><span style="color: #888;">Свободно</span>'}
+                            ${activeMeeting ? `<br><b style="color: #ff3860;">🔥 СХОДКА: ${activeMeeting.time}</b>` : '<br><span style="color: #888;">Свободная точка</span>'}
                         </div>
                     `);
 
@@ -579,7 +568,7 @@
                 });
             });
         }
-                    function updateQuickPlaces() {
+                        function updateQuickPlaces() {
             const districtSelect = document.getElementById('create-district');
             const activeTagInput = document.querySelector('input[name="radar-tag"]:checked');
             if (!districtSelect) return;
@@ -597,7 +586,7 @@
             const filteredPoints = districtPoints.filter(pt => pt.category === currentTag);
             
             if (filteredPoints.length === 0) {
-                quickContainer.innerHTML = '<span style="font-size: 11px; color: var(--text-muted);">Нет фиксированных точек. Введите вручную.</span>';
+                quickContainer.innerHTML = '<span style="font-size: 11px; color: var(--text-muted);">Нет точек для этой категории. Введите вручную.</span>';
                 return;
             }
 
@@ -605,7 +594,7 @@
                 const tagBtn = document.createElement('button');
                 tagBtn.type = 'button';
                 tagBtn.innerText = placeObj.name;
-                tagBtn.style.cssText = 'background:rgba(255,255,255,0.05); color:var(--accent); border:1px solid rgba(0,162,255,0.3); padding:5px 10px; border-radius:15px; font-size:11px; cursor:pointer; font-weight:600;';
+                tagBtn.style.cssText = 'background:rgba(255,255,255,0.06); color:var(--accent-cyan); border:1px solid rgba(0,242,254,0.3); padding:5px 10px; border-radius:15px; font-size:11px; cursor:pointer; font-weight:600;';
                 tagBtn.addEventListener('click', () => {
                     exactPlaceInput.value = placeObj.name;
                 });
@@ -668,7 +657,7 @@
             if (myUsername === 'admin' || myUsername === 'alex_cyber') {
                 const badgeContainer = document.getElementById('admin-badge-container');
                 if (badgeContainer) {
-                    badgeContainer.innerHTML = '<span style="background: rgba(255,56,56,0.2); color: #ff3838; padding: 4px 8px; border-radius: 8px; font-size: 11px; font-weight: bold;">КУРАТОР</span>';
+                    badgeContainer.innerHTML = '<span style="background: rgba(255,56,96,0.2); color: #ff3860; padding: 4px 8px; border-radius: 8px; font-size: 11px; font-weight: bold;">КУРАТОР</span>';
                 }
             }
 
@@ -815,7 +804,7 @@
 
             Object.keys(badges).forEach(key => {
                 const el = document.getElementById(badges[key]);
-                if (el) el.innerText = counts[key] ? `🔥 ${counts[key]}` : "";
+                if (el) el.innerText = counts[key] ? ` (${counts[key]})` : "";
             });
         }
 
@@ -842,23 +831,23 @@
                 
                 const isCreator = (m.creator === myUsername);
                 const isAlreadyJoined = m.members.includes(myUsername);
-                const membersLinks = m.members.map(user => `<a href="https://t.me/${user}" target="_blank" style="color: var(--accent); text-decoration: none;">@${user}</a>`).join(', ');
+                const membersLinks = m.members.map(user => `<a href="https://t.me/${user}" target="_blank" style="color: var(--accent-cyan); text-decoration: none;">@${user}</a>`).join(', ');
 
                 card.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <strong style="color: var(--accent); font-size: 15px;">📍 ${m.district}</strong>
-                        <span style="font-size: 11px; background: #1a1b26; padding: 4px 10px; border-radius: 12px; color: var(--text-muted); font-weight: bold;">⏳ ${m.time}</span>
+                        <strong style="color: var(--accent-cyan); font-size: 15px;">📍 ${m.district}</strong>
+                        <span style="font-size: 11px; background: #1a1b26; padding: 4px 10px; border-radius: 12px; color: #ff3860; font-weight: bold;">⏳ ${m.time}</span>
                     </div>
                     <p style="margin: 0 0 6px 0; font-size: 14px;"><b>Где:</b> ${m.exactPlace}</p>
                     <p style="margin: 0 0 6px 0; font-size: 14px;"><b>Категория:</b> ${m.category}</p>
                     <p style="margin: 0 0 6px 0; font-size: 12px; color: #a4b0be;">👥 Участников: <b>${m.members.length}</b> | Лимит: <b>${m.maxPeople}</b></p>
                     <p style="margin: 0 0 10px 0; font-size: 13px; color: #a4b0be;">${m.description}</p>
-                    <p style="margin: 0 0 10px 0; font-size: 12px; color: var(--accent);">👤 Создатель: <a href="https://t.me/${m.creator}" target="_blank" style="color: var(--accent); text-decoration: none;">@${m.creator}</a></p>
+                    <p style="margin: 0 0 10px 0; font-size: 12px; color: var(--accent-cyan);">👤 Создатель: <a href="https://t.me/${m.creator}" target="_blank" style="color: var(--accent-cyan); text-decoration: none;">@${m.creator}</a></p>
                     <p style="margin: 0 0 10px 0; font-size: 11px; color: var(--text-muted);">👥 Вписались: ${membersLinks}</p>
                     <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                        ${!isAlreadyJoined ? `<button class="btn btn-primary" style="padding: 10px; font-size: 13px; flex: 2;" onclick="joinMeeting('${m.id}')">⚡ Буду на месте</button>` : `<div style="flex: 2; text-align: center; color: var(--accent-green); font-weight: bold; font-size: 13px; padding: 10px; background: rgba(46,204,113,0.1); border-radius: 8px;">✅ Ты вписан в состав</div>`}
-                        ${isCreator ? `<button class="btn btn-danger" style="padding: 10px; font-size: 13px; flex: 1.5; background: #8b0000;" onclick="cancelMeeting('${m.id}')">🚪 Отменить</button>` : ''}
-                        <button class="btn btn-danger" style="padding: 10px; font-size: 13px; flex: 1; background: #261616; color: var(--accent-red);" onclick="reportDescription('${m.creator}')">⚠ ЖБ</button>
+                        ${!isAlreadyJoined ? `<button class="btn btn-primary" style="padding: 10px; font-size: 13px; flex: 2;" onclick="joinMeeting('${m.id}')">⚡ Буду на месте</button>` : `<div style="flex: 2; text-align: center; color: #2ecc71; font-weight: bold; font-size: 13px; padding: 10px; background: rgba(46,204,113,0.1); border-radius: 8px;">✅ Ты вписан в состав</div>`}
+                        ${isCreator ? `<button class="btn btn-danger" style="padding: 10px; font-size: 13px; flex: 1.5;" onclick="cancelMeeting('${m.id}')">🚪 Отменить</button>` : ''}
+                        <button class="btn btn-danger" style="padding: 10px; font-size: 13px; flex: 1; background: #261616; color: #ff3860;" onclick="reportDescription('${m.creator}')">⚠ ЖБ</button>
                     </div>
                 `;
                 container.appendChild(card);
@@ -911,7 +900,7 @@
 
             archive.forEach(m => {
                 const card = document.createElement('div'); card.className = 'card';
-                card.innerHTML = `<strong style="color: var(--accent-green);">📍 Район: ${m.district}</strong>
+                card.innerHTML = `<strong style="color: #2ecc71;">📍 Район: ${m.district}</strong>
                     <p style="margin: 5px 0; font-size: 13px;"><b>Место:</b> ${m.exactPlace}</p>
                     <p style="margin: 5px 0 10px 0; font-size: 12px; color: var(--text-muted);">Организатор: @${m.creator}</p>`;
                 container.appendChild(card);
@@ -928,9 +917,9 @@
             complaints.forEach((c, idx) => {
                 const item = document.createElement('div'); item.className = 'card';
                 item.innerHTML = `
-                    <div style="font-size: 11px; color: var(--accent); text-transform: uppercase; font-weight: bold; margin-bottom: 4px;">${c.type}</div>
+                    <div style="font-size: 11px; color: var(--accent-cyan); text-transform: uppercase; font-weight: bold; margin-bottom: 4px;">${c.type}</div>
                     <p style="margin: 0 0 4px 0;">👤 <b>Нарушитель:</b> @${c.violator}</p>
-                    <p style="margin: 0 0 12px 0; font-size: 13px; color: #ff8a80;">⚠️ <b>Суть:</b> ${c.reason}</p>
+                    <p style="margin: 0 0 12px 0; font-size: 13px; color: #ff809a;">⚠️ <b>Суть:</b> ${c.reason}</p>
                     <button class="btn btn-danger" style="padding: 7px 10px; font-size: 11px;" onclick="adminCloseCase(${idx})">Закрыть дело</button>
                 `;
                 list.appendChild(item);
@@ -945,3 +934,4 @@
     </script>
 </body>
 </html>
+
