@@ -123,9 +123,11 @@
         }
         .btn-primary { background: linear-gradient(135deg, var(--accent-cyan), #0072ff); color: #fff; box-shadow: 0 4px 15px rgba(0, 114, 255, 0.4); }
         .btn-danger { background: linear-gradient(135deg, #ff3860, #ff1493); color: #fff; box-shadow: 0 4px 15px rgba(255, 56, 96, 0.4); }
+        .btn-success { background: linear-gradient(135deg, #2ecc71, #1abc9c); color: #fff; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4); }
+        .btn-warning { background: linear-gradient(135deg, #ff9f43, #ff5252); color: #fff; box-shadow: 0 4px 15px rgba(255, 159, 67, 0.4); }
+        .btn-disabled { background: #33334d !important; color: #777799 !important; box-shadow: none !important; cursor: not-allowed !important; }
         .hidden { display: none !important; }
 
-        /* Цветные стилизованные кнопки фильтров и чипов */
         .filter-chip {
             background: linear-gradient(135deg, rgba(0, 242, 254, 0.15), rgba(127, 0, 255, 0.15)) !important;
             border: 1px solid var(--accent-cyan) !important;
@@ -137,7 +139,17 @@
             box-shadow: 0 0 12px rgba(0, 242, 254, 0.5);
         }
 
-               /* Неоновое свечение и мигание цвета (появление/исчезновение) */
+        .rep-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: bold;
+            background: rgba(0, 242, 254, 0.15);
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
         @keyframes neon-blink-fast {
             0%, 100% { opacity: 1; filter: drop-shadow(0 0 8px currentColor); }
             50% { opacity: 0.15; filter: drop-shadow(0 0 1px currentColor); }
@@ -157,7 +169,7 @@
     </style>
 </head>
 <body>
-        <div id="auth-screen" class="screen active">
+    <div id="auth-screen" class="screen active">
         <div style="text-align: center; margin-top: 35px; margin-bottom: 25px;">
             <h1 style="font-size: 26px; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0;">GRODNO RUN 2026</h1>
             <p class="subtitle" style="margin-top: 6px;">Кибернетическая система сбора и координации</p>
@@ -165,7 +177,7 @@
 
         <div class="card">
             <div class="alert">
-                ⚠️ <b>Внимание:</b> Для верификации личности и предотвращения спама в системе требуется указать ваш реальный Telegram username и возраст.
+                ⚠️ <b>Внимание:</b> Укажите реальный Telegram username и возраст. Начальный рейтинг: <b>100 pts</b>. При снижении рейтинга до 0 доступ блокируется.
             </div>
 
             <div class="form-group">
@@ -222,150 +234,157 @@
                 <p style="font-size: 12px;">Создай свой первый сбор во вкладке «Собрать»!</p>
             </div>
         </div>
-            <div style="position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: rgba(10, 10, 22, 0.92); backdrop-filter: var(--glass-blur); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-around; padding: 0 4px; z-index: 999; box-sizing: border-box;">
-        <button class="btn nav-btn active" data-sub="sub-radar" style="flex: 1; height: 100%; background: transparent; border: none; color: var(--accent-cyan); font-size: 10px; font-weight: 800; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-transform: uppercase; letter-spacing: 0.5px;">📡 Радар</button>
-        <button class="btn nav-btn" data-sub="sub-create" style="flex: 1; height: 100%; background: transparent; border: none; color: var(--text-muted); font-size: 10px; font-weight: 800; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-transform: uppercase; letter-spacing: 0.5px;">⚡ Собрать</button>
-        <button class="btn nav-btn" data-sub="sub-archive" style="flex: 1; height: 100%; background: transparent; border: none; color: var(--text-muted); font-size: 10px; font-weight: 800; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-transform: uppercase; letter-spacing: 0.5px;">📜 Архив</button>
-        <button class="btn nav-btn" data-sub="sub-admin" style="flex: 1; height: 100%; background: transparent; border: none; color: var(--text-muted); font-size: 10px; font-weight: 800; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-transform: uppercase; letter-spacing: 0.5px;">🚨 Куратор</button>
-    </div>
-
-    <div id="sub-create" class="sub-screen screen">
-        <div class="card">
-            <h3>⚡ Запустить новый сбор</h3>
-            <div class="subtitle">Отметь локацию на общем радаре Гродно</div>
-
-            <div class="form-group">
-                <label>📍 Выберите район</label>
-                <select id="create-district">
-                    <option value="Центр (Советская)">Центр (Советская)</option>
-                    <option value="ТЦ Тринити">ТЦ Тринити</option>
-                    <option value="OldCity (Олд Сити)">OldCity (Олд Сити)</option>
-                    <option value="Ольшанка">Ольшанка</option>
-                    <option value="Девятовка">Девятовка</option>
-                    <option value="Грандичи">Грандичи</option>
-                    <option value="Пышки (Парк)">Пышки (Парк)</option>
-                    <option value="БЛК / Форты">БЛК / Форты</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>🔥 Категория активности:</label>
-                <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px;">
-                    <input type="radio" id="tag-walk" name="radar-tag" value="🚶‍♂️ Прогулка" checked style="display:none;">
-                    <label for="tag-walk" class="btn filter-chip" style="padding: 8px 10px; font-size: 11px; width: auto; margin:0;">🚶‍♂️ Прогулка</label>
-
-                    <input type="radio" id="tag-football" name="radar-tag" value="⚽ Футбол" style="display:none;">
-                    <label for="tag-football" class="btn filter-chip" style="padding: 8px 10px; font-size: 11px; width: auto; margin:0;">⚽ Футбол</label>
-
-                    <input type="radio" id="tag-basketball" name="radar-tag" value="🏀 Баскетбол" style="display:none;">
-                    <label for="tag-basketball" class="btn filter-chip" style="padding: 8px 10px; font-size: 11px; width: auto; margin:0;">🏀 Баскетбол</label>
-
-                    <input type="radio" id="tag-volleyball" name="radar-tag" value="🏐 Волейбол" style="display:none;">
-                    <label for="tag-volleyball" class="btn filter-chip" style="padding: 8px 10px; font-size: 11px; width: auto; margin:0;">🏐 Волейбол</label>
-
-                    <input type="radio" id="tag-pingpong" name="radar-tag" value="🏓 Наст. теннис" style="display:none;">
-                    <label for="tag-pingpong" class="btn filter-chip" style="padding: 8px 10px; font-size: 11px; width: auto; margin:0;">🏓 Наст. теннис</label>
-
-                    <input type="radio" id="tag-workout" name="radar-tag" value="🏋️‍♂️ Турники / Бег" style="display:none;">
-                    <label for="tag-workout" class="btn filter-chip" style="padding: 8px 10px; font-size: 11px; width: auto; margin:0;">🏋️‍♂️ Турники</label>
-
-                    <input type="radio" id="tag-bike" name="radar-tag" value="🚲 Велик" style="display:none;">
-                    <label for="tag-bike" class="btn filter-chip" style="padding: 8px 10px; font-size: 11px; width: auto; margin:0;">🚲 Велик</label>
-
-                    <input type="radio" id="tag-game" name="radar-tag" value="🎮 Гейминг" style="display:none;">
-                    <label for="tag-game" class="btn filter-chip" style="padding: 8px 10px; font-size: 11px; width: auto; margin:0;">🎮 Гейминг</label>
-                </div>
-            </div>
-
-            <div class="form-group" style="margin-top: 14px;">
-                <label>🎯 Точное место встречи:</label>
-                <input type="text" id="create-exact-place" placeholder="Например: Коробка на Ожешко, Скейт-парк">
-                <div id="quick-places-container" style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px;"></div>
-            </div>
-
-            <div class="form-group" style="margin-top: 14px;">
-                <label>⏱️ Когда собираемся?</label>
-                <div style="display: flex; gap: 15px; margin-top: 4px; align-items: center;">
-                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 12px; color: #ff3860; font-weight: bold;">
-                        <input type="radio" name="time-type" value="now" checked onchange="toggleTimeInputs()"> ⚡ Срочно
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 12px; color: var(--accent-cyan); font-weight: bold;">
-                        <input type="radio" name="time-type" value="later" onchange="toggleTimeInputs()"> 📅 Выбрать время
-                    </label>
-                </div>
-                <div id="time-picker-block" class="hidden" style="display: flex; gap: 10px; margin-top: 10px;">
-                    <div style="flex: 1;">
-                        <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">Часы:</label>
-                        <select id="create-hour">
-                            <option value="09">09:00</option><option value="10">10:00</option><option value="11">11:00</option>
-                            <option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option>
-                            <option value="15" selected>15:00</option><option value="16">16:00</option><option value="17">17:00</option>
-                            <option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option>
-                            <option value="21">21:00</option><option value="22">22:00</option>
-                        </select>
-                    </div>
-                    <div style="flex: 1;">
-                        <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">Минуты:</label>
-                        <select id="create-minute">
-                            <option value="00" selected>00 мин</option><option value="15">15 мин</option>
-                            <option value="30">30 мин</option><option value="45">45 мин</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group" style="margin-top: 14px;">
-                <label>📝 Короткое описание / приметы:</label>
-                <textarea id="create-desc" placeholder="Кто нужен? Что берём с собой? Сколько сидим?" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; padding: 12px; color: #fff; font-size:13px; resize: none; height: 65px; box-sizing: border-box; outline: none;"></textarea>
-            </div>
-
-            <div class="form-group" style="margin-top: 14px;">
-                <label>👥 Состав участников:</label>
-                <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px;">
-                    <button type="button" class="btn filter-chip tag-chip-comp active" data-mode="limit" onclick="setCompositionMode('limit')" style="padding: 7px 10px; font-size: 11px; width: auto;">👥 Максимум человек</button>
-                    <button type="button" class="btn filter-chip tag-chip-comp" data-mode="gender" onclick="setCompositionMode('gender')" style="padding: 7px 10px; font-size: 11px; width: auto;">⚙️ Точный состав (М/Ж)</button>
-                </div>
-
-                <div id="mode-limit-block" style="margin-top: 10px;">
-                    <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">Сколько максимум человек:</label>
-                    <input type="text" id="create-max-people" placeholder="Например: 5 или Без лимита">
-                </div>
-
-                <div id="mode-gender-block" class="hidden" style="display: flex; gap: 10px; margin-top: 10px;">
-                    <div style="flex: 1;">
-                        <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">Девушек:</label>
-                        <input type="number" id="count-girls" min="0" value="0">
-                    </div>
-                    <div style="flex: 1;">
-                        <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">Пацанов:</label>
-                        <input type="number" id="count-guys" min="0" value="0">
-                    </div>
-                </div>
-            </div>
-
-            <button class="btn btn-primary" id="btn-launch-radar" style="margin-top: 18px;">🚀 ЗАПУСТИТЬ РАДАР СБОРА</button>
+                <div style="position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: rgba(10, 10, 22, 0.92); backdrop-filter: var(--glass-blur); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-around; padding: 0 4px; z-index: 999; box-sizing: border-box;">
+            <button class="btn nav-btn active" data-sub="sub-radar" style="flex: 1; height: 100%; background: transparent; border: none; color: var(--accent-cyan); font-size: 10px; font-weight: 800; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-transform: uppercase; letter-spacing: 0.5px;">📡 Радар</button>
+            <button class="btn nav-btn" data-sub="sub-create" style="flex: 1; height: 100%; background: transparent; border: none; color: var(--text-muted); font-size: 10px; font-weight: 800; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-transform: uppercase; letter-spacing: 0.5px;">⚡ Собрать</button>
+            <button class="btn nav-btn" data-sub="sub-my-events" style="flex: 1; height: 100%; background: transparent; border: none; color: var(--text-muted); font-size: 10px; font-weight: 800; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-transform: uppercase; letter-spacing: 0.5px;">🔥 Мои сходки</button>
+            <button class="btn nav-btn" data-sub="sub-archive" style="flex: 1; height: 100%; background: transparent; border: none; color: var(--text-muted); font-size: 10px; font-weight: 800; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-transform: uppercase; letter-spacing: 0.5px;">📜 Архив</button>
+            <button class="btn nav-btn" data-sub="sub-admin" style="flex: 1; height: 100%; background: transparent; border: none; color: var(--text-muted); font-size: 10px; font-weight: 800; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-transform: uppercase; letter-spacing: 0.5px;">🚨 Куратор</button>
         </div>
-    </div>
 
-    <div id="sub-archive" class="sub-screen screen">
-        <h2>📜 Архив сборов</h2>
-        <p class="subtitle">История завершенных и прошлых встреч</p>
-        <div id="archive-empty" style="text-align: center; color: var(--text-muted); padding: 30px 0;">Архив пуст.</div>
-        <div id="archive-list"></div>
-    </div>
+        <div id="sub-create" class="sub-screen screen">
+            <div class="card">
+                <h3>⚡ Запустить новый сбор</h3>
+                <div class="subtitle">Отметь локацию на общем радаре Гродно</div>
 
-    <div id="sub-admin" class="sub-screen screen">
-        <h2>🚨 Панель Куратора</h2>
-        <p class="subtitle">Управление жалобами и модерация</p>
-        <div id="admin-empty" style="text-align: center; color: var(--text-muted); padding: 30px 0;">Нарушений нет. Всё чисто!</div>
-        <div id="violators-list"></div>
-    </div>
+                <div class="form-group">
+                    <label>📍 Выберите район</label>
+                    <select id="create-district">
+                        <option value="Центр (Советская)">Центр (Советская)</option>
+                        <option value="ТЦ Тринити">ТЦ Тринити</option>
+                        <option value="OldCity (Олд Сити)">OldCity (Олд Сити)</option>
+                        <option value="Ольшанка">Ольшанка</option>
+                        <option value="Девятовка">Девятовка</option>
+                        <option value="Грандичи">Грандичи</option>
+                        <option value="Пышки (Парк)">Пышки (Парк)</option>
+                        <option value="БЛК / Форты">БЛК / Форты</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>🔥 Категория активности:</label>
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px;">
+                        <input type="radio" id="tag-walk" name="radar-tag" value="🚶‍♂️ Прогулка" checked style="display:none;">
+                        <label for="tag-walk" class="btn filter-chip" style="padding: 8px 10px; font-size: 11px; width: auto; margin:0;">🚶‍♂️ Прогулка</label>
+
+                        <input type="radio" id="tag-football" name="radar-tag" value="⚽ Футбол" style="display:none;">
+                        <label for="tag-football" class="btn filter-chip" style="padding: 8px 10px; font-size: 11px; width: auto; margin:0;">⚽ Футбол</label>
+
+                        <input type="radio" id="tag-basketball" name="radar-tag" value="🏀 Баскетбол" style="display:none;">
+                        <label for="tag-basketball" class="btn filter-chip" style="padding: 8px 10px; font-size: 11px; width: auto; margin:0;">🏀 Баскетбол</label>
+
+                        <input type="radio" id="tag-volleyball" name="radar-tag" value="🏐 Волейбол" style="display:none;">
+                        <label for="tag-volleyball" class="btn filter-chip" style="padding: 8px 10px; font-size: 11px; width: auto; margin:0;">🏐 Волейбол</label>
+
+                        <input type="radio" id="tag-pingpong" name="radar-tag" value="🏓 Наст. теннис" style="display:none;">
+                        <label for="tag-pingpong" class="btn filter-chip" style="padding: 8px 10px; font-size: 11px; width: auto; margin:0;">🏓 Наст. теннис</label>
+
+                        <input type="radio" id="tag-workout" name="radar-tag" value="🏋️‍♂️ Турники / Бег" style="display:none;">
+                        <label for="tag-workout" class="btn filter-chip" style="padding: 8px 10px; font-size: 11px; width: auto; margin:0;">🏋️‍♂️ Турники</label>
+
+                        <input type="radio" id="tag-bike" name="radar-tag" value="🚲 Велик" style="display:none;">
+                        <label for="tag-bike" class="btn filter-chip" style="padding: 8px 10px; font-size: 11px; width: auto; margin:0;">🚲 Велик</label>
+
+                        <input type="radio" id="tag-game" name="radar-tag" value="🎮 Гейминг" style="display:none;">
+                        <label for="tag-game" class="btn filter-chip" style="padding: 8px 10px; font-size: 11px; width: auto; margin:0;">🎮 Гейминг</label>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 14px;">
+                    <label>🎯 Точное место встречи:</label>
+                    <input type="text" id="create-exact-place" placeholder="Например: Коробка на Ожешко, Скейт-парк">
+                    <div id="quick-places-container" style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px;"></div>
+                </div>
+
+                <div class="form-group" style="margin-top: 14px;">
+                    <label>⏱️ Когда собираемся?</label>
+                    <div style="display: flex; gap: 15px; margin-top: 4px; align-items: center;">
+                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 12px; color: #ff3860; font-weight: bold;">
+                            <input type="radio" name="time-type" value="now" checked onchange="toggleTimeInputs()"> ⚡ Срочно
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 12px; color: var(--accent-cyan); font-weight: bold;">
+                            <input type="radio" name="time-type" value="later" onchange="toggleTimeInputs()"> 📅 Выбрать время
+                        </label>
+                    </div>
+                    <div id="time-picker-block" class="hidden" style="display: flex; gap: 10px; margin-top: 10px;">
+                        <div style="flex: 1;">
+                            <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">Часы:</label>
+                            <select id="create-hour">
+                                <option value="09">09:00</option><option value="10">10:00</option><option value="11">11:00</option>
+                                <option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option>
+                                <option value="15" selected>15:00</option><option value="16">16:00</option><option value="17">17:00</option>
+                                <option value="18">18:00</option><option value="19">19:00</option><option value="20">20:00</option>
+                                <option value="21">21:00</option><option value="22">22:00</option>
+                            </select>
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">Минуты:</label>
+                            <select id="create-minute">
+                                <option value="00" selected>00 мин</option><option value="15">15 мин</option>
+                                <option value="30">30 мин</option><option value="45">45 мин</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 14px;">
+                    <label>📝 Короткое описание / приметы:</label>
+                    <textarea id="create-desc" placeholder="Кто нужен? Что берём с собой? Сколько сидим?" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px; padding: 12px; color: #fff; font-size:13px; resize: none; height: 65px; box-sizing: border-box; outline: none;"></textarea>
+                </div>
+
+                <div class="form-group" style="margin-top: 14px;">
+                    <label>👥 Состав участников:</label>
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px;">
+                        <button type="button" class="btn filter-chip tag-chip-comp active" data-mode="limit" onclick="setCompositionMode('limit')" style="padding: 7px 10px; font-size: 11px; width: auto;">👥 Максимум человек</button>
+                        <button type="button" class="btn filter-chip tag-chip-comp" data-mode="gender" onclick="setCompositionMode('gender')" style="padding: 7px 10px; font-size: 11px; width: auto;">⚙️ Точный состав (М/Ж)</button>
+                    </div>
+
+                    <div id="mode-limit-block" style="margin-top: 10px;">
+                        <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">Сколько максимум человек:</label>
+                        <input type="text" id="create-max-people" placeholder="Например: 5 или Без лимита">
+                    </div>
+
+                    <div id="mode-gender-block" class="hidden" style="display: flex; gap: 10px; margin-top: 10px;">
+                        <div style="flex: 1;">
+                            <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">Девушек:</label>
+                            <input type="number" id="count-girls" min="0" value="0">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">Пацанов:</label>
+                            <input type="number" id="count-guys" min="0" value="0">
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" id="btn-launch-radar" style="margin-top: 18px;">🚀 ЗАПУСТИТЬ РАДАР СБОРА</button>
+            </div>
+        </div>
+
+        <div id="sub-my-events" class="sub-screen screen">
+            <h2>🔥 Мои сходки</h2>
+            <p class="subtitle">Отметка прибытия, отзывы и оценка участников (доступно 24 часа)</p>
+            <div id="my-events-empty" style="text-align: center; color: var(--text-muted); padding: 30px 0;">Вы пока не состоите ни в одной сходке.</div>
+            <div id="my-events-list"></div>
+        </div>
+
+        <div id="sub-archive" class="sub-screen screen">
+            <h2>📜 Архив сборов</h2>
+            <p class="subtitle">История завершенных и прошлых встреч</p>
+            <div id="archive-empty" style="text-align: center; color: var(--text-muted); padding: 30px 0;">Архив пуст.</div>
+            <div id="archive-list"></div>
+        </div>
+
+        <div id="sub-admin" class="sub-screen screen">
+            <h2>🚨 Панель Куратора</h2>
+            <p class="subtitle">Управление жалобами, штрафы и модерация</p>
+            <div id="admin-empty" style="text-align: center; color: var(--text-muted); padding: 30px 0;">Нарушений нет. Всё чисто!</div>
+            <div id="violators-list"></div>
+        </div>
     </div>
         <script>
         const BIN_ID = '6a68a3d7da38895dfe9b46cf';
         const API_KEY = '$2a$10$fCuDEyphx80p7hlYAPd8C.W8S8fZv53sNq6UhpL8m/Oot7eVvdScu';
 
-        // Расширенная база локаций Гродно по всем категориям с детальными координатами
         const grodnoLocationsData = {
             'Центр (Советская)': [
                 { name: 'У Танка', category: '🚶‍♂️ Прогулка', coords: [53.6800, 23.8303], desc: 'Легендарное место сбора в центре' },
@@ -457,10 +476,37 @@
         let meetings = JSON.parse(localStorage.getItem('gr_meetings_2026')) || [];
         let archive = JSON.parse(localStorage.getItem('gr_archive_2026')) || [];
         let complaints = JSON.parse(localStorage.getItem('gr_complaints_2026')) || [];
+        let userReputation = JSON.parse(localStorage.getItem('gr_reputation_db_2026')) || {};
+
         let currentDistrictFilter = "all";
         let mapInstance = null;
         let mapMarkers = [];
         let currentCompositionMode = 'limit';
+
+        function getUserRep(user) {
+            if (userReputation[user] === undefined) {
+                userReputation[user] = 100;
+                saveReputation();
+            }
+            return userReputation[user];
+        }
+
+        function changeUserRep(user, delta) {
+            let current = getUserRep(user);
+            current += delta;
+            if (current < 0) current = 0;
+            userReputation[user] = current;
+            saveReputation();
+            
+            if (user === myUsername && current <= 0) {
+                alert("🚫 Ваш рейтинг упал до 0! Вы заблокированы в системе Grodno Run.");
+                document.body.innerHTML = "<div style='color:#ff3860; padding:50px; text-align:center;'><h2>ДОСТУП ЗАБЛОКИРОВАН</h2><p>Ваш рейтинг репутации равен 0.</p></div>";
+            }
+        }
+
+        function saveReputation() {
+            localStorage.setItem('gr_reputation_db_2026', JSON.stringify(userReputation));
+        }
 
         async function loadMeetingsFromServer() {
             try {
@@ -494,10 +540,71 @@
 
         function updateStatusHeader() {
             const statusEl = document.getElementById('user-status-header');
+            const rep = getUserRep(myUsername);
             if (statusEl) {
-                statusEl.innerText = `${activeGender}, ${activeAge} л. (@${myUsername}) 🛰 СЕТЬ`;
+                statusEl.innerHTML = `${activeGender}, ${activeAge} л. (@${myUsername}) | <span class="rep-badge">⭐ ${rep} pts</span>`;
             }
         }
+
+        function isEventStarted(meeting) {
+            if (!meeting.time || meeting.time === '⚡ СРОЧНО') return true;
+            const parts = meeting.time.split(':');
+            if (parts.length === 2) {
+                const now = new Date();
+                const targetHours = parseInt(parts[0], 10);
+                const targetMinutes = parseInt(parts[1], 10);
+                const targetDate = new Date();
+                targetDate.setHours(targetHours, targetMinutes, 0, 0);
+                return now >= targetDate;
+            }
+            return true;
+        }
+
+        function checkMeetingTimeouts() {
+            let changed = false;
+            const now = new Date();
+
+            meetings.forEach(m => {
+                if (!m.checkedInUsers) m.checkedInUsers = [];
+                if (!m.creationTimestamp) m.creationTimestamp = Date.now();
+
+                let meetingStartTime = null;
+                if (!m.time || m.time === '⚡ СРОЧНО') {
+                    meetingStartTime = new Date(m.creationTimestamp);
+                } else {
+                    const parts = m.time.split(':');
+                    if (parts.length === 2) {
+                        meetingStartTime = new Date();
+                        meetingStartTime.setHours(parseInt(parts[0], 10), parseInt(parts[1], 10), 0, 0);
+                    }
+                }
+
+                if (meetingStartTime) {
+                    const diffMs = now - meetingStartTime;
+                    const diffMins = diffMs / (1000 * 60);
+
+                    // Прошло более 10 минут с момента старта
+                    if (diffMins >= 10) {
+                        const kickedUsers = m.members.filter(user => !m.checkedInUsers.includes(user));
+                        if (kickedUsers.length > 0) {
+                            kickedUsers.forEach(u => {
+                                changeUserRep(u, -15);
+                            });
+                            m.members = m.members.filter(user => m.checkedInUsers.includes(user));
+                            changed = true;
+                        }
+                    }
+                }
+            });
+
+            if (changed) {
+                localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
+                saveMeetingsToServer();
+                renderAll();
+            }
+        }
+
+        setInterval(checkMeetingTimeouts, 15000);
 
         function initLeafletMap() {
             if (mapInstance) return;
@@ -519,7 +626,6 @@
             renderMapMarkers();
         }
 
-        // Уникальные яркие неоновые цвета для каждой категории активности
         function getCategoryColor(category) {
             if (category.includes('Футбол')) return '#ffd700';     
             if (category.includes('Баскетбол')) return '#ff6600';  
@@ -530,363 +636,160 @@
             if (category.includes('Гейминг')) return '#ff0055';    
             return '#00f2fe';                                      
         }
-
-        // Интеллектуальный расчет пульсации на основе времени до сходки или флага СРОЧНО
-        function getPulseClass(meetingTimeText) {
-            if (!meetingTimeText || meetingTimeText === '⚡ СРОЧНО') {
-                return 'pulse-fast';
-            }
-            
-            // Если указано конкретное время (например, "18:30")
-            const parts = meetingTimeText.split(':');
-            if (parts.length === 2) {
-                const now = new Date();
-                const targetHours = parseInt(parts[0], 10);
-                const targetMinutes = parseInt(parts[1], 10);
-                
-                const targetDate = new Date();
-                targetDate.setHours(targetHours, targetMinutes, 0, 0);
-                
-                const diffMs = targetDate - now;
-                const diffMins = diffMs / (1000 * 60);
-                
-                // Менее 40 минут до сходки -> быстро мигает
-                if (diffMins < 40) {
-                    return 'pulse-fast';
-                }
-                // От 40 минут до 2 часов -> средне мигает
-                else if (diffMins >= 40 && diffMins <= 120) {
-                    return 'pulse-medium';
-                }
-                // Более 2 часов -> медленно мигает
-                else {
-                    return 'pulse-slow';
-                }
-            }
-            return 'pulse-medium';
-        }
-
-        function renderMapMarkers() {
+                    function renderMapMarkers() {
             if (!mapInstance) return;
+
             mapMarkers.forEach(m => mapInstance.removeLayer(m));
             mapMarkers = [];
 
-            const activeCategory = document.querySelector('input[name="radar-tag"]:checked')?.value || '🚶‍♂️ Прогулка';
+            meetings.forEach(m => {
+                if (currentDistrictFilter !== "all" && m.district !== currentDistrictFilter) return;
 
-            Object.keys(grodnoLocationsData).forEach(districtName => {
-                const points = grodnoLocationsData[districtName];
-                points.forEach(pt => {
-                    if (pt.category !== activeCategory) return;
+                const locs = grodnoLocationsData[m.district] || [];
+                const matchedLoc = locs.find(l => l.name === m.exactPlace) || locs[0];
+                const coords = matchedLoc ? matchedLoc.coords : [53.6768, 23.8303];
 
-                    const activeMeeting = meetings.find(m => m.district === districtName && m.exactPlace === pt.name);
+                const mainColor = getCategoryColor(m.category);
+                
+                let pulseClass = 'pulse-slow';
+                if (m.time === '⚡ СРОЧНО') {
+                    pulseClass = 'pulse-fast';
+                } else if (m.members.length >= 3) {
+                    pulseClass = 'pulse-medium';
+                }
 
-                    let markerColor = '#4a4a6a'; 
-                    let pulseAnimationClass = 'pulse-slow'; // Базовая фоновая пульсация для всех точек
-                    let radiusSize = 6;
-
-                    if (activeMeeting) {
-                        markerColor = getCategoryColor(pt.category);
-                        radiusSize = 9;
-                        pulseAnimationClass = getPulseClass(activeMeeting.time);
-                    }
-
-                    const circleMarker = L.circleMarker(pt.coords, {
-                        radius: radiusSize,
-                        fillColor: markerColor,
-                        color: activeMeeting ? '#ffffff' : '#777799',
-                        weight: activeMeeting ? 2 : 1,
-                        opacity: 1,
-                        fillOpacity: 0.95,
-                        className: pulseAnimationClass
-                    }).addTo(mapInstance);
-
-                    circleMarker.bindPopup(`
-                        <div style="color: #000; font-family: sans-serif; font-size: 12px;">
-                            <b style="color: #0072ff;">${districtName}</b><br>
-                            <b>${pt.name}</b><br>
-                            <span style="color: #555;">${pt.desc}</span>
-                            ${activeMeeting ? `<br><b style="color: #ff3860;">🔥 СХОДКА: ${activeMeeting.time}</b>` : '<br><span style="color: #888;">Свободная точка</span>'}
-                        </div>
-                    `);
-
-                    circleMarker.on('click', () => {
-                        const exactPlaceInput = document.getElementById('create-exact-place');
-                        const districtSelect = document.getElementById('create-district');
-                        if (exactPlaceInput) exactPlaceInput.value = pt.name;
-                        if (districtSelect) {
-                            districtSelect.value = districtName;
-                            updateQuickPlaces();
-                        }
-                    });
-
-                    mapMarkers.push(circleMarker);
+                const customIcon = L.divIcon({
+                    className: 'custom-map-pin',
+                    html: `<div class="${pulseClass}" style="
+                        width: 22px; 
+                        height: 22px; 
+                        background: ${mainColor}; 
+                        border: 2px solid #ffffff; 
+                        border-radius: 50%; 
+                        box-shadow: 0 0 15px ${mainColor}, inset 0 0 4px #000;
+                        cursor: pointer;
+                    "></div>`,
+                    iconSize: [22, 22],
+                    iconAnchor: [11, 11]
                 });
+
+                const marker = L.marker(coords, { icon: customIcon }).addTo(mapInstance);
+                
+                const popupContent = `
+                    <div style="color: #fff; background: #0c0c1e; padding: 10px; border-radius: 10px; border: 1px solid ${mainColor}; font-family: sans-serif; min-width: 160px;">
+                        <strong style="color: ${mainColor}; font-size: 13px; display: block; margin-bottom: 4px;">📍 ${m.district}</strong>
+                        <div style="font-size: 12px; font-weight: bold; margin-bottom: 4px;">${m.exactPlace}</div>
+                        <div style="font-size: 11px; color: #a4b0be; margin-bottom: 6px;">${m.category} | ⏳ ${m.time}</div>
+                        <div style="font-size: 11px; color: #fff;">👥 Участников: <b>${m.members.length}</b></div>
+                    </div>
+                `;
+
+                marker.bindPopup(popupContent, {
+                    backgroundColor: 'transparent',
+                    border: 'none'
+                });
+
+                mapMarkers.push(marker);
             });
         }
-                    function updateQuickPlaces() {
+
+        function renderQuickPlaces() {
             const districtSelect = document.getElementById('create-district');
-            const activeTagInput = document.querySelector('input[name="radar-tag"]:checked');
-            if (!districtSelect) return;
-            
-            const currentDistrict = districtSelect.value;
-            const currentTag = activeTagInput ? activeTagInput.value.trim() : '🚶‍♂️ Прогулка';
-            const exactPlaceInput = document.getElementById('create-exact-place');
-            if (!exactPlaceInput) return;
-            
-            let quickContainer = document.getElementById('quick-places-container');
-            if (!quickContainer) return;
-            quickContainer.innerHTML = ''; 
-            
-            const districtPoints = grodnoLocationsData[currentDistrict] || [];
-            const filteredPoints = districtPoints.filter(pt => pt.category === currentTag);
-            
-            if (filteredPoints.length === 0) {
-                quickContainer.innerHTML = '<span style="font-size: 11px; color: var(--text-muted);">Нет точек для этой категории. Введите вручную.</span>';
-                return;
-            }
+            const container = document.getElementById('quick-places-container');
+            if (!districtSelect || !container) return;
 
-            filteredPoints.forEach(placeObj => {
-                const tagBtn = document.createElement('button');
-                tagBtn.type = 'button';
-                tagBtn.innerText = placeObj.name;
-                tagBtn.style.cssText = 'background:rgba(255,255,255,0.06); color:var(--accent-cyan); border:1px solid rgba(0,242,254,0.3); padding:5px 10px; border-radius:15px; font-size:11px; cursor:pointer; font-weight:600;';
-                tagBtn.addEventListener('click', () => {
-                    exactPlaceInput.value = placeObj.name;
-                });
-                quickContainer.appendChild(tagBtn);
+            const selectedDistrict = districtSelect.value;
+            const places = grodnoLocationsData[selectedDistrict] || [];
+
+            container.innerHTML = '';
+            places.forEach(loc => {
+                const chip = document.createElement('button');
+                chip.type = 'button';
+                chip.className = 'btn filter-chip';
+                chip.style.cssText = 'padding: 5px 9px; font-size: 10px; width: auto; background: rgba(255,255,255,0.05); border: 1px solid var(--border);';
+                chip.innerText = loc.name;
+                chip.onclick = () => {
+                    document.getElementById('create-exact-place').value = loc.name;
+                };
+                container.appendChild(chip);
             });
         }
 
-        window.toggleTimeInputs = function() {
-            const timeType = document.querySelector('input[name="time-type"]:checked')?.value;
-            const timePickerBlock = document.getElementById('time-picker-block');
-            if (!timePickerBlock) return;
-            if (timeType === 'later') {
-                timePickerBlock.classList.remove('hidden');
-            } else {
-                timePickerBlock.classList.add('hidden');
-            }
-        };
-
-        window.setCompositionMode = function(mode) {
+        function setCompositionMode(mode) {
             currentCompositionMode = mode;
-            const limitBlock = document.getElementById('mode-limit-block');
-            const genderBlock = document.getElementById('mode-gender-block');
-            const buttons = document.querySelectorAll('.tag-chip-comp');
-            
-            buttons.forEach(btn => btn.classList.remove('active'));
-            
+            document.querySelectorAll('.tag-chip-comp').forEach(c => c.classList.remove('active'));
+            document.querySelector(`.tag-chip-comp[data-mode="${mode}"]`)?.classList.add('active');
+
             if (mode === 'limit') {
-                document.querySelector('[data-mode="limit"]').classList.add('active');
-                if (limitBlock) limitBlock.classList.remove('hidden');
-                if (genderBlock) genderBlock.classList.add('hidden');
+                document.getElementById('mode-limit-block')?.classList.remove('hidden');
+                document.getElementById('mode-gender-block')?.classList.add('hidden');
             } else {
-                document.querySelector('[data-mode="gender"]').classList.add('active');
-                if (limitBlock) limitBlock.classList.add('hidden');
-                if (genderBlock) genderBlock.classList.remove('hidden');
+                document.getElementById('mode-limit-block')?.classList.add('hidden');
+                document.getElementById('mode-gender-block')?.classList.remove('hidden');
             }
-        };
+        }
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            if (localStorage.getItem('gr_registered_v3') === 'true') {
-                document.getElementById('auth-screen')?.classList.remove('active');
-                document.getElementById('auth-screen').style.display = 'none';
-
-                const mainScr = document.getElementById('main-screen');
-                if (mainScr) {
-                    mainScr.classList.add('active');
-                    mainScr.style.display = 'block';
-                }
-                myUsername = localStorage.getItem('gr_username_v3') || "Grodno_User";
-                activeAge = parseInt(localStorage.getItem('gr_age_v3')) || 18;
-                activeGender = localStorage.getItem('gr_gender_v3') || "Парень";
-
-                updateStatusHeader();
-                await loadMeetingsFromServer();
-                renderAll();
-                setTimeout(initLeafletMap, 200);
-            } else {
-                document.getElementById('auth-screen')?.classList.add('active');
-            }
-
-            if (myUsername === 'admin' || myUsername === 'alex_cyber') {
-                const badgeContainer = document.getElementById('admin-badge-container');
-                if (badgeContainer) {
-                    badgeContainer.innerHTML = '<span style="background: rgba(255,56,96,0.2); color: #ff3860; padding: 4px 8px; border-radius: 8px; font-size: 11px; font-weight: bold;">КУРАТОР</span>';
-                }
-            }
-
-            updateQuickPlaces();
-
-            document.getElementById('create-district')?.addEventListener('change', updateQuickPlaces);
-            document.querySelectorAll('input[name="radar-tag"]').forEach(radio => {
-                radio.addEventListener('change', () => {
-                    updateQuickPlaces();
-                    renderMapMarkers();
-                });
-            });
-        });
-
-        document.getElementById('btn-save-auth')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            const uInput = document.getElementById('auth-username').value.trim().replace('@', '');
-            const ageInput = parseInt(document.getElementById('auth-age').value);
-            const genInput = document.getElementById('auth-gender').value;
-
-            if (!uInput || isNaN(ageInput) || ageInput < 11 || ageInput > 35) {
-                alert('Укажите корректный Telegram username и возраст (от 11 до 35 лет)!');
-                return;
-            }
-
-            localStorage.setItem('gr_username_v3', uInput);
-            localStorage.setItem('gr_age_v3', ageInput);
-            localStorage.setItem('gr_gender_v3', genInput);
-            localStorage.setItem('gr_registered_v3', 'true');
-
-            myUsername = uInput;
-            activeAge = ageInput;
-            activeGender = genInput;
-
-            document.getElementById('auth-screen').classList.remove('active');
-            document.getElementById('auth-screen').style.display = 'none';
-            document.getElementById('main-screen').classList.add('active');
-            document.getElementById('main-screen').style.display = 'block';
-
-            updateStatusHeader(); 
-            renderAll();
-            setTimeout(() => { initLeafletMap(); }, 200);
-        });
-
-        document.querySelectorAll('.bottom-nav .nav-btn, [data-sub]').forEach(btn => {
-            const subName = btn.getAttribute('data-sub');
-            if (!subName) return;
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-                document.querySelectorAll('.sub-screen').forEach(s => s.classList.remove('active'));
-                btn.classList.add('active');
-                document.getElementById(subName)?.classList.add('active');
-                renderAll();
-                if (subName === 'sub-radar') {
-                    setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 150);
-                }
-            });
-        });
-
-        document.querySelectorAll('#radar-filter-bar .filter-chip').forEach(chip => {
-            chip.addEventListener('click', () => {
-                document.querySelectorAll('#radar-filter-bar .filter-chip').forEach(c => c.classList.remove('active'));
-                chip.classList.add('active');
-                currentDistrictFilter = chip.getAttribute('data-filter');
-                renderMeetingsList();
-            });
-        });
-
-        document.getElementById('btn-launch-radar')?.addEventListener('click', async function(e) {
-            e.preventDefault();
-            
-            const district = document.getElementById('create-district')?.value || 'Центр (Советская)';
-            const exactPlace = document.getElementById('create-exact-place')?.value.trim();
-            const desc = document.getElementById('create-desc')?.value.trim() || 'Без описания';
-            
-            const girlsCount = currentCompositionMode === 'gender' ? (parseInt(document.getElementById('count-girls')?.value) || 0) : 0;
-            const guysCount = currentCompositionMode === 'gender' ? (parseInt(document.getElementById('count-guys')?.value) || 0) : 0;
-            const maxPeopleInput = currentCompositionMode === 'limit' ? (document.getElementById('create-max-people')?.value || 'Без лимита') : 'По составу (М/Ж)';
-
-            if (!exactPlace) {
-                alert('Укажите точное место встречи!');
-                return;
-            }
-
-            let timeText = '';
+        function toggleTimeInputs() {
             const timeType = document.querySelector('input[name="time-type"]:checked')?.value;
-            if (timeType === 'now') {
-                timeText = '⚡ СРОЧНО';
+            const pickerBlock = document.getElementById('time-picker-block');
+            if (!pickerBlock) return;
+
+            if (timeType === 'later') {
+                pickerBlock.classList.remove('hidden');
             } else {
-                const hour = document.getElementById('create-hour')?.value || '12';
-                const minute = document.getElementById('create-minute')?.value || '00';
-                timeText = `${hour}:${minute}`;
+                pickerBlock.classList.add('hidden');
             }
-
-            const tag = document.querySelector('input[name="radar-tag"]:checked')?.value || '🚶‍♂️ Прогулка';
-
-            const newMeeting = {
-                id: 'm_' + Date.now() + "_" + Math.random().toString(36).substr(2, 5),
-                district: district,
-                exactPlace: exactPlace,
-                time: timeText,
-                category: tag,
-                description: desc,
-                compositionMode: currentCompositionMode,
-                girlsCount: girlsCount,
-                guysCount: guysCount,
-                maxPeople: maxPeopleInput,
-                creator: myUsername,
-                members: [myUsername]
-            };
-
-            meetings.unshift(newMeeting);
-            if (!archive.some(item => item.id === newMeeting.id)) {
-                archive.unshift(newMeeting);
-            }
-            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
-            localStorage.setItem('gr_archive_2026', JSON.stringify(archive));
-
-            await saveMeetingsToServer();
-
-            alert('Радар успешно запущен!');
-            renderAll();
-            document.querySelector('[data-sub="sub-radar"]')?.click();
-            setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 150);
-        });
-
-        function renderAll() {
-            renderMeetingsList();
-            renderArchiveList();
-            renderViolators();
-            updateDistrictBadges();
-            renderMapMarkers();
         }
 
-        function updateDistrictBadges() {
-            const counts = {};
-            meetings.forEach(m => counts[m.district] = (counts[m.district] || 0) + 1);
-
-            const badges = {
-                "Центр (Советская)": "b-center", "ТЦ Тринити": "b-trinity", "OldCity (Олд Сити)": "b-oldcity",
-                "Ольшанка": "b-olshanka", "Грандичи": "b-grandichi", "Девятовка": "b-devyatovka",
-                "Пышки (Парк)": "b-pyshki", "БЛК / Форты": "b-forty"
-            };
-
-            Object.keys(badges).forEach(key => {
-                const el = document.getElementById(badges[key]);
-                if (el) el.innerText = counts[key] ? ` (${counts[key]})` : "";
-            });
-        }
-
-        function renderMeetingsList() {
-            const container = document.getElementById('radar-list');
-            const emptyMsg = document.getElementById('empty-state-msg');
+        function renderMyEvents() {
+            const container = document.getElementById('my-events-list');
+            const emptyMsg = document.getElementById('my-events-empty');
             if (!container) return;
             container.innerHTML = '';
 
-            const filtered = meetings.filter(m => {
-                if (currentDistrictFilter !== "all" && m.district !== currentDistrictFilter) return false;
-                return true;
-            });
+            const myMeetings = meetings.filter(m => m.members.includes(myUsername));
 
-            if (filtered.length === 0) {
+            if (myMeetings.length === 0) {
                 if (emptyMsg) emptyMsg.style.display = 'block';
                 return;
             }
             if (emptyMsg) emptyMsg.style.display = 'none';
 
-            filtered.forEach(m => {
+            myMeetings.forEach(m => {
+                if (!m.checkedInUsers) m.checkedInUsers = [];
+                if (!m.ratings) m.ratings = {};
+
                 const card = document.createElement('div');
-                card.className = `card`;
-                
-                const isCreator = (m.creator === myUsername);
-                const isAlreadyJoined = m.members.includes(myUsername);
-                const membersLinks = m.members.map(user => `<a href="https://t.me/${user}" target="_blank" style="color: var(--accent-cyan); text-decoration: none;">@${user}</a>`).join(', ');
+                card.className = 'card';
+
+                const isCheckedIn = m.checkedInUsers.includes(myUsername);
+                const eventActive = isEventStarted(m);
+
+                let checkInBtnHtml = '';
+                if (isCheckedIn) {
+                    checkInBtnHtml = `<div style="text-align: center; color: #2ecc71; font-weight: bold; font-size: 13px; padding: 10px; background: rgba(46,204,113,0.1); border-radius: 8px;">✅ Отметка о прибытии подтверждена</div>`;
+                } else if (eventActive) {
+                    checkInBtnHtml = `<button class="btn btn-success" style="padding: 10px; font-size: 13px;" onclick="checkInToMeeting('${m.id}')">📍 Я на месте (Подтвердить)</button>`;
+                } else {
+                    checkInBtnHtml = `<button class="btn btn-disabled" style="padding: 10px; font-size: 12px;" disabled>⏳ Кнопка «Я на месте» откроется в ${m.time}</button>`;
+                }
+
+                let membersRatingHtml = m.members.map(user => {
+                    if (user === myUsername) return '';
+                    const hasRated = m.ratings[myUsername] && m.ratings[myUsername][user];
+                    return `
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.03); padding: 8px; border-radius: 8px; margin-top: 6px;">
+                            <span style="font-size: 12px; color: #fff;">@${user}</span>
+                            ${hasRated ? 
+                                `<span style="font-size: 11px; color: #2ecc71;">Оценка поставлена</span>` : 
+                                `<div style="display: flex; gap: 4px;">
+                                    <button class="btn btn-success" style="padding: 4px 8px; font-size: 10px; width: auto;" onclick="rateMember('${m.id}', '${user}', 1)">👍 +5 pts</button>
+                                    <button class="btn btn-danger" style="padding: 4px 8px; font-size: 10px; width: auto;" onclick="rateMember('${m.id}', '${user}', -1)">👎 -10 pts</button>
+                                </div>`
+                            }
+                        </div>
+                    `;
+                }).join('');
 
                 card.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
@@ -894,100 +797,123 @@
                         <span style="font-size: 11px; background: #1a1b26; padding: 4px 10px; border-radius: 12px; color: #ff3860; font-weight: bold;">⏳ ${m.time}</span>
                     </div>
                     <p style="margin: 0 0 6px 0; font-size: 14px;"><b>Где:</b> ${m.exactPlace}</p>
-                    <p style="margin: 0 0 6px 0; font-size: 14px;"><b>Категория:</b> ${m.category}</p>
-                    <p style="margin: 0 0 6px 0; font-size: 12px; color: #a4b0be;">👥 Участников: <b>${m.members.length}</b> | Лимит: <b>${m.maxPeople}</b></p>
                     <p style="margin: 0 0 10px 0; font-size: 13px; color: #a4b0be;">${m.description}</p>
-                    <p style="margin: 0 0 10px 0; font-size: 12px; color: var(--accent-cyan);">👤 Создатель: <a href="https://t.me/${m.creator}" target="_blank" style="color: var(--accent-cyan); text-decoration: none;">@${m.creator}</a></p>
-                    <p style="margin: 0 0 10px 0; font-size: 11px; color: var(--text-muted);">👥 Вписались: ${membersLinks}</p>
-                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                        ${!isAlreadyJoined ? `<button class="btn btn-primary" style="padding: 10px; font-size: 13px; flex: 2;" onclick="joinMeeting('${m.id}')">⚡ Буду на месте</button>` : `<div style="flex: 2; text-align: center; color: #2ecc71; font-weight: bold; font-size: 13px; padding: 10px; background: rgba(46,204,113,0.1); border-radius: 8px;">✅ Ты вписан в состав</div>`}
-                        ${isCreator ? `<button class="btn btn-danger" style="padding: 10px; font-size: 13px; flex: 1.5;" onclick="cancelMeeting('${m.id}')">🚪 Отменить</button>` : ''}
-                        <button class="btn btn-danger" style="padding: 10px; font-size: 13px; flex: 1; background: #261616; color: #ff3860;" onclick="reportDescription('${m.creator}')">⚠ ЖБ</button>
+                    <div style="margin-bottom: 12px;">
+                        ${checkInBtnHtml}
+                    </div>
+                    <div style="border-top: 1px solid var(--border); pt-10; margin-top: 10px;">
+                        <label style="font-size: 10px; color: var(--text-muted);">Оценить участников сходки:</label>
+                        ${membersRatingHtml || '<p style="font-size: 11px; color: var(--text-muted); margin: 4px 0;">Вы единственный участник</p>'}
                     </div>
                 `;
                 container.appendChild(card);
             });
         }
 
-        window.joinMeeting = async function(id) {
-            const m = meetings.find(item => item.id === id); 
+        window.checkInToMeeting = async function(id) {
+            const m = meetings.find(item => item.id === id);
             if (!m) return;
 
-            if (m.members.includes(myUsername)) {
-                alert("Ты уже вписался в эту компанию!");
+            if (!m.checkedInUsers) m.checkedInUsers = [];
+            if (!m.checkedInUsers.includes(myUsername)) {
+                m.checkedInUsers.push(myUsername);
+                changeUserRep(myUsername, 2); // Бонус +2 репутации за прибытие
+                localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
+                await saveMeetingsToServer();
+                alert("✅ Отметка принята! Вам начислено +2 pts к репутации.");
+                renderAll();
+            }
+        };
+
+        window.rateMember = function(meetingId, targetUser, score) {
+            const m = meetings.find(item => item.id === meetingId);
+            if (!m) return;
+
+            if (!m.ratings) m.ratings = {};
+            if (!m.ratings[myUsername]) m.ratings[myUsername] = {};
+
+            m.ratings[myUsername][targetUser] = score;
+
+            if (score > 0) {
+                changeUserRep(targetUser, 5);
+                alert(`👍 Оценка отправлена! Участник @${targetUser} получил +5 pts`);
+            } else {
+                changeUserRep(targetUser, -10);
+                alert(`👎 Жалоба зафиксирована. Участник @${targetUser} потерял -10 pts`);
+            }
+
+            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
+            renderAll();
+        };
+                    document.getElementById('create-district')?.addEventListener('change', () => {
+            renderQuickPlaces();
+        });
+
+        document.getElementById('btn-save-auth')?.addEventListener('click', () => {
+            const uInput = document.getElementById('auth-username')?.value.trim();
+            const aInput = parseInt(document.getElementById('auth-age')?.value, 10);
+            const gInput = document.getElementById('auth-gender')?.value;
+
+            if (!uInput) {
+                alert('Укажите ваш Telegram Username!');
+                return;
+            }
+            if (!aInput || aInput < 11 || aInput > 99) {
+                alert('Укажите корректный возраст!');
                 return;
             }
 
-            m.members.push(myUsername);
-            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
-            await saveMeetingsToServer();
+            myUsername = uInput.replace('@', '');
+            activeAge = aInput;
+            activeGender = gInput;
 
-            alert(`✅ Ты вписался в сходку!`);
-            renderAll();
-        };
+            localStorage.setItem('gr_user_name_2026', myUsername);
+            localStorage.setItem('gr_user_age_2026', activeAge.toString());
+            localStorage.setItem('gr_user_gender_2026', activeGender);
 
-        window.cancelMeeting = async function(id) {
-            if (!confirm("Отменить и удалить этот сбор?")) return;
+            document.getElementById('auth-screen').classList.remove('active');
+            document.getElementById('main-screen').classList.add('active');
+
+            initApp();
+        });
+
+        async function initApp() {
+            updateStatusHeader();
+            renderQuickPlaces();
+            await loadMeetingsFromServer();
             
-            meetings = meetings.filter(item => item.id !== id);
-            localStorage.setItem('gr_meetings_2026', JSON.stringify(meetings));
-            await saveMeetingsToServer();
-            
-            alert("Сход успешно отменен и удален!");
+            initLeafletMap();
             renderAll();
-        };
 
-        window.reportDescription = function(username) {
-            const reason = prompt("Причина жалобы:");
-            if (!reason) return;
-            complaints.unshift({ id: Date.now(), violator: username, type: "Жалоба на описание", reason: reason });
-            localStorage.setItem('gr_complaints_2026', JSON.stringify(complaints));
-            alert("Жалоба отправлена куратору!");
-            renderAll();
-        };
-
-        function renderArchiveList() {
-            const container = document.getElementById('archive-list');
-            const empty = document.getElementById('archive-empty');
-            if(!container) return; container.innerHTML = '';
-            if (archive.length === 0) { if (empty) empty.style.display = 'block'; return; }
-            if (empty) empty.style.display = 'none';
-
-            archive.forEach(m => {
-                const card = document.createElement('div'); card.className = 'card';
-                card.innerHTML = `<strong style="color: #2ecc71;">📍 Район: ${m.district}</strong>
-                    <p style="margin: 5px 0; font-size: 13px;"><b>Место:</b> ${m.exactPlace}</p>
-                    <p style="margin: 5px 0 10px 0; font-size: 12px; color: var(--text-muted);">Организатор: @${m.creator}</p>`;
-                container.appendChild(card);
-            });
+            if (getUserRep(myUsername) <= 0) {
+                document.body.innerHTML = "<div style='color:#ff3860; padding:50px; text-align:center;'><h2>ДОСТУП ЗАБЛОКИРОВАН</h2><p>Ваш рейтинг репутации равен 0.</p></div>";
+            }
         }
 
-        function renderViolators() {
-            const list = document.getElementById('violators-list');
-            const empty = document.getElementById('admin-empty');
-            if (!list) return; list.innerHTML = '';
-            if (complaints.length === 0) { if (empty) empty.style.display = 'block'; return; }
-            if (empty) empty.style.display = 'none';
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedUser = localStorage.getItem('gr_user_name_2026');
+            const savedAge = localStorage.getItem('gr_user_age_2026');
+            const savedGender = localStorage.getItem('gr_user_gender_2026');
 
-            complaints.forEach((c, idx) => {
-                const item = document.createElement('div'); item.className = 'card';
-                item.innerHTML = `
-                    <div style="font-size: 11px; color: var(--accent-cyan); text-transform: uppercase; font-weight: bold; margin-bottom: 4px;">${c.type}</div>
-                    <p style="margin: 0 0 4px 0;">👤 <b>Нарушитель:</b> @${c.violator}</p>
-                    <p style="margin: 0 0 12px 0; font-size: 13px; color: #ff809a;">⚠️ <b>Суть:</b> ${c.reason}</p>
-                    <button class="btn btn-danger" style="padding: 7px 10px; font-size: 11px;" onclick="adminCloseCase(${idx})">Закрыть дело</button>
-                `;
-                list.appendChild(item);
-            });
-        }
+            if (savedUser && savedAge) {
+                myUsername = savedUser;
+                activeAge = parseInt(savedAge, 10);
+                if (savedGender) activeGender = savedGender;
 
-        window.adminCloseCase = function(index) {
-            complaints.splice(index, 1); 
-            localStorage.setItem('gr_complaints_2026', JSON.stringify(complaints));
-            renderAll();
+                document.getElementById('auth-screen').classList.remove('active');
+                document.getElementById('main-screen').classList.add('active');
+                initApp();
+            } else {
+                document.getElementById('auth-screen').classList.add('active');
+            }
+        });
+
+        const origRenderAll = renderAll;
+        renderAll = function() {
+            origRenderAll();
+            renderMyEvents();
+            updateStatusHeader();
         };
     </script>
 </body>
 </html>
-
-    
